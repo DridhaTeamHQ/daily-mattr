@@ -278,6 +278,14 @@ function SearchTabs({ tab, setTab, query, setQuery }) {
 // Rotating jewel bands so the grid reads "more is more" without losing order.
 const DESI_BANDS = ['#F4A300', '#D81B60', '#0E7C7B', '#C2410C', '#5B2A86', '#1B5E3F']
 
+// Stable band per article id, so colours don't reshuffle when the live feed
+// updates and a new story is prepended.
+const bandFor = (id) => {
+  let h = 0
+  for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0
+  return DESI_BANDS[h % DESI_BANDS.length]
+}
+
 // Case studies get their own wine band + "Case Study" badge so they never read
 // as just another news brief; topic short articles carry their topic as a chip.
 const CASE_BAND = '#7B1E3B'
@@ -405,34 +413,31 @@ function Feed({ category, articles }) {
               : 'No stories match your search.'}
           </p>
         )}
-        {(() => {
-          let n = 0
-          return groups.map(([label, items], gi) => {
-            const featured = gi === 0 ? items[0] : null
-            const rest = gi === 0 ? items.slice(1) : items
-            return (
-              <section key={label}>
-                <Reveal>
-                  <DateHeading>{label}</DateHeading>
+        {groups.map(([label, items], gi) => {
+          const featured = gi === 0 ? items[0] : null
+          const rest = gi === 0 ? items.slice(1) : items
+          return (
+            <section key={label}>
+              <Reveal>
+                <DateHeading>{label}</DateHeading>
+              </Reveal>
+              {featured && (
+                <Reveal className="mb-6">
+                  <FeaturedCard category={category} article={featured} band={bandFor(featured.id)} />
                 </Reveal>
-                {featured && (
-                  <Reveal className="mb-6">
-                    <FeaturedCard category={category} article={featured} band={DESI_BANDS[n++ % DESI_BANDS.length]} />
-                  </Reveal>
-                )}
-                {rest.length > 0 && (
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {rest.map((a, ri) => (
-                      <Reveal key={a.id} className="h-full" delay={Math.min(ri * 0.07, 0.28)}>
-                        <StoryCard category={category} article={a} band={DESI_BANDS[n++ % DESI_BANDS.length]} />
-                      </Reveal>
-                    ))}
-                  </div>
-                )}
-              </section>
-            )
-          })
-        })()}
+              )}
+              {rest.length > 0 && (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {rest.map((a, ri) => (
+                    <Reveal key={a.id} className="h-full" delay={Math.min(ri * 0.07, 0.28)}>
+                      <StoryCard category={category} article={a} band={bandFor(a.id)} />
+                    </Reveal>
+                  ))}
+                </div>
+              )}
+            </section>
+          )
+        })}
       </div>
     </>
   )

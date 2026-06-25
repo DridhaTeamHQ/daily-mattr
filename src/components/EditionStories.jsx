@@ -8,6 +8,12 @@ const SERIF = { fontFamily: "'Source Serif 4', Georgia, serif" }
 const SANS = { fontFamily: "'Roboto', system-ui, sans-serif" }
 const WINE = '#7B1E3B'
 const BANDS = ['#F4A300', '#D81B60', '#0E7C7B', '#C2410C', '#5B2A86', '#1B5E3F']
+// Stable band per id so colours don't reshuffle when the live feed updates.
+const bandFor = (id) => {
+  let h = 0
+  for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0
+  return BANDS[h % BANDS.length]
+}
 
 function Reveal({ children, delay = 0, className = '' }) {
   return (
@@ -97,7 +103,7 @@ export default function EditionStories() {
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {latest.map((a, i) => (
             <Reveal key={a.id} className="h-full" delay={Math.min(i * 0.06, 0.3)}>
-              <StoryCard a={a} band={BANDS[i % BANDS.length]} />
+              <StoryCard a={a} band={bandFor(a.id)} />
             </Reveal>
           ))}
         </div>
