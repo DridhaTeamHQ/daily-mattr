@@ -95,6 +95,10 @@ export async function subscribe(category, opts = {}) {
     rhythm: category.newsletter_type === 'news_rhythm' ? (opts.rhythm || 'weekly') : null,
     send_days: category.newsletter_type === 'news_rhythm' ? (opts.send_days || null) : null,
     source_preference: category.newsletter_type === 'news_rhythm' ? (opts.source_preference || 'top') : null,
+    case_study_categories:
+      category.newsletter_type === 'case_study_daily'
+        ? (opts.case_study_categories?.length ? opts.case_study_categories : null)
+        : null,
     status: 'active',
     updated_at: new Date().toISOString(),
   }
