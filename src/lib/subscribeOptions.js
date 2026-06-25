@@ -13,7 +13,7 @@ export const SUBSCRIBE_CATEGORIES = [
 
 export const RHYTHMS = [
   { id: 'daily', label: 'Daily', desc: 'Get your newsletter every day.' },
-  { id: 'weekly', label: 'Weekly', desc: 'Pick one or more days in the week.' },
+  { id: 'weekly', label: 'Weekly', desc: 'Pick the day it arrives each week.' },
 ]
 
 export const WEEKDAYS = [

@@ -53,12 +53,13 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
   const allSelected = categories.length === SUBSCRIBE_CATEGORIES.length
   const summary =
     rhythm === 'weekly' && days.length
-      ? `Weekly, ${days.map((d) => WEEKDAYS.find((w) => w.id === d)?.label).filter(Boolean).join(', ')}`
+      ? `Weekly, ${WEEKDAYS.find((w) => w.id === days[0])?.label || ''}`
       : RHYTHMS.find((r) => r.id === rhythm)?.label
 
-  const toggleDay = (id) => {
+  // Weekly is a single day — selecting one replaces the previous choice.
+  const selectDay = (id) => {
     triggerHaptic('light')
-    setDays((d) => (d.includes(id) ? d.filter((x) => x !== id) : [...d, id]))
+    setDays([id])
   }
   const toggleCategory = (slug) => {
     triggerHaptic('light')
@@ -174,11 +175,11 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
                             <button
                               type="button"
                               key={w.id}
-                              onClick={(e) => { e.stopPropagation(); toggleDay(w.id) }}
-                              className={pill(days.includes(w.id))}
+                              onClick={(e) => { e.stopPropagation(); selectDay(w.id) }}
+                              className={pill(days[0] === w.id)}
                             >
                               <span>{w.label}</span>
-                              {days.includes(w.id) && <Tick />}
+                              {days[0] === w.id && <Tick />}
                             </button>
                           ))}
                         </div>

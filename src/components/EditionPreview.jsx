@@ -144,7 +144,7 @@ export default function EditionPreview({ rhythm = 'daily', days = [], categories
             })}
           </div>
           {rhythm === 'weekly' && (
-            <p className="mt-1 text-xs text-gray-500">Weekly — arrives on the day(s) you pick.</p>
+            <p className="mt-1 text-xs text-gray-500">Weekly — arrives on the day you pick.</p>
           )}
         </div>
       </div>
