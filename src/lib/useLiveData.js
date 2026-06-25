@@ -17,6 +17,10 @@ export function useLiveData(fetcher, deps = [], { intervalMs = 20000 } = {}) {
 
   useEffect(() => {
     let alive = true
+    // Reset on dependency change (e.g. switching category) so the page shows a
+    // fresh load instead of flashing the previous selection's stale data.
+    sigRef.current = null
+    setData(null)
 
     const load = async () => {
       try {

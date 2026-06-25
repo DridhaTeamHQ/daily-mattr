@@ -77,18 +77,40 @@ export async function fetchApprovedByCategory(slug) {
   return all.filter((a) => a.slug === slug)
 }
 
-// Just the approved case studies (kind === 'case_study'), newest first.
+// Approved case studies, read from the source of truth: corporate_cases.
+// (The agent does not reliably mirror approved cases into `articles`, so reading
+// them from there missed them entirely.) Requires public read access to
+// corporate_cases (status approved/published).
 export async function fetchCaseStudies() {
-  const all = await fetchApproved()
-  return all.filter((a) => a.kind === 'case_study')
+  const { data, error } = await supabase
+    .from('corporate_cases')
+    .select('id,headline,company,case_type,summary,detail,source,source_url,generated_at,updated_at,status')
+    .in('status', ['approved', 'published'])
+    .order('generated_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map((c) => ({
+    id: c.id,
+    kind: 'case_study',
+    headline: c.headline,
+    summary: c.summary || '',
+    body: c.detail || c.summary || '',
+    source: c.source || '',
+    sourceUrl: c.source_url || '',
+    publishedAt: c.generated_at,
+    company: c.company || null,
+    caseType: c.case_type || null,
+  }))
 }
 
-// One round-trip for the home page: latest news stories + the case studies.
+// One pass for the home page: latest approved news stories + the case studies.
 export async function fetchEdition() {
-  const all = await fetchApproved()
+  const [articles, caseStudies] = await Promise.all([
+    fetchApproved(),
+    fetchCaseStudies().catch(() => []),
+  ])
   return {
-    latest: all.filter((a) => a.kind === 'article'),
-    caseStudies: all.filter((a) => a.kind === 'case_study'),
+    latest: articles.filter((a) => a.kind === 'article'),
+    caseStudies,
   }
 }
 
