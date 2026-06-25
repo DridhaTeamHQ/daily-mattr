@@ -277,19 +277,43 @@ function SearchTabs({ tab, setTab, query, setQuery }) {
 // Rotating jewel bands so the grid reads "more is more" without losing order.
 const DESI_BANDS = ['#F4A300', '#D81B60', '#0E7C7B', '#C2410C', '#5B2A86', '#1B5E3F']
 
+// Case studies get their own wine band + "Case Study" badge so they never read
+// as just another news brief; topic short articles carry their topic as a chip.
+const CASE_BAND = '#7B1E3B'
+const isCase = (a) => a.kind === 'case_study'
+
+function CardTags({ article, band }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2" style={SANS}>
+      {isCase(article) ? (
+        <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: CASE_BAND }}>
+          ◆ Case Study
+        </span>
+      ) : (
+        article.importance >= 7 && (
+          <span className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: band }}>
+            ✦ Long Story
+          </span>
+        )
+      )}
+      {article.bucket && !isCase(article) && (
+        <span className="rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ borderColor: band, color: band }}>
+          {article.bucket}
+        </span>
+      )}
+    </div>
+  )
+}
+
 function FeaturedCard({ category, article, band }) {
+  const b = isCase(article) ? CASE_BAND : band
   return (
     <Link
       to={`/${category}/${article.id}`}
       className="desi-card desi-frame block rounded-2xl p-6 transition-transform hover:-translate-y-0.5 sm:p-8"
-      style={{ '--band': band }}
+      style={{ '--band': b }}
     >
-      <span
-        className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white"
-        style={{ ...SANS, background: band }}
-      >
-        ✦ Long Story
-      </span>
+      <CardTags article={article} band={b} />
       <h3 className="mt-4 text-2xl font-bold leading-snug text-gray-900 sm:text-3xl" style={SERIF}>
         {article.headline}
       </h3>
@@ -304,13 +328,15 @@ function FeaturedCard({ category, article, band }) {
 }
 
 function StoryCard({ category, article, band }) {
+  const b = isCase(article) ? CASE_BAND : band
   return (
     <Link
       to={`/${category}/${article.id}`}
       className="desi-card flex h-full flex-col rounded-2xl p-5 shadow-sm transition-transform hover:-translate-y-0.5"
-      style={{ '--band': band }}
+      style={{ '--band': b }}
     >
-      <h4 className="text-[17px] font-bold leading-snug text-gray-900" style={SERIF}>
+      <CardTags article={article} band={b} />
+      <h4 className="mt-3 text-[17px] font-bold leading-snug text-gray-900" style={SERIF}>
         {article.headline}
       </h4>
       <p className="mt-2 line-clamp-4 flex-1 text-[13px] leading-relaxed text-gray-700" style={SANS}>
@@ -373,7 +399,9 @@ function Feed({ category, articles }) {
       <div key={tab} className="mx-auto max-w-[1600px] px-4 pb-8 sm:px-8 lg:px-14">
         {groups.length === 0 && (
           <p className="mt-16 text-center text-gray-500" style={SANS}>
-            No stories match your search.
+            {articles.length === 0
+              ? 'No stories published in this edition yet — check back soon.'
+              : 'No stories match your search.'}
           </p>
         )}
         {(() => {
@@ -470,6 +498,19 @@ function Reading({ category, articles, articleId }) {
               ← All {themeFor(category).label} stories
             </Link>
           </div>
+          <div className="mb-3 flex flex-wrap items-center gap-2" style={SANS}>
+            {isCase(article) ? (
+              <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: CASE_BAND }}>
+                ◆ Case Study
+              </span>
+            ) : (
+              article.bucket && (
+                <span className="rounded-full border border-[#c9a227] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#b8860b]">
+                  {article.bucket}
+                </span>
+              )
+            )}
+          </div>
           <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl" style={SERIF}>
             {article.headline}
           </h1>
@@ -485,12 +526,27 @@ function Reading({ category, articles, articleId }) {
           </div>
 
           <div className="mt-8 space-y-5 text-[16px] leading-[1.8] text-gray-700" style={SANS}>
-            <p className="text-[18px] leading-[1.7] text-gray-800">{article.summary}</p>
-            <p>
-              This is a curated brief from Daily Mattr. We synthesised the key developments above from
-              multiple newsrooms so you get the full picture in seconds. For the complete reporting,
-              continue to the original source below.
-            </p>
+            {isCase(article) && article.body ? (
+              // Case study: the agent's curated write-up (summary + detail).
+              article.body
+                .split(/\n\n+/)
+                .map((p) => p.trim())
+                .filter(Boolean)
+                .map((p, i) => (
+                  <p key={i} className={i === 0 ? 'text-[18px] leading-[1.7] text-gray-800' : ''}>
+                    {p}
+                  </p>
+                ))
+            ) : (
+              <>
+                <p className="text-[18px] leading-[1.7] text-gray-800">{article.summary}</p>
+                <p>
+                  This is a curated brief from Daily Mattr. We synthesised the key developments above from
+                  multiple newsrooms so you get the full picture in seconds. For the complete reporting,
+                  continue to the original source below.
+                </p>
+              </>
+            )}
           </div>
 
           {article.tags?.length > 0 && (
