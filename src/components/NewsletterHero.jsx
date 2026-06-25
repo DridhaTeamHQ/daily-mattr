@@ -54,13 +54,22 @@ export default function NewsletterHero() {
         </p>
 
         {/* CTA */}
-        <a
-          href="#subscribe"
-          className="relative inline-flex items-center justify-center rounded-[50px] border border-white/10 bg-[#7900d9] px-6 py-4 text-[15px] font-semibold uppercase tracking-wide text-white shadow-[0_10px_30px_rgba(121,0,217,0.45)] transition-transform hover:scale-[1.03]"
-          style={SANS}
-        >
-          Subscribe
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="#subscribe"
+            className="relative inline-flex items-center justify-center rounded-[50px] px-6 py-4 text-[15px] font-semibold uppercase tracking-wide text-white shadow-[0_10px_30px_rgba(216,27,96,0.45)] transition-transform hover:scale-[1.03]"
+            style={{ ...SANS, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
+          >
+            Subscribe
+          </a>
+          <a
+            href="#stories"
+            className="relative inline-flex items-center justify-center rounded-[50px] border border-[#7b1e3b]/40 bg-white/40 px-6 py-4 text-[15px] font-semibold uppercase tracking-wide text-[#7b1e3b] backdrop-blur-sm transition-transform hover:scale-[1.03]"
+            style={SANS}
+          >
+            Read today&rsquo;s edition
+          </a>
+        </div>
       </div>
     </section>
   )

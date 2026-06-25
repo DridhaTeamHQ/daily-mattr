@@ -34,10 +34,11 @@ export default function NewsletterNav() {
           {/* Center nav (desktop) */}
           <nav className="hidden items-center lg:flex">
             <Link to="/" className={linkClass} style={ROBOTO}>Newsletter</Link>
+            <Link to="/case-studies" className={linkClass} style={ROBOTO}>Case Studies</Link>
             <button onClick={() => goHash('themes')} className={linkClass} style={ROBOTO}>Themes</button>
             <Link
               to="/subscribe"
-              className="ml-1 rounded-full border border-black/70 bg-white/30 px-4 py-2 text-[13px] font-medium uppercase tracking-[0.02em] text-black whitespace-nowrap shadow-sm"
+              className="ml-1 rounded-full border border-[#7b1e3b]/60 bg-white/40 px-4 py-2 text-[13px] font-medium uppercase tracking-[0.02em] text-[#7b1e3b] whitespace-nowrap shadow-sm"
               style={ROBOTO}
             >
               Subscribe
@@ -50,8 +51,8 @@ export default function NewsletterNav() {
               <>
                 <Link
                   to="/profile"
-                  className="rounded-[50px] bg-[#7900d9] px-5 py-2.5 text-[13px] font-semibold text-white whitespace-nowrap shadow-[0_8px_24px_rgba(121,0,217,0.35)] transition-transform hover:scale-[1.03]"
-                  style={ROBOTO}
+                  className="rounded-[50px] px-5 py-2.5 text-[13px] font-semibold text-white whitespace-nowrap shadow-[0_8px_24px_rgba(216,27,96,0.35)] transition-transform hover:scale-[1.03]"
+                  style={{ ...ROBOTO, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
                 >
                   Profile
                 </Link>
@@ -66,8 +67,8 @@ export default function NewsletterNav() {
             ) : (
               <Link
                 to="/login?redirect=/subscribe"
-                className="rounded-[50px] bg-[#7900d9] px-6 py-3 text-[14px] font-semibold text-white whitespace-nowrap shadow-[0_8px_24px_rgba(121,0,217,0.35)] transition-transform hover:scale-[1.03]"
-                style={ROBOTO}
+                className="rounded-[50px] px-6 py-3 text-[14px] font-semibold text-white whitespace-nowrap shadow-[0_8px_24px_rgba(216,27,96,0.35)] transition-transform hover:scale-[1.03]"
+                style={{ ...ROBOTO, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
               >
                 Login
               </Link>

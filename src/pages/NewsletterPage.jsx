@@ -4,6 +4,7 @@ import Footer from '../components/Footer'
 import NewsletterHero from '../components/NewsletterHero'
 import ThemeSelector from '../components/ThemeSelector'
 import NewsletterSubscribe from '../components/NewsletterSubscribe'
+import EditionStories from '../components/EditionStories'
 import './NewsletterPage.css'
 
 // The newsletter page follows the light Figma design (frame 1:1292):
@@ -36,7 +37,12 @@ const NewsletterPage = () => {
       </div>
 
       <main className="nl-after">
-        <div id="themes" className="scroll-mt-24">
+        {/* Live: today's approved stories + the case-study spotlight */}
+        <div id="stories" className="mt-16 scroll-mt-24">
+          <EditionStories />
+        </div>
+
+        <div id="themes" className="mt-20 scroll-mt-24">
           <ThemeSelector selected={subCategories} onToggle={toggleSubCategory} />
         </div>
 

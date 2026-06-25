@@ -26,7 +26,8 @@ const BUCKET_TO_SLUG = {
   'Policy Partner': 'national',
   'Real Estate': 'lifestyle',
   'Wellness Daily': 'lifestyle',
-  'Corporate Case': 'finance',
+  // 'Corporate Case' is intentionally unmapped — case studies live on their own
+  // /case-studies page, not inside a category feed.
 }
 
 // Drop the synthetic fragment the agent appends to make synced rows unique
@@ -80,4 +81,24 @@ export async function fetchApprovedByCategory(slug) {
 export async function fetchCaseStudies() {
   const all = await fetchApproved()
   return all.filter((a) => a.kind === 'case_study')
+}
+
+// One round-trip for the home page: latest news stories + the case studies.
+export async function fetchEdition() {
+  const all = await fetchApproved()
+  return {
+    latest: all.filter((a) => a.kind === 'article'),
+    caseStudies: all.filter((a) => a.kind === 'case_study'),
+  }
+}
+
+// Pretty label for a category slug (for chips/sections on the home page).
+export const SLUG_LABEL = {
+  national: 'National',
+  international: 'International',
+  finance: 'Finance',
+  sports: 'Sports',
+  entertainment: 'Entertainment',
+  lifestyle: 'Lifestyle',
+  technology: 'Technology',
 }
