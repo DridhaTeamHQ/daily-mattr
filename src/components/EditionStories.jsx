@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { fetchEdition, SLUG_LABEL } from '../lib/content'
+import { useLiveData } from '../lib/useLiveData'
 
 const SERIF = { fontFamily: "'Source Serif 4', Georgia, serif" }
 const SANS = { fontFamily: "'Roboto', system-ui, sans-serif" }
@@ -68,13 +69,8 @@ function Spotlight({ cs }) {
 
 // "Today's edition" — live approved stories + the day's case-study spotlight.
 export default function EditionStories() {
-  const [edition, setEdition] = useState(null)
-
-  useEffect(() => {
-    let alive = true
-    fetchEdition().then((e) => { if (alive) setEdition(e) }).catch(() => { if (alive) setEdition({ latest: [], caseStudies: [] }) })
-    return () => { alive = false }
-  }, [])
+  // Live: polls + refetches on tab focus so the home page stays current.
+  const edition = useLiveData(fetchEdition, [])
 
   if (!edition) return null
   const latest = edition.latest.slice(0, 6)

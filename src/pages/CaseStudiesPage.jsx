@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import NewsletterNav from '../components/NewsletterNav'
 import Footer from '../components/Footer'
 import { fetchCaseStudies } from '../lib/content'
+import { useLiveData } from '../lib/useLiveData'
 import '../styles/desi.css'
 
 const SERIF = { fontFamily: "'Source Serif 4', Georgia, serif" }
@@ -227,14 +228,8 @@ function CaseReading({ items, id }) {
 
 export default function CaseStudiesPage() {
   const { id } = useParams()
-  const [items, setItems] = useState(null)
-
-  useEffect(() => {
-    let alive = true
-    fetchCaseStudies().then((d) => { if (alive) setItems(d) }).catch(() => { if (alive) setItems([]) })
-    return () => { alive = false }
-  }, [])
-
+  // Live: polls + refetches on tab focus so new/edited approved cases show up.
+  const items = useLiveData(fetchCaseStudies, [])
   const loading = items === null
   const list = useMemo(() => items || [], [items])
 

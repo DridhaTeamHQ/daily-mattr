@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import NewsletterNav from '../components/NewsletterNav'
 import Footer from '../components/Footer'
 import { fetchNewsletter } from '../lib/newsApi'
+import { useLiveData } from '../lib/useLiveData'
 import { NEWSLETTER_THEMES } from '../lib/newsletterThemes'
 import '../styles/desi.css'
 
@@ -586,30 +587,17 @@ function Reading({ category, articles, articleId }) {
 export default function CategoryNewsPage() {
   const { category, articleId } = useParams()
   const navigate = useNavigate()
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
 
   const theme = themeFor(category)
   const valid = NEWSLETTER_THEMES.some((t) => t.slug === category)
 
   useEffect(() => {
-    if (!valid) {
-      navigate('/', { replace: true })
-      return
-    }
-    let alive = true
-    setLoading(true)
-    fetchNewsletter(category).then((d) => {
-      if (alive) {
-        setData(d)
-        setLoading(false)
-      }
-    })
-    return () => {
-      alive = false
-    }
-  }, [category, valid, navigate])
+    if (!valid) navigate('/', { replace: true })
+  }, [valid, navigate])
 
+  // Live: polls + refetches on tab focus so approvals/edits show without reload.
+  const data = useLiveData(() => fetchNewsletter(category), [category])
+  const loading = data === null
   const articles = data?.articles || []
 
   return (

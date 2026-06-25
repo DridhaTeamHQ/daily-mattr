@@ -7,10 +7,10 @@ import { fetchApprovedByCategory } from './content'
 export async function fetchNewsletter(category) {
   try {
     const articles = await fetchApprovedByCategory(category)
-    return { category, updatedAt: new Date().toISOString(), articles }
+    return { category, articles }
   } catch (err) {
     // Network/DB hiccup — fail soft to an empty feed rather than crash the page.
     console.error('fetchNewsletter failed:', err?.message || err)
-    return { category, updatedAt: new Date().toISOString(), articles: [], error: true }
+    return { category, articles: [], error: true }
   }
 }
