@@ -1,7 +1,6 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NEWSLETTER_THEMES } from '../lib/newsletterThemes'
-import { SOURCE_PREFERENCES } from '../lib/subscribeOptions'
 import '../styles/desi.css'
 
 // Live, desi-maximalist preview of the edition being built. The masthead tints to
@@ -38,21 +37,16 @@ function Mandala({ className }) {
 }
 
 function litDays(rhythm, days) {
-  if (rhythm === 'daily') return new Set(DAY_IDS)
-  if (rhythm === 'weekly') return new Set(days)
-  if (rhythm === 'bi-weekly') return new Set(['tue', 'fri'])
-  return new Set() // monthly
+  return rhythm === 'weekly' ? new Set(days) : new Set(DAY_IDS)
 }
 
-export default function EditionPreview({ rhythm = 'daily', days = [], source = 'top', categories = [], name = '', summary = '' }) {
+export default function EditionPreview({ rhythm = 'daily', days = [], categories = [], name = '', summary = '' }) {
   const lead = categories.length ? themeBySlug[categories[categories.length - 1]] : null
   const d = lead?.desi || DEFAULT
   const grad = `linear-gradient(135deg, ${d.from}, ${d.to})`
   const accent = d.accent
   const lit = litDays(rhythm, days)
-  const sourceIdx = Math.max(0, SOURCE_PREFERENCES.findIndex((s) => s.id === source))
-  const breadth = sourceIdx + 1
-  const wrapWord = rhythm === 'monthly' ? 'Monthly' : rhythm === 'weekly' ? 'Weekly' : rhythm === 'bi-weekly' ? 'Bi-Weekly' : 'Daily'
+  const wrapWord = rhythm === 'weekly' ? 'Weekly' : 'Daily'
 
   return (
     <div className="desi-frame relative overflow-hidden rounded-3xl bg-[#fffdf5]">
@@ -133,42 +127,25 @@ export default function EditionPreview({ rhythm = 'daily', days = [], source = '
 
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-[#c79a1e]">When it lands</p>
-          {rhythm === 'monthly' ? (
-            <p className="mt-2 text-sm text-gray-700">Once a month — one curated edition.</p>
-          ) : (
-            <div className="mt-2 flex items-center gap-1.5">
-              {DAY_IDS.map((id) => {
-                const on = lit.has(id)
-                return (
-                  <motion.span
-                    key={id}
-                    animate={{ scale: on ? 1 : 0.9 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-bold ${on ? 'text-white' : 'text-gray-400'}`}
-                    style={{ background: on ? accent : 'rgba(0,0,0,0.05)' }}
-                  >
-                    {DAY_SHORT[id]}
-                  </motion.span>
-                )
-              })}
-            </div>
-          )}
-          {rhythm === 'bi-weekly' && <p className="mt-1 text-xs text-gray-500">Twice a week — Tuesday &amp; Friday.</p>}
-        </div>
-
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider text-[#c79a1e]">Curation breadth</p>
-          <div className="mt-2 flex items-center gap-2">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                animate={{ opacity: i < breadth ? 1 : 0.15 }}
-                className="h-2 flex-1 rounded-full"
-                style={{ background: i < breadth ? accent : '#000' }}
-              />
-            ))}
+          <div className="mt-2 flex items-center gap-1.5">
+            {DAY_IDS.map((id) => {
+              const on = lit.has(id)
+              return (
+                <motion.span
+                  key={id}
+                  animate={{ scale: on ? 1 : 0.9 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-bold ${on ? 'text-white' : 'text-gray-400'}`}
+                  style={{ background: on ? accent : 'rgba(0,0,0,0.05)' }}
+                >
+                  {DAY_SHORT[id]}
+                </motion.span>
+              )
+            })}
           </div>
-          <p className="mt-1 text-xs text-gray-500">{SOURCE_PREFERENCES[sourceIdx]?.label}</p>
+          {rhythm === 'weekly' && (
+            <p className="mt-1 text-xs text-gray-500">Weekly — arrives on the day(s) you pick.</p>
+          )}
         </div>
       </div>
     </div>

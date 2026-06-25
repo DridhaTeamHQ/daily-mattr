@@ -6,7 +6,6 @@ import {
   SUBSCRIBE_CATEGORIES,
   RHYTHMS,
   WEEKDAYS,
-  SOURCE_PREFERENCES,
 } from '../lib/subscribeOptions'
 import EditionPreview from './EditionPreview'
 
@@ -103,10 +102,6 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
   // ---- desi-maximalism tokens (jewel + gold on warm ivory) ----
   const headline = 'text-[17px] font-medium text-[#1c1c1e] leading-snug'
   const desc = 'text-[15px] text-[#1c1c1e] leading-snug'
-  const optBox = (active) =>
-    `rounded-[12px] border w-full px-5 py-[15px] text-left transition-colors ${
-      active ? 'bg-[#fff0d6] border-[#d81b60]' : 'bg-white border-[#c9a227]/35 hover:border-[#c9a227]/70'
-    }`
   const pill = (active) =>
     `flex items-center justify-between gap-2 rounded-[32px] border px-6 py-[14px] text-[15px] font-medium text-[rgba(28,28,30,0.93)] transition-colors ${
       active ? 'bg-[#fff0d6] border-[#d81b60]' : 'bg-white border-[#c9a227]/35 hover:border-[#c9a227]/70'
@@ -116,7 +111,7 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
   if (status.state === 'success') {
     return (
       <div className="grid gap-8 lg:grid-cols-2">
-        <div className="lg:sticky lg:top-24 lg:self-start"><EditionPreview rhythm={rhythm} days={days} source={source} categories={categories} name={name} summary={summary} /></div>
+        <div className="lg:sticky lg:top-24 lg:self-start"><EditionPreview rhythm={rhythm} days={days} categories={categories} name={name} summary={summary} /></div>
         <div className="desi-frame rounded-[24px] bg-[#fffdf5] p-8 text-center sm:p-10" style={SANS}>
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fff0d6] text-[#d81b60]">
             <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -132,7 +127,7 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
     <div className="grid gap-8 lg:grid-cols-2">
       {/* LEFT — live preview (the section's left visual) */}
       <div className="lg:sticky lg:top-24 lg:self-start">
-        <EditionPreview rhythm={rhythm} days={days} source={source} categories={categories} name={name} summary={summary} />
+        <EditionPreview rhythm={rhythm} days={days} categories={categories} name={name} summary={summary} />
       </div>
 
       {/* RIGHT — desi builder card */}
@@ -189,11 +184,6 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
                         </div>
                       </motion.div>
                     )}
-                    {active && r.id === 'bi-weekly' && (
-                      <motion.p initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden pt-2 text-[13px] text-[#6b6b73]">
-                        You will receive editions twice a week (Tuesday &amp; Friday).
-                      </motion.p>
-                    )}
                   </AnimatePresence>
                 </div>
               )
@@ -221,25 +211,6 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
                 <button type="button" key={c.slug} onClick={() => toggleCategory(c.slug)} className={pill(active)}>
                   <span className="truncate">{c.label}</span>
                   {active && <Tick />}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Source Preference */}
-        <div className="border-b border-[#c9a227]/30 pb-8">
-          <div className="flex flex-col gap-2 px-8 pb-2 pt-8">
-            <p className="text-[18px] font-medium text-black">Source Preference</p>
-            <p className="text-[15px] text-black">Choose how broadly we should curate.</p>
-          </div>
-          <div className="flex flex-col gap-2 px-8">
-            {SOURCE_PREFERENCES.map((s) => {
-              const active = source === s.id
-              return (
-                <button type="button" key={s.id} onClick={() => { triggerHaptic('light'); setSource(s.id) }} className={optBox(active)}>
-                  <p className={headline}>{s.label}</p>
-                  <p className={desc}>{s.desc}</p>
                 </button>
               )
             })}
