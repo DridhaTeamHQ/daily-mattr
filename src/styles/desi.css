@@ -1,0 +1,61 @@
+/* Desi-maximalism building blocks for the news pages.
+   Warm paper, block-print dot grid, gold jhalar (hanging-scallop) edge, and an
+   ornamental section divider — all CSS/SVG so it stays light. */
+
+.desi-paper {
+  background-color: #fbf4e6;
+  background-image:
+    radial-gradient(rgba(123, 30, 59, 0.06) 1.3px, transparent 1.4px),
+    radial-gradient(rgba(212, 175, 55, 0.06) 1.3px, transparent 1.4px);
+  background-size: 24px 24px, 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Hanging-scallop trim. Set --jhalar to the accent colour. */
+.desi-jhalar {
+  height: 16px;
+  width: 100%;
+  --jhalar: #f4a300;
+  background:
+    radial-gradient(circle at 50% 0, var(--jhalar) 0 7px, transparent 8px) repeat-x;
+  background-size: 24px 16px;
+  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.12));
+}
+
+/* Ornamental divider: gold rules flanking a centred motif. */
+.desi-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.desi-divider::before,
+.desi-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.55), transparent);
+}
+.desi-divider__motif {
+  color: #c79a1e;
+  font-size: 14px;
+  letter-spacing: 4px;
+  white-space: nowrap;
+}
+
+/* Thin gold double-frame for hero / featured cards. */
+.desi-frame {
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.55),
+    0 0 0 5px rgba(212, 175, 55, 0.16),
+    0 24px 60px -24px rgba(106, 27, 90, 0.45);
+}
+
+/* Card with a coloured top band (set --band) over warm ivory. */
+.desi-card {
+  background: #fffdf5;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-top: 3px solid var(--band, #f4a300);
+}
+.desi-card:hover {
+  border-color: rgba(201, 162, 39, 0.6);
+}
