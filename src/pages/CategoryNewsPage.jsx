@@ -233,12 +233,7 @@ function CategoryHero({ theme }) {
   )
 }
 
-const TABS = [
-  { key: 'all', label: 'All Stories' },
-  { key: 'quick', label: 'Quick Reads' },
-  { key: 'deep', label: 'Deep Reads' },
-]
-function SearchTabs({ tab, setTab, query, setQuery }) {
+function SearchTabs({ tab, setTab, query, setQuery, tabs }) {
   return (
     <div className="mx-auto mt-10 flex max-w-[1600px] flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-14">
       <div className="relative w-full sm:max-w-sm">
@@ -254,23 +249,25 @@ function SearchTabs({ tab, setTab, query, setQuery }) {
           style={SANS}
         />
       </div>
-      <div className="flex items-center gap-2 rounded-full border border-[#c9a227]/40 bg-[#fffdf5] p-1" style={SANS}>
-        {TABS.map((t) => {
-          const on = tab === t.key
-          return (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
-                on ? 'text-white' : 'text-[#7b1e3b] hover:text-[#d81b60]'
-              }`}
-              style={on ? { background: 'linear-gradient(135deg, #F4A300, #D81B60)' } : undefined}
-            >
-              {t.label}
-            </button>
-          )
-        })}
-      </div>
+      {tabs && (
+        <div className="flex items-center gap-2 rounded-full border border-[#c9a227]/40 bg-[#fffdf5] p-1" style={SANS}>
+          {tabs.map((t) => {
+            const on = tab === t.key
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
+                  on ? 'text-white' : 'text-[#7b1e3b] hover:text-[#d81b60]'
+                }`}
+                style={on ? { background: 'linear-gradient(135deg, #F4A300, #D81B60)' } : undefined}
+              >
+                {t.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -291,6 +288,7 @@ const bandFor = (id) => {
 const CASE_BAND = '#7B1E3B'
 const isCase = (a) => a.kind === 'case_study'
 
+// Short brief: a compact card explicitly tagged "Brief".
 function CardTags({ article, band }) {
   return (
     <div className="flex flex-wrap items-center gap-2" style={SANS}>
@@ -299,11 +297,9 @@ function CardTags({ article, band }) {
           ◆ Case Study
         </span>
       ) : (
-        article.importance >= 7 && (
-          <span className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: band }}>
-            ✦ Long Story
-          </span>
-        )
+        <span className="rounded-full bg-[#fff0d6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7b1e3b]">
+          Brief
+        </span>
       )}
       {article.bucket && !isCase(article) && (
         <span className="rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ borderColor: band, color: band }}>
@@ -314,24 +310,35 @@ function CardTags({ article, band }) {
   )
 }
 
-function FeaturedCard({ category, article, band }) {
-  const b = isCase(article) ? CASE_BAND : band
+// Long-form feature: a wide, framed card explicitly tagged "In-depth · Long read".
+function FeatureCard({ category, article }) {
   return (
     <Link
       to={`/${category}/${article.id}`}
       className="desi-card desi-frame block rounded-2xl p-6 transition-transform hover:-translate-y-0.5 sm:p-8"
-      style={{ '--band': b }}
+      style={{ '--band': '#7B1E3B' }}
     >
-      <CardTags article={article} band={b} />
+      <div className="flex flex-wrap items-center gap-2" style={SANS}>
+        <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #7B1E3B)' }}>
+          ✦ In-depth
+        </span>
+        {article.bucket && (
+          <span className="rounded-full border border-[#7b1e3b]/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7b1e3b]">
+            {article.bucket}
+          </span>
+        )}
+        <span className="text-[11px] text-gray-400">Long read</span>
+      </div>
       <h3 className="mt-4 text-2xl font-bold leading-snug text-gray-900 sm:text-3xl" style={SERIF}>
         {article.headline}
       </h3>
       <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-gray-700" style={SANS}>
         {article.summary}
       </p>
-      <div className="mt-5">
-        <Sources count={article.sourceCount || (article.tags?.length || 2) + 1} sources={article.sources} />
-      </div>
+      <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-bold text-[#7b1e3b]" style={SANS}>
+        Read the full feature
+        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </span>
     </Link>
   )
 }
@@ -394,71 +401,72 @@ function DateHeading({ children }) {
 }
 
 // ---- feed state -------------------------------------------------------------
-function Feed({ category, articles }) {
+// Differentiates LONG features ("In-depth") from SHORT briefs, in every category.
+function Feed({ category, articles, features }) {
   const [tab, setTab] = useState('all')
   const [query, setQuery] = useState('')
 
-  const filtered = useMemo(() => {
-    let list = articles
-    if (query.trim()) {
-      const q = query.toLowerCase()
-      list = list.filter((a) => `${a.headline} ${a.summary}`.toLowerCase().includes(q))
-    }
-    // Deep = the big, multi-source / high-importance stories; Quick = the rest.
-    const isDeep = (a) =>
-      a.importance != null ? a.importance >= 7 : (a.summary || '').length > 180
-    if (tab === 'quick') list = list.filter((a) => !isDeep(a))
-    if (tab === 'deep') list = list.filter(isDeep)
-    return list
-  }, [articles, tab, query])
+  const q = query.trim().toLowerCase()
+  const match = (a) => !q || `${a.headline} ${a.summary}`.toLowerCase().includes(q)
+  const feats = useMemo(() => features.filter(match), [features, q])
+  const briefs = useMemo(() => articles.filter(match), [articles, q])
 
-  const groups = groupByDate(filtered)
+  const hasFeatures = features.length > 0
+  const tabs = hasFeatures
+    ? [{ key: 'all', label: 'All' }, { key: 'long', label: 'In-depth' }, { key: 'short', label: 'Briefs' }]
+    : null
+
+  const showLong = (tab === 'all' || tab === 'long') && feats.length > 0
+  const showShort = (tab === 'all' || tab === 'short') && briefs.length > 0
+  const empty = feats.length === 0 && briefs.length === 0
 
   return (
     <>
-      <SearchTabs tab={tab} setTab={setTab} query={query} setQuery={setQuery} />
-      <div key={tab} className="mx-auto max-w-[1600px] px-4 pb-8 sm:px-8 lg:px-14">
-        {groups.length === 0 && (
+      <SearchTabs tab={tab} setTab={setTab} query={query} setQuery={setQuery} tabs={tabs} />
+      <div className="mx-auto max-w-[1600px] px-4 pb-8 sm:px-8 lg:px-14">
+        {empty && (
           <p className="mt-16 text-center text-gray-500" style={SANS}>
-            {articles.length === 0
+            {articles.length === 0 && features.length === 0
               ? 'No stories published in this edition yet — check back soon.'
               : 'No stories match your search.'}
           </p>
         )}
-        {groups.map(([label, items], gi) => {
-          const featured = gi === 0 ? items[0] : null
-          const rest = gi === 0 ? items.slice(1) : items
-          return (
-            <section key={label}>
-              <Reveal>
-                <DateHeading>{label}</DateHeading>
-              </Reveal>
-              {featured && (
-                <Reveal className="mb-6">
-                  <FeaturedCard category={category} article={featured} band={bandFor(featured.id)} />
+
+        {showLong && (
+          <section>
+            <Reveal><DateHeading>In-depth</DateHeading></Reveal>
+            <div className="flex flex-col gap-6">
+              {feats.map((f, i) => (
+                <Reveal key={f.id} delay={Math.min(i * 0.07, 0.28)}>
+                  <FeatureCard category={category} article={f} />
                 </Reveal>
-              )}
-              {rest.length > 0 && (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {rest.map((a, ri) => (
-                    <Reveal key={a.id} className="h-full" delay={Math.min(ri * 0.07, 0.28)}>
-                      <StoryCard category={category} article={a} band={bandFor(a.id)} />
-                    </Reveal>
-                  ))}
-                </div>
-              )}
-            </section>
-          )
-        })}
+              ))}
+            </div>
+          </section>
+        )}
+
+        {showShort && (
+          <section>
+            <Reveal><DateHeading>{hasFeatures ? 'Short briefs' : 'Latest'}</DateHeading></Reveal>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {briefs.map((a, ri) => (
+                <Reveal key={a.id} className="h-full" delay={Math.min(ri * 0.07, 0.28)}>
+                  <StoryCard category={category} article={a} band={bandFor(a.id)} />
+                </Reveal>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </>
   )
 }
 
 // ---- reading state ----------------------------------------------------------
-function Reading({ category, articles, articleId }) {
-  const article = articles.find((a) => a.id === articleId) || articles[0]
-  const groups = groupByDate(articles)
+function Reading({ category, items, articleId }) {
+  const article = items.find((a) => a.id === articleId) || items[0]
+  const groups = groupByDate(items)
+  const isLong = isCase(article) || article?.kind === 'feature'
 
   if (!article) {
     return (
@@ -521,12 +529,19 @@ function Reading({ category, articles, articleId }) {
               <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: CASE_BAND }}>
                 ◆ Case Study
               </span>
+            ) : article.kind === 'feature' ? (
+              <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #7B1E3B)' }}>
+                ✦ In-depth
+              </span>
             ) : (
-              article.bucket && (
-                <span className="rounded-full border border-[#c9a227] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#b8860b]">
-                  {article.bucket}
-                </span>
-              )
+              <span className="rounded-full bg-[#fff0d6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7b1e3b]">
+                Brief
+              </span>
+            )}
+            {article.bucket && (
+              <span className="rounded-full border border-[#c9a227] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#b8860b]">
+                {article.bucket}
+              </span>
             )}
           </div>
           <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl" style={SERIF}>
@@ -544,8 +559,8 @@ function Reading({ category, articles, articleId }) {
           </div>
 
           <div className="mt-8 space-y-5 text-[16px] leading-[1.8] text-gray-700" style={SANS}>
-            {isCase(article) && article.body ? (
-              // Case study: the agent's curated write-up (summary + detail).
+            {isLong && article.body ? (
+              // Case study / long feature: the agent's full curated write-up.
               article.body
                 .split(/\n\n+/)
                 .map((p) => p.trim())
@@ -615,6 +630,9 @@ export default function CategoryNewsPage() {
   // Live: polls + refetches on tab focus so approvals/edits show without reload.
   const { data, error, loading, reload } = useLiveData(() => fetchNewsletter(category), [category])
   const articles = data?.articles || []
+  const features = data?.features || []
+  // Long features first so they head the reading list.
+  const readingItems = [...features, ...articles]
 
   return (
     <div className="desi-paper min-h-screen text-gray-900">
@@ -627,9 +645,9 @@ export default function CategoryNewsPage() {
         ) : loading ? (
           <SkeletonFeed />
         ) : articleId ? (
-          <Reading category={category} articles={articles} articleId={articleId} />
+          <Reading category={category} items={readingItems} articleId={articleId} />
         ) : (
-          <Feed category={category} articles={articles} />
+          <Feed category={category} articles={articles} features={features} />
         )}
       </div>
       <div className="mt-16">

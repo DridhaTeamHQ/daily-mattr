@@ -105,6 +105,36 @@ export async function fetchCaseStudies() {
   }))
 }
 
+// Long-form topic FEATURES (the in-depth "thesis" per category) — the long
+// counterpart to the short briefs in `articles`. Read from editorial_drafts.
+// topic_slug already matches our website slugs (real-estate / policy-partner /
+// money-matters / wellness-daily).
+export async function fetchFeatures() {
+  const { data, error } = await supabase
+    .from('editorial_drafts')
+    .select('id,topic_slug,topic_name,headline,summary,detail,primary_source_url,primary_source_title,generated_at,status')
+    .in('status', ['approved', 'published'])
+    .order('generated_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map((d) => ({
+    id: `feature-${d.id}`,         // prefixed so it never collides with a brief id
+    kind: 'feature',
+    slug: d.topic_slug,
+    headline: d.headline,
+    summary: d.summary || '',
+    body: d.detail || d.summary || '',
+    source: d.primary_source_title || '',
+    sourceUrl: d.primary_source_url || '',
+    publishedAt: d.generated_at,
+    bucket: d.topic_name,
+  }))
+}
+
+export async function fetchFeaturesByCategory(slug) {
+  const all = await fetchFeatures()
+  return all.filter((f) => f.slug === slug)
+}
+
 // One pass for the home page: latest approved news stories + the case studies.
 export async function fetchEdition() {
   const [articles, caseStudies] = await Promise.all([
