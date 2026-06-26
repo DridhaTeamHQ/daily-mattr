@@ -34,7 +34,7 @@ export default function NewsletterNav() {
           {/* Center nav (desktop) */}
           <nav className="hidden items-center lg:flex">
             <Link to="/" className={linkClass} style={ROBOTO}>Newsletter</Link>
-            <Link to="/case-studies" className={linkClass} style={ROBOTO}>Case Studies</Link>
+            <Link to="/case-studies" className={linkClass} style={ROBOTO}>Corporate Cases</Link>
             <button onClick={() => goHash('themes')} className={linkClass} style={ROBOTO}>Themes</button>
             <Link
               to="/subscribe"

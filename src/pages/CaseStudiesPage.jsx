@@ -58,7 +58,7 @@ function CaseHero({ count }) {
               className="text-[clamp(2.5rem,9vw,110px)] font-extrabold uppercase leading-none tracking-tight text-white"
               style={{ ...SERIF, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}
             >
-              Case Studies
+              Corporate Cases
             </h1>
             <div className="h-[3px] w-28 rounded-full" style={{ background: '#F4A300' }} />
             <p className="max-w-2xl text-[15px] leading-relaxed text-white/90" style={SANS}>

@@ -20,7 +20,7 @@ export default function Footer() {
             <div className="flex flex-col gap-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Browse</span>
               <Link to="/" className="text-gray-700 hover:text-[#d81b60]">Newsletter</Link>
-              <Link to="/case-studies" className="text-gray-700 hover:text-[#d81b60]">Case Studies</Link>
+              <Link to="/case-studies" className="text-gray-700 hover:text-[#d81b60]">Corporate Cases</Link>
               <Link to="/subscribe" className="text-gray-700 hover:text-[#d81b60]">Subscribe</Link>
               <Link to="/profile" className="text-gray-700 hover:text-[#d81b60]">Profile</Link>
             </div>
