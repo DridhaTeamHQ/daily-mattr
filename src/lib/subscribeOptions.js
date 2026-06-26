@@ -2,13 +2,11 @@
 // These MUST stay in sync with the email agent's _shared/news-categories.ts.
 
 export const SUBSCRIBE_CATEGORIES = [
-  { slug: 'national', label: 'National' },
-  { slug: 'international', label: 'International' },
-  { slug: 'finance', label: 'Finance' },
-  { slug: 'sports', label: 'Sports' },
-  { slug: 'entertainment', label: 'Entertainment' },
-  { slug: 'lifestyle', label: 'Lifestyle' },
-  { slug: 'technology', label: 'Technology' },
+  { slug: 'general', label: 'General' },
+  { slug: 'real-estate', label: 'Real Estate' },
+  { slug: 'policy-partner', label: 'Policy Partner' },
+  { slug: 'money-matters', label: 'Money Matters' },
+  { slug: 'wellness-daily', label: 'Wellness Daily' },
 ]
 
 export const RHYTHMS = [

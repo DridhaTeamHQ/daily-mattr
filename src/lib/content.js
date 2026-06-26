@@ -13,21 +13,19 @@ import { supabase } from './supabaseClient'
 
 export const CASE_STUDY_CATEGORY = 'Corporate Case'
 
-// Agent bucket (articles.category, else articles.topic) -> website theme slug.
-const BUCKET_TO_SLUG = {
-  // general news (articles.topic)
-  India: 'national',
-  Explained: 'national',
-  World: 'international',
-  Business: 'finance',
-  Science: 'technology',
-  // topic categories (articles.category)
-  'Money Matters': 'finance',
-  'Policy Partner': 'national',
-  'Real Estate': 'lifestyle',
-  'Wellness Daily': 'lifestyle',
-  // 'Corporate Case' is intentionally unmapped — case studies live on their own
-  // /case-studies page, not inside a category feed.
+// The four topic categories map 1:1 to their own pages. Everything else that
+// isn't a case study (general news tagged India/World/Business/Explained/… )
+// falls into the single "General" feed. Case studies are unmapped — they live
+// on their own /case-studies page, not inside a category feed.
+const TOPIC_SLUG = {
+  'Real Estate': 'real-estate',
+  'Policy Partner': 'policy-partner',
+  'Money Matters': 'money-matters',
+  'Wellness Daily': 'wellness-daily',
+}
+function slugFor(category) {
+  if (category === CASE_STUDY_CATEGORY) return null
+  return TOPIC_SLUG[category] || 'general'
 }
 
 // Drop the synthetic fragment the agent appends to make synced rows unique
@@ -49,7 +47,7 @@ function normalize(row) {
     category: row.category || null,
     topic: row.topic || null,
     bucket,                                   // raw agent label, used as a chip
-    slug: BUCKET_TO_SLUG[bucket] || null,
+    slug: slugFor(row.category),
     edited: !!(row.edited_title || row.edited_summary),
     // prominence 1 = lead story -> treat as a "deep" read
     importance: row.prominence === 1 ? 9 : null,
@@ -116,11 +114,9 @@ export async function fetchEdition() {
 
 // Pretty label for a category slug (for chips/sections on the home page).
 export const SLUG_LABEL = {
-  national: 'National',
-  international: 'International',
-  finance: 'Finance',
-  sports: 'Sports',
-  entertainment: 'Entertainment',
-  lifestyle: 'Lifestyle',
-  technology: 'Technology',
+  general: 'General',
+  'real-estate': 'Real Estate',
+  'policy-partner': 'Policy Partner',
+  'money-matters': 'Money Matters',
+  'wellness-daily': 'Wellness Daily',
 }

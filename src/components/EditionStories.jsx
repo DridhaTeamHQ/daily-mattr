@@ -91,7 +91,7 @@ export default function EditionStories() {
             <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d81b60]" style={SANS}>✦ Fresh today ✦</span>
             <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#7b1e3b] sm:text-4xl" style={SERIF}>Today&rsquo;s edition</h2>
           </div>
-          <Link to="/national" className="hidden shrink-0 text-[13px] font-semibold text-[#7b1e3b] hover:text-[#d81b60] sm:inline" style={SANS}>
+          <Link to="/general" className="hidden shrink-0 text-[13px] font-semibold text-[#7b1e3b] hover:text-[#d81b60] sm:inline" style={SANS}>
             Browse all stories →
           </Link>
         </div>
@@ -113,7 +113,7 @@ export default function EditionStories() {
         <Link to="/case-studies" className="rounded-full border border-[#7b1e3b]/40 px-5 py-2.5 text-[13px] font-bold uppercase tracking-wide text-[#7b1e3b] transition-colors hover:bg-[#fff0d6]" style={SANS}>
           All case studies
         </Link>
-        {['national', 'international', 'finance', 'lifestyle', 'technology'].map((s) => (
+        {['general', 'real-estate', 'policy-partner', 'money-matters', 'wellness-daily'].map((s) => (
           <Link key={s} to={`/${s}`} className="rounded-full border border-[#c9a227]/40 px-4 py-2 text-[12px] font-semibold text-gray-700 transition-colors hover:border-[#c9a227]" style={SANS}>
             {SLUG_LABEL[s]}
           </Link>

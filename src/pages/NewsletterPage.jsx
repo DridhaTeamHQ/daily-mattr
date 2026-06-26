@@ -30,7 +30,7 @@ const NewsletterPage = () => {
           {/* Edge-to-edge collage banner (full-bleed) */}
           <img
             src="/newsletter/banner.png"
-            alt="Daily Mattr — national, finance, sports, lifestyle, tech and more"
+            alt="Daily Mattr — general headlines, real estate, policy, money and wellness"
             className="block w-full h-auto"
           />
         </div>
