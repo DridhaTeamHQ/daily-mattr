@@ -40,7 +40,7 @@ function normalize(row) {
     kind: isCase ? 'case_study' : 'article',
     headline: row.edited_title || row.title,
     summary: row.edited_summary || row.summary || '',
-    body: row.raw_content || row.summary || '',
+    body: row.edited_summary || row.summary || '',
     source: row.source || '',
     sourceUrl: cleanUrl(row.url),
     publishedAt: row.reviewed_at || row.scraped_at || row.created_at,
@@ -54,8 +54,13 @@ function normalize(row) {
   }
 }
 
+// Light list payload — NO raw_content (the full scraped article text). Pulling
+// it for every approved row on every poll is large enough to hit the anon role's
+// statement timeout and fail the whole fetch; the list/reading views don't use
+// it (case-study bodies come from corporate_cases). Keeping this lean makes the
+// pull fast and reliable.
 const SELECT =
-  'id,title,edited_title,summary,edited_summary,raw_content,source,url,topic,category,section,prominence,status,reviewed_at,scraped_at,created_at'
+  'id,title,edited_title,summary,edited_summary,source,url,topic,category,section,prominence,status,reviewed_at,scraped_at,created_at'
 
 // Every approved item, newest first.
 export async function fetchApproved() {

@@ -76,7 +76,7 @@ function Spotlight({ cs }) {
 // "Today's edition" — live approved stories + the day's case-study spotlight.
 export default function EditionStories() {
   // Live: polls + refetches on tab focus so the home page stays current.
-  const edition = useLiveData(fetchEdition, [])
+  const { data: edition } = useLiveData(fetchEdition, [])
 
   if (!edition) return null
   const latest = edition.latest.slice(0, 6)

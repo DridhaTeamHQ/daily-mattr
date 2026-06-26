@@ -229,8 +229,7 @@ function CaseReading({ items, id }) {
 export default function CaseStudiesPage() {
   const { id } = useParams()
   // Live: polls + refetches on tab focus so new/edited approved cases show up.
-  const items = useLiveData(fetchCaseStudies, [])
-  const loading = items === null
+  const { data: items, error, loading, reload } = useLiveData(fetchCaseStudies, [])
   const list = useMemo(() => items || [], [items])
 
   return (
@@ -238,7 +237,13 @@ export default function CaseStudiesPage() {
       <NewsletterNav />
       <div className="pt-24 sm:pt-28">
         <CaseHero count={list.length} />
-        {loading ? (
+        {error && !items ? (
+          <div className="mx-auto max-w-[1600px] px-4 py-20 text-center sm:px-8 lg:px-14" style={SANS}>
+            <p className="text-[15px] text-[#7b1e3b]">Couldn’t load case studies.</p>
+            <p className="mt-1 text-[13px] text-gray-500 break-words">{error}</p>
+            <button onClick={reload} className="mt-4 rounded-full px-5 py-2.5 text-[13px] font-bold uppercase tracking-wide text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #7B1E3B)' }}>Retry</button>
+          </div>
+        ) : loading ? (
           <div className="mx-auto max-w-[1600px] px-4 pb-8 pt-12 sm:px-8 lg:px-14">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }).map((_, i) => (

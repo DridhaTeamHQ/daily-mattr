@@ -358,6 +358,18 @@ function StoryCard({ category, article, band }) {
   )
 }
 
+function LoadError({ message, onRetry }) {
+  return (
+    <div className="mx-auto max-w-[1600px] px-4 py-20 text-center sm:px-8 lg:px-14" style={SANS}>
+      <p className="text-[15px] text-[#7b1e3b]">Couldn’t load stories.</p>
+      <p className="mt-1 text-[13px] text-gray-500 break-words">{message}</p>
+      <button onClick={onRetry} className="mt-4 rounded-full px-5 py-2.5 text-[13px] font-bold uppercase tracking-wide text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>
+        Retry
+      </button>
+    </div>
+  )
+}
+
 function SkeletonFeed() {
   return (
     <div className="mx-auto max-w-[1600px] px-4 pb-8 pt-10 sm:px-8 lg:px-14">
@@ -601,8 +613,7 @@ export default function CategoryNewsPage() {
   }, [valid, navigate])
 
   // Live: polls + refetches on tab focus so approvals/edits show without reload.
-  const data = useLiveData(() => fetchNewsletter(category), [category])
-  const loading = data === null
+  const { data, error, loading, reload } = useLiveData(() => fetchNewsletter(category), [category])
   const articles = data?.articles || []
 
   return (
@@ -611,7 +622,9 @@ export default function CategoryNewsPage() {
       <div className="pt-24 sm:pt-28">
         <CategoryHero theme={theme} />
 
-        {loading ? (
+        {error && !data ? (
+          <LoadError message={error} onRetry={reload} />
+        ) : loading ? (
           <SkeletonFeed />
         ) : articleId ? (
           <Reading category={category} articles={articles} articleId={articleId} />
