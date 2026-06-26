@@ -18,6 +18,11 @@ const cadenceLabel = (s) => {
   if (s.newsletter_type === 'category_small_articles') return `Every ${s.weekday ? s.weekday[0].toUpperCase() + s.weekday.slice(1) : 'week'}`
   return s.rhythm ? s.rhythm[0].toUpperCase() + s.rhythm.slice(1) : 'Weekly'
 }
+// Show product names that match the subscribe page's three newsletters.
+const productName = (s, cat) =>
+  s.category_slug === 'national' && s.rhythm === 'daily' ? 'Daily Headlines'
+    : s.newsletter_type === 'case_study_daily' ? 'Daily Case Study'
+      : cat?.name || s.category_slug
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth()
@@ -64,33 +69,34 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#faf9f6] text-gray-900">
-      <header className="border-b border-black/10 bg-white">
+      <header className="border-b border-[#c9a227]/35 bg-[#fffdf5]">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-          <Link to="/" className="text-lg font-extrabold tracking-[2px]">DAILY MATTR</Link>
+          <Link to="/" className="text-lg font-extrabold tracking-[2px] text-[#7b1e3b]" style={SERIF}>DAILY MATTR</Link>
           <div className="flex items-center gap-3 text-sm">
-            <Link to="/" className="text-[#7900d9] font-semibold">Newsletters</Link>
-            <button onClick={signOut} className="rounded-full border border-gray-300 px-3 py-1.5 hover:bg-gray-50">Sign out</button>
+            <Link to="/" className="font-semibold text-[#d81b60]">Newsletters</Link>
+            <button onClick={signOut} className="rounded-full border border-[#c9a227]/40 px-3 py-1.5 hover:bg-[#fff0d6]">Sign out</button>
           </div>
         </div>
       </header>
+      <div className="desi-jhalar" style={{ '--jhalar': '#c9a227' }} />
 
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-3xl font-bold" style={SERIF}>Your profile</h1>
-        {msg && <div className="mt-3 rounded-lg bg-[#7900d9]/10 px-3 py-2 text-sm text-[#7900d9]">{msg}</div>}
+        <h1 className="text-3xl font-bold text-[#7b1e3b]" style={SERIF}>Your profile</h1>
+        {msg && <div className="mt-3 rounded-lg bg-[#eef6ec] px-3 py-2 text-sm text-[#2e6b3c] border border-[#bcd9c1]">{msg}</div>}
 
         {/* Account details */}
-        <section className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
-          <h2 className="text-lg font-bold" style={SERIF}>Account</h2>
+        <section className="mt-6 desi-frame rounded-2xl bg-[#fffdf5] p-6">
+          <h2 className="text-lg font-bold text-[#1c1c1e]" style={SERIF}>Account</h2>
           <label className="mt-4 block text-sm text-gray-600">Name</label>
           <div className="mt-1 flex gap-2">
-            <input value={name} onChange={(e) => setName(e.target.value)} className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 outline-none focus:border-[#7900d9]" placeholder="Your name" />
-            <button onClick={saveName} className="rounded-xl bg-[#7900d9] px-4 font-semibold text-white">Save</button>
+            <input value={name} onChange={(e) => setName(e.target.value)} className="flex-1 rounded-xl border border-[#c9a227]/40 px-4 py-2.5 outline-none focus:border-[#d81b60]" placeholder="Your name" />
+            <button onClick={saveName} className="rounded-xl px-5 font-semibold text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>Save</button>
           </div>
           <p className="mt-3 text-sm text-gray-500">Email: <span className="text-gray-800">{prefs.profile?.email || user?.email}</span></p>
         </section>
 
         {/* Active subscriptions */}
-        <section className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+        <section className="mt-6 desi-frame rounded-2xl bg-[#fffdf5] p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold" style={SERIF}>Active newsletters</h2>
             {prefs.subscriptions.length > 0 && (
@@ -101,9 +107,9 @@ export default function ProfilePage() {
           {loading ? (
             <p className="mt-4 text-gray-500">Loading…</p>
           ) : prefs.subscriptions.length === 0 ? (
-            <div className="mt-4 rounded-xl bg-gray-50 p-6 text-center">
+            <div className="mt-4 rounded-xl bg-[#fff7e6] p-6 text-center">
               <p className="text-gray-600">You have no active subscriptions yet.</p>
-              <Link to="/" className="mt-3 inline-block rounded-full bg-[#7900d9] px-5 py-2.5 text-sm font-semibold text-white">Browse newsletters</Link>
+              <Link to="/subscribe" className="mt-3 inline-block rounded-full px-5 py-2.5 text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>Browse newsletters</Link>
             </div>
           ) : (
             <ul className="mt-4 divide-y divide-gray-100">
@@ -114,7 +120,7 @@ export default function ProfilePage() {
                   <li key={s.category_slug} className="py-3">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <div className="font-semibold">{cat?.name || s.category_slug}</div>
+                        <div className="font-semibold">{productName(s, cat)}</div>
                         <div className="text-sm text-gray-500">{cadenceLabel(s)}</div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -138,9 +144,9 @@ export default function ProfilePage() {
                               onClick={() => changeDay(s.category_slug, w.value)}
                               title={disabled ? `Already used by ${catBySlug[usedBy]?.name || usedBy}` : ''}
                               className={`rounded-full px-3 py-1.5 text-sm border ${
-                                current ? 'bg-[#7900d9] border-[#7900d9] text-white'
+                                current ? 'bg-[#d81b60] border-[#d81b60] text-white'
                                 : disabled ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
-                                : 'border-gray-300 text-gray-700 hover:border-[#7900d9]'
+                                : 'border-[#c9a227]/40 text-gray-700 hover:border-[#c9a227]'
                               }`}
                             >
                               {w.label}
