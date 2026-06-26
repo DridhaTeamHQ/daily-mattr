@@ -17,6 +17,15 @@ export const NEWSLETTER_THEMES = [
     desi: { from: '#C2410C', to: '#7B1E3B', accent: '#F4A300' },
   },
   {
+    slug: 'case-studies',
+    label: 'Case Studies',
+    desc: 'One business case study a day — a company, a decision, a lesson. Deep, structured, source-bound.',
+    image: null,
+    gradient: 'from-rose-900 to-amber-700',
+    desi: { from: '#7B1E3B', to: '#3A1206', accent: '#F4A300' },
+    href: '/case-studies', // browse-only card: links to the dedicated page, not a wrap category
+  },
+  {
     slug: 'real-estate',
     label: 'Real Estate',
     desc: 'Launches, handovers, builder moves, infrastructure and regulation across India’s property market.',

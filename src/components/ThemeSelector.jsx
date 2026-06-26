@@ -30,11 +30,11 @@ export default function ThemeSelector({ selected = [], onToggle }) {
               whileHover={{ y: -4 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
               className={`group text-left rounded-2xl p-4 flex flex-col gap-4 transition-colors bg-[#fbf7f0] border ${
-                active ? 'border-[#7900d9]' : 'border-black/5 hover:border-black/15'
+                active ? 'border-[#d81b60]' : 'border-[#c9a227]/20 hover:border-[#c9a227]/50'
               }`}
             >
-              {/* Cover + title link to the category's stories feed */}
-              <Link to={`/${cat.slug}`} className="flex flex-col gap-4">
+              {/* Cover + title link to the category's stories feed (or dedicated page) */}
+              <Link to={cat.href || `/${cat.slug}`} className="flex flex-col gap-4">
                 {/* Number label */}
                 <div className="w-full">
                   <div className="h-px w-full bg-gray-200" />
@@ -73,19 +73,26 @@ export default function ThemeSelector({ selected = [], onToggle }) {
                 <p className="text-base leading-relaxed text-gray-600">{cat.desc}</p>
               </Link>
 
-              {/* Add-to-wrap toggle (subscription selection) */}
-              <button
-                type="button"
-                onClick={() => { triggerHaptic('light'); onToggle?.(cat.slug) }}
-                className={`inline-flex items-center gap-2 py-1 text-base font-medium ${active ? 'text-purple-500' : 'text-gray-900 hover:text-purple-500'}`}
-              >
-                {active ? (
-                  <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.7l-5.7 5.7a1 1 0 01-1.4 0L7.3 13a1 1 0 011.4-1.4l1.6 1.6 5-5a1 1 0 011.4 1.4z" /></svg>
-                ) : (
-                  <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" strokeLinecap="round" /></svg>
-                )}
-                {active ? 'Added to wrap' : 'Add to wrap'}
-              </button>
+              {/* Case Studies is a browse-only card (its own page); the rest toggle into the wrap */}
+              {cat.href ? (
+                <Link to={cat.href} className="inline-flex items-center gap-2 py-1 text-base font-medium text-[#7b1e3b] hover:text-[#d81b60]">
+                  Read case studies
+                  <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => { triggerHaptic('light'); onToggle?.(cat.slug) }}
+                  className={`inline-flex items-center gap-2 py-1 text-base font-medium ${active ? 'text-[#d81b60]' : 'text-gray-900 hover:text-[#d81b60]'}`}
+                >
+                  {active ? (
+                    <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.7l-5.7 5.7a1 1 0 01-1.4 0L7.3 13a1 1 0 011.4-1.4l1.6 1.6 5-5a1 1 0 011.4 1.4z" /></svg>
+                  ) : (
+                    <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" strokeLinecap="round" /></svg>
+                  )}
+                  {active ? 'Added to wrap' : 'Add to wrap'}
+                </button>
+              )}
             </motion.div>
           )
         })}
