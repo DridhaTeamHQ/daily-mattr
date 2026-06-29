@@ -257,19 +257,21 @@ export default function SubscribePage() {
 
 function ProductCard({ n, band, title, cadence, blurb, active, activeLabel, children }) {
   return (
-    <section className="desi-frame overflow-hidden rounded-3xl bg-[#fffdf5]">
-      <div className="h-1 w-full" style={{ background: band }} />
-      <div className="p-6 sm:p-7">
+    <section className="desi-frame flex overflow-hidden rounded-3xl bg-[#fffdf5]">
+      {/* Accent rail with a big edition number (desktop) */}
+      <div className="hidden w-16 shrink-0 flex-col items-center pt-6 sm:flex" style={{ background: `${band}14` }}>
+        <span className="text-[30px] font-extrabold leading-none" style={{ ...SERIF, color: band }}>{n}</span>
+        <div className="mt-4 w-[3px] flex-1 rounded-full" style={{ background: band }} />
+      </div>
+      <div className="min-w-0 flex-1 p-6 sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex items-start gap-4">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white" style={{ background: band }}>{n}</span>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-[#1c1c1e]" style={SERIF}>{title}</h2>
-                <span className="rounded-full bg-[#fff0d6] px-2 py-0.5 text-[11px] font-bold text-[#7b1e3b]">{cadence}</span>
-              </div>
-              <p className="mt-1 max-w-xl text-sm leading-relaxed text-gray-600">{blurb}</p>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold text-white sm:hidden" style={{ background: band }}>{n}</span>
+              <h2 className="text-xl font-bold text-gray-900" style={SERIF}>{title}</h2>
+              <span className="rounded-full bg-[#fff0d6] px-2 py-0.5 text-[11px] font-bold text-[#7b1e3b]">{cadence}</span>
             </div>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-gray-600">{blurb}</p>
           </div>
           {active && <ActivePill label={activeLabel || 'Active'} />}
         </div>

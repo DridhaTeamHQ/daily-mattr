@@ -4,9 +4,14 @@ import { useAuth } from '../context/AuthContext'
 import '../styles/desi.css'
 
 const SERIF = { fontFamily: "'Source Serif 4', Georgia, serif" }
+const PROMISES = [
+  'One sharp edition every morning',
+  'Headlines, money, policy & corporate cases',
+  'Pick your topics and the days they land',
+]
 
-// /login — Google sign-in. Honours ?redirect=/path so the user returns to where
-// they started (e.g. the newsletter page with a pending subscribe intent).
+// /login — split-screen Google sign-in. Left: editorial wine brand panel.
+// Right: the sign-in. Honours ?redirect=/path so the user returns where they were.
 export default function LoginPage() {
   const { isAuthed, loading, signInWithGoogle } = useAuth()
   const [params] = useSearchParams()
@@ -32,29 +37,50 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 text-gray-900">
-      {/* Desi-maximalism backdrop */}
-      <img
-        src="/auth-bg.jpg"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-      />
-      {/* warm readability veil — calmer so the card sits cleanly */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#fffdf5]/85 via-[#fffdf5]/62 to-[#fffdf5]/88" />
+    <div className="min-h-dvh bg-[#faf9f6] text-gray-900 lg:grid lg:grid-cols-2">
+      {/* LEFT — editorial brand panel (desktop) */}
+      <aside
+        className="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16"
+        style={{ background: 'linear-gradient(160deg, #7b1e3b 0%, #5e1730 45%, #3a1206 100%)' }}
+      >
+        <img src="/auth-bg.jpg" alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-overlay" />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.12]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)', backgroundSize: '22px 22px' }} />
 
-      {/* Card */}
-      <div className="desi-frame relative w-full max-w-md overflow-hidden rounded-3xl bg-[#fffdf5]/95 text-center backdrop-blur-sm">
-        <div className="p-8 sm:p-11">
-          <div
-            className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl border border-[#c9a227] bg-[#7b1e3b] text-xl font-extrabold text-[#f6e7c9]"
-            style={SERIF}
-          >
-            DM
-          </div>
+        <div className="relative text-[15px] font-extrabold tracking-[2px] text-[#f6e7c9]">DAILY MATTR</div>
+
+        <div className="relative">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#f4a300]">✦ India, in full colour ✦</span>
+          <h2 className="mt-5 text-[clamp(2.5rem,4vw,58px)] font-bold leading-[1.02] text-[#fdf6e7]" style={SERIF}>
+            India&rsquo;s day,<br />decoded.
+          </h2>
+          <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-[#f6e7c9]/80">
+            The headlines, the deals, and the corporate cases that actually matter — curated every morning.
+          </p>
+          <ul className="mt-9 space-y-3.5">
+            {PROMISES.map((t) => (
+              <li key={t} className="flex items-center gap-3 text-[14px] text-[#fdf6e7]/90">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#f4a300]/20 text-[#f4a300]">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="relative text-[12px] text-[#f6e7c9]/50">© {new Date().getFullYear()} Dridha Technologies</div>
+      </aside>
+
+      {/* RIGHT — sign in */}
+      <main className="flex min-h-dvh flex-col items-center justify-center px-5 py-12">
+        <div className="mb-8 lg:hidden">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-[#c9a227] bg-[#7b1e3b] text-xl font-extrabold text-[#f6e7c9]" style={SERIF}>DM</div>
+        </div>
+
+        <div className="w-full max-w-sm">
           <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d81b60]">✦ Daily Mattr ✦</span>
-          <h1 className="mt-3 text-[28px] font-bold leading-tight text-gray-900" style={SERIF}>Sign in to Daily Mattr</h1>
-          <p className="mt-2 text-sm text-gray-600">Save and manage your newsletter preferences.</p>
+          <h1 className="mt-3 text-[30px] font-bold leading-tight text-gray-900" style={SERIF}>Welcome back</h1>
+          <p className="mt-2 text-[15px] text-gray-600">Sign in to save and manage your newsletter editions.</p>
 
           <button
             onClick={onGoogle}
@@ -72,16 +98,14 @@ export default function LoginPage() {
 
           {err && <p className="mt-4 text-sm text-red-500">{err}</p>}
 
-          <div className="mt-7 border-t border-gray-200 pt-5">
-            <p className="text-xs text-gray-500">
-              You can browse everything without an account — sign-in is only needed to subscribe.
-            </p>
-            <Link to="/" className="mt-3 inline-block text-[12px] font-semibold text-[#7b1e3b] hover:text-[#d81b60]">
-              ← Back to Daily Mattr
-            </Link>
-          </div>
+          <p className="mt-6 text-xs leading-relaxed text-gray-500">
+            You can browse everything without an account — sign-in is only needed to subscribe.
+          </p>
+          <Link to="/" className="mt-4 inline-block text-[12px] font-semibold text-[#7b1e3b] hover:text-[#d81b60]">
+            ← Back to Daily Mattr
+          </Link>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

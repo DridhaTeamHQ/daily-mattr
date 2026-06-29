@@ -69,46 +69,57 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#faf9f6] text-gray-900">
-      <header className="border-b border-[#c9a227]/35 bg-[#fffdf5]">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+      <header className="border-b border-[#c9a227]/30 bg-[#fffdf5]">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <Link to="/" className="text-lg font-extrabold tracking-[2px] text-[#7b1e3b]" style={SERIF}>DAILY MATTR</Link>
           <div className="flex items-center gap-3 text-sm">
-            <Link to="/" className="font-semibold text-[#d81b60]">Newsletters</Link>
+            <Link to="/" className="text-gray-600 hover:text-[#7b1e3b]">Explore</Link>
+            <Link to="/subscribe" className="font-semibold text-[#d81b60]">Subscribe</Link>
             <button onClick={signOut} className="rounded-full border border-[#c9a227]/40 px-3 py-1.5 hover:bg-[#fff0d6]">Sign out</button>
           </div>
         </div>
       </header>
-      <div className="desi-jhalar" style={{ '--jhalar': '#c9a227' }} />
 
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <div className="flex items-center gap-4">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#c9a227] bg-[#7b1e3b] text-lg font-bold text-[#f6e7c9]" style={SERIF}>
+      {/* Hero band */}
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #7b1e3b, #3a1206)' }}>
+        <div className="pointer-events-none absolute inset-0 opacity-[0.1]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)', backgroundSize: '20px 20px' }} />
+        <div className="relative mx-auto flex max-w-5xl flex-wrap items-center gap-5 px-4 py-10">
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#f4a300]/50 bg-white/10 text-2xl font-bold text-[#fdf6e7]" style={SERIF}>
             {(name || prefs.profile?.email || user?.email || 'D').trim().charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold text-gray-900" style={SERIF}>
+            <h1 className="text-3xl font-bold text-[#fdf6e7]" style={SERIF}>
               {name ? `Hello, ${name.split(' ')[0]}` : 'Your profile'}
             </h1>
-            <p className="truncate text-sm text-gray-500">{prefs.profile?.email || user?.email}</p>
+            <p className="truncate text-sm text-[#f6e7c9]/75">{prefs.profile?.email || user?.email}</p>
+          </div>
+          <div className="ml-auto flex items-center gap-3 rounded-2xl border border-[#f4a300]/30 bg-white/10 px-5 py-3 text-[#fdf6e7]">
+            <span className="text-3xl font-bold leading-none" style={SERIF}>{prefs.subscriptions.length}</span>
+            <span className="text-[11px] font-semibold uppercase leading-tight tracking-wider text-[#f6e7c9]/80">Active<br />{prefs.subscriptions.length === 1 ? 'edition' : 'editions'}</span>
           </div>
         </div>
-        {msg && <div className="mt-4 rounded-lg bg-[#eef6ec] px-3 py-2 text-sm text-[#2e6b3c] border border-[#bcd9c1]">{msg}</div>}
+      </div>
 
-        {/* Account details */}
-        <section className="mt-6 desi-frame rounded-2xl bg-[#fffdf5] p-6">
-          <h2 className="text-lg font-bold text-[#1c1c1e]" style={SERIF}>Account</h2>
+      {msg && (
+        <div className="mx-auto mt-4 max-w-5xl px-4">
+          <div className="rounded-lg border border-[#bcd9c1] bg-[#eef6ec] px-3 py-2 text-sm text-[#2e6b3c]">{msg}</div>
+        </div>
+      )}
+
+      <main className="mx-auto grid max-w-5xl gap-6 px-4 py-8 lg:grid-cols-[0.85fr_1.5fr] lg:items-start">
+        {/* Account */}
+        <section className="desi-frame rounded-2xl bg-[#fffdf5] p-6 lg:sticky lg:top-6">
+          <h2 className="text-lg font-bold text-gray-900" style={SERIF}>Account</h2>
           <label className="mt-4 block text-sm text-gray-600">Name</label>
-          <div className="mt-1 flex gap-2">
-            <input value={name} onChange={(e) => setName(e.target.value)} className="flex-1 rounded-xl border border-[#c9a227]/40 px-4 py-2.5 outline-none focus:border-[#d81b60]" placeholder="Your name" />
-            <button onClick={saveName} className="rounded-xl border border-[#c9a227] bg-[#7b1e3b] px-5 font-semibold text-white transition-colors hover:bg-[#5e1730]">Save</button>
-          </div>
-          <p className="mt-3 text-sm text-gray-500">Email: <span className="text-gray-800">{prefs.profile?.email || user?.email}</span></p>
+          <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-xl border border-[#c9a227]/40 px-4 py-2.5 outline-none focus:border-[#d81b60]" placeholder="Your name" />
+          <button onClick={saveName} className="mt-3 w-full rounded-xl border border-[#c9a227] bg-[#7b1e3b] py-2.5 font-semibold text-white transition-colors hover:bg-[#5e1730]">Save name</button>
+          <p className="mt-4 border-t border-gray-100 pt-4 text-sm text-gray-500">Signed in as<br /><span className="text-gray-800">{prefs.profile?.email || user?.email}</span></p>
         </section>
 
         {/* Active subscriptions */}
-        <section className="mt-6 desi-frame rounded-2xl bg-[#fffdf5] p-6">
+        <section className="desi-frame rounded-2xl bg-[#fffdf5] p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold" style={SERIF}>Active newsletters</h2>
+            <h2 className="text-lg font-bold text-gray-900" style={SERIF}>Active newsletters</h2>
             {prefs.subscriptions.length > 0 && (
               <button onClick={removeAll} className="text-sm text-red-500 hover:underline">Unsubscribe all</button>
             )}
