@@ -53,21 +53,17 @@ function Spotlight({ cs }) {
     <Reveal>
       <Link
         to={`/case-studies/${cs.id}`}
-        className="desi-frame group relative block overflow-hidden rounded-3xl p-8 sm:p-10"
-        style={{ background: `linear-gradient(135deg, ${WINE}, #3A1206)` }}
+        className="group block rounded-2xl border border-gray-200 bg-white p-6 transition-colors hover:border-gray-300 sm:p-8"
       >
-        <div className="absolute inset-0 opacity-[0.15]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)', backgroundSize: '18px 18px' }} />
-        <div className="relative">
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={SANS}>
-            ◆ Case Study of the day
-          </span>
-          <h3 className="mt-4 max-w-3xl text-2xl font-bold leading-snug text-white sm:text-3xl" style={SERIF}>{cs.headline}</h3>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-white/85" style={SANS}>{cs.summary}</p>
-          <span className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold uppercase tracking-wide text-[#3a1206] shadow-lg" style={{ ...SANS, background: '#F4A300' }}>
-            Read the case
-            <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </span>
-        </div>
+        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#7b1e3b]" style={SANS}>
+          Case study of the day
+        </span>
+        <h3 className="mt-3 max-w-3xl text-2xl font-bold leading-snug text-gray-900 sm:text-[32px]" style={SERIF}>{cs.headline}</h3>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-gray-600" style={SANS}>{cs.summary}</p>
+        <span className="mt-5 inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#7b1e3b] transition-colors group-hover:text-[#d81b60]" style={SANS}>
+          Read the case
+          <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </span>
       </Link>
     </Reveal>
   )
@@ -89,7 +85,7 @@ export default function EditionStories() {
         <div className="mb-2 flex items-end justify-between gap-4">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d81b60]" style={SANS}>✦ Fresh today ✦</span>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#7b1e3b] sm:text-4xl" style={SERIF}>Today&rsquo;s edition</h2>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl" style={SERIF}>Today&rsquo;s edition</h2>
           </div>
           <Link to="/general" className="hidden shrink-0 text-[13px] font-semibold text-[#7b1e3b] hover:text-[#d81b60] sm:inline" style={SANS}>
             Browse all stories →

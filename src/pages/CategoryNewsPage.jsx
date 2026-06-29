@@ -152,83 +152,40 @@ function Sources({ count = 5, sources = [] }) {
   )
 }
 
-// A faint mandala drawn in SVG, parked in the hero corners.
-function Mandala({ className }) {
-  return (
-    <svg viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="1.2">
-      <circle cx="50" cy="50" r="46" />
-      <circle cx="50" cy="50" r="34" />
-      <circle cx="50" cy="50" r="20" />
-      {Array.from({ length: 16 }).map((_, i) => {
-        const a = (i * Math.PI) / 8
-        return <line key={i} x1="50" y1="50" x2={50 + 46 * Math.cos(a)} y2={50 + 46 * Math.sin(a)} />
-      })}
-      {Array.from({ length: 16 }).map((_, i) => {
-        const a = (i * Math.PI) / 8
-        return <circle key={`p${i}`} cx={50 + 34 * Math.cos(a)} cy={50 + 34 * Math.sin(a)} r="3" />
-      })}
-    </svg>
-  )
-}
-
-// Fallback palette so a theme without a `desi` field never crashes the hero.
+// Fallback accent so a theme without a `desi` field never crashes the hero.
 const DESI_FALLBACK = { from: '#7B1E3B', to: '#3A1206', accent: '#F4A300' }
 
+// Editorial-minimal category header: a big serif title on the cream page, a
+// small accent overline, a one-line description, and a quiet subscribe link.
+// No gradients, mandalas, or fringe — colour lives in the story images below.
 function CategoryHero({ theme }) {
   const d = theme.desi || DESI_FALLBACK
   return (
-    <section className="relative isolate overflow-hidden">
-      <div className="relative mx-auto mt-2 max-w-[1600px] px-4 sm:px-8 lg:px-14">
-        <div className="desi-frame relative overflow-hidden rounded-3xl">
-          {/* jewel-tone gradient base, tinted with the category cover */}
-          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${d.from}, ${d.to})` }} />
-          {theme.image && (
-            <img src={theme.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-overlay" />
-          )}
-          {/* block-print dot veil */}
-          <div
-            className="absolute inset-0 opacity-[0.18]"
-            style={{
-              backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)',
-              backgroundSize: '20px 20px',
-            }}
-          />
-          {/* corner mandalas */}
-          <Mandala className="pointer-events-none absolute -left-10 -top-10 h-44 w-44 text-white/20" />
-          <Mandala className="pointer-events-none absolute -bottom-12 -right-10 h-52 w-52 text-white/15" />
-
-          <motion.div
-            className="relative flex flex-col items-center gap-5 px-6 py-20 text-center sm:py-24"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.35em]" style={{ ...SANS, color: d.accent }}>
-              ✦ Daily Mattr Edition ✦
-            </span>
-            <h1
-              className="text-[clamp(2.5rem,9vw,120px)] font-extrabold uppercase leading-none tracking-tight text-white"
-              style={{ ...SERIF, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}
-            >
-              {theme.label}
-            </h1>
-            <div className="h-[3px] w-28 rounded-full" style={{ background: d.accent }} />
-            <p className="max-w-2xl text-[15px] leading-relaxed text-white/90" style={SANS}>
-              {theme.desc}
-            </p>
-            <Link
-              to="/subscribe"
-              className="rounded-full px-7 py-3 text-[13px] font-bold uppercase tracking-wide text-[#3a1206] shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-              style={{ ...SANS, background: d.accent }}
-            >
-              Subscribe
-            </Link>
-          </motion.div>
-
-          {/* jhalar trim hanging from the hero's bottom edge */}
-          <div className="desi-jhalar absolute inset-x-0 bottom-0" style={{ '--jhalar': d.accent }} />
-        </div>
-      </div>
+    <section className="mx-auto max-w-[1600px] px-4 pt-4 sm:px-8 lg:px-14">
+      <motion.div
+        className="border-b border-gray-200 pb-8 sm:pb-10"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span className="text-[11px] font-semibold uppercase tracking-[0.3em]" style={{ ...SANS, color: d.accent }}>
+          Daily Mattr Edition
+        </span>
+        <h1 className="mt-3 text-[clamp(2.5rem,8vw,84px)] font-bold leading-[0.95] tracking-tight text-gray-900" style={SERIF}>
+          {theme.label}
+        </h1>
+        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-gray-600" style={SANS}>
+          {theme.desc}
+        </p>
+        <Link
+          to="/subscribe"
+          className="mt-5 inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#7b1e3b] transition-colors hover:text-[#d81b60]"
+          style={SANS}
+        >
+          Subscribe to this edition
+          <svg className="h-[17px] w-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </Link>
+      </motion.div>
     </section>
   )
 }

@@ -126,7 +126,7 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
         {/* Header + live summary */}
         <div className="flex flex-wrap items-center gap-3">
           <CalendarIcon className="h-5 w-5 text-[#b8860b]" />
-          <h3 className="text-[20px] font-bold text-[#7b1e3b]" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
+          <h3 className="text-[20px] font-bold text-gray-900" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
             Build your edition
           </h3>
           {summary && <span className={`${summaryBadge} ml-auto`}>{summary}</span>}

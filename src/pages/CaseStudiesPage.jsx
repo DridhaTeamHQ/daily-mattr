@@ -18,62 +18,33 @@ const dateLabel = (iso) => {
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-// A faint mandala, parked in the hero corners.
-function Mandala({ className }) {
-  return (
-    <svg viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="1.2">
-      <circle cx="50" cy="50" r="46" />
-      <circle cx="50" cy="50" r="34" />
-      <circle cx="50" cy="50" r="20" />
-      {Array.from({ length: 16 }).map((_, i) => {
-        const a = (i * Math.PI) / 8
-        return <line key={i} x1="50" y1="50" x2={50 + 46 * Math.cos(a)} y2={50 + 46 * Math.sin(a)} />
-      })}
-    </svg>
-  )
-}
-
+// Editorial-minimal masthead: dark serif title on the cream page, a small accent
+// overline, the standfirst, and a quiet count. No gradient block or mandalas.
 function CaseHero({ count }) {
   return (
-    <section className="relative isolate overflow-hidden">
-      <div className="relative mx-auto mt-2 max-w-[1600px] px-4 sm:px-8 lg:px-14">
-        <div className="desi-frame relative overflow-hidden rounded-3xl">
-          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${WINE}, #3A1206)` }} />
-          <div
-            className="absolute inset-0 opacity-[0.18]"
-            style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)', backgroundSize: '20px 20px' }}
-          />
-          <Mandala className="pointer-events-none absolute -left-10 -top-10 h-44 w-44 text-white/20" />
-          <Mandala className="pointer-events-none absolute -bottom-12 -right-10 h-52 w-52 text-white/15" />
-          <motion.div
-            className="relative flex flex-col items-center gap-5 px-6 py-20 text-center sm:py-24"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.35em]" style={{ ...SANS, color: '#F4A300' }}>
-              ◆ Daily Mattr ◆
-            </span>
-            <h1
-              className="text-[clamp(2.5rem,9vw,110px)] font-extrabold uppercase leading-none tracking-tight text-white"
-              style={{ ...SERIF, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}
-            >
-              Corporate Cases
-            </h1>
-            <div className="h-[3px] w-28 rounded-full" style={{ background: '#F4A300' }} />
-            <p className="max-w-2xl text-[15px] leading-relaxed text-white/90" style={SANS}>
-              One company, one lesson. Deep, structured breakdowns of the moves shaping Indian business — the
-              strategy, the stakes, and what it means next.
-            </p>
-            {count > 0 && (
-              <span className="rounded-full bg-white/10 px-4 py-1.5 text-[12px] font-semibold text-white/90" style={SANS}>
-                {count} {count === 1 ? 'case' : 'cases'} in this edition
-              </span>
-            )}
-          </motion.div>
-          <div className="desi-jhalar absolute inset-x-0 bottom-0" style={{ '--jhalar': '#F4A300' }} />
-        </div>
-      </div>
+    <section className="mx-auto max-w-[1600px] px-4 pt-4 sm:px-8 lg:px-14">
+      <motion.div
+        className="border-b border-gray-200 pb-8 sm:pb-10"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#7b1e3b]" style={SANS}>
+          Daily Mattr
+        </span>
+        <h1 className="mt-3 text-[clamp(2.5rem,8vw,84px)] font-bold leading-[0.95] tracking-tight text-gray-900" style={SERIF}>
+          Corporate Cases
+        </h1>
+        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-gray-600" style={SANS}>
+          One company, one lesson. Deep, structured breakdowns of the moves shaping Indian business — the
+          strategy, the stakes, and what it means next.
+        </p>
+        {count > 0 && (
+          <p className="mt-4 text-[13px] font-medium text-gray-400" style={SANS}>
+            {count} {count === 1 ? 'case' : 'cases'} in this edition
+          </p>
+        )}
+      </motion.div>
     </section>
   )
 }

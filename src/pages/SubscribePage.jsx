@@ -125,7 +125,7 @@ export default function SubscribePage() {
 
       <main className="mx-auto max-w-4xl px-4 py-10">
         <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d81b60]">✦ Make it yours ✦</span>
-        <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-[#7b1e3b]" style={SERIF}>Your subscription</h1>
+        <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-900" style={SERIF}>Your subscription</h1>
         <p className="mt-2 max-w-2xl text-gray-600">
           Three independent newsletters. Subscribe to any or all — <strong className="text-[#7b1e3b]">each lands as its own separate email.</strong>
           {isAuthed ? '' : ' Log in to subscribe and manage them.'}

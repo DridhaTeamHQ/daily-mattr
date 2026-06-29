@@ -21,17 +21,6 @@ const FAN = [
 export default function NewsletterHero() {
   return (
     <section className="relative overflow-hidden bg-[#faf9f6] pt-28 pb-16 sm:pt-32">
-      {/* Vintage newspaper texture (Figma node 1:1293) faded into the cream bg */}
-      <img
-        src="/newsletter/hero/newspaper.jpg"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-multiply"
-      />
-      {/* Soften it toward the top and fade to cream at the bottom so the type stays crisp */}
-      <div className="pointer-events-none absolute inset-0 bg-[#faf9f6]/35" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-[#faf9f6]" />
-
       <div className="relative z-10 flex flex-col items-center gap-8 px-4">
         {/* Title */}
         <h1
@@ -57,8 +46,8 @@ export default function NewsletterHero() {
         <div className="flex flex-wrap items-center justify-center gap-3">
           <a
             href="#subscribe"
-            className="relative inline-flex items-center justify-center rounded-[50px] px-6 py-4 text-[15px] font-semibold uppercase tracking-wide text-white shadow-[0_10px_30px_rgba(216,27,96,0.45)] transition-transform hover:scale-[1.03]"
-            style={{ ...SANS, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
+            className="inline-flex items-center justify-center rounded-full border border-[#c9a227] bg-[#7b1e3b] px-7 py-3.5 text-[15px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#5e1730]"
+            style={SANS}
           >
             Subscribe
           </a>

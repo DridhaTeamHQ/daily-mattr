@@ -49,7 +49,7 @@ const NewsletterPage = () => {
         <section id="subscribe" className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 mt-20 scroll-mt-28">
           <div className="mb-8">
             <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d81b60]">✦ Make it yours ✦</span>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-[#7b1e3b]" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>Build your edition</h2>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>Build your edition</h2>
             <p className="mt-2 text-gray-600">Pick when it lands, what it covers, and how broadly we curate — watch it come together on the right.</p>
           </div>
           <NewsletterSubscribe categories={subCategories} onCategoriesChange={setSubCategories} />

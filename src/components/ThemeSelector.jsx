@@ -23,7 +23,7 @@ export default function ThemeSelector() {
         <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d81b60]" style={SANS}>
           ✦ Explore ✦
         </span>
-        <h2 className="mt-2 text-4xl font-extrabold tracking-tight text-[#7b1e3b] sm:text-5xl" style={SERIF}>
+        <h2 className="mt-2 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl" style={SERIF}>
           Explore the editions
         </h2>
         <p className="mt-2 max-w-2xl text-base text-gray-600 sm:text-lg" style={SANS}>
