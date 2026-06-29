@@ -116,7 +116,7 @@ export default function SubscribePage() {
                 <button onClick={signOut} className="rounded-full border border-[#c9a227]/40 px-3 py-1.5 hover:bg-[#fff0d6]">Sign out</button>
               </>
             ) : (
-              <Link to="/login?redirect=/subscribe" className="rounded-full px-4 py-1.5 font-semibold text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>Login</Link>
+              <Link to="/login?redirect=/subscribe" className="rounded-full border border-[#c9a227] bg-[#7b1e3b] px-4 py-1.5 font-semibold text-white transition-colors hover:bg-[#5e1730]">Login</Link>
             )}
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function SubscribePage() {
         {!isAuthed && !authLoading && (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#c9a227]/40 bg-[#fff7e6] px-5 py-4">
             <p className="text-sm text-[#7b1e3b]">Sign in to save your choices and manage them anytime.</p>
-            <Link to="/login?redirect=/subscribe" className="rounded-full px-5 py-2 text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>Log in with Google</Link>
+            <Link to="/login?redirect=/subscribe" className="rounded-full border border-[#c9a227] bg-[#7b1e3b] px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-[#5e1730]">Log in with Google</Link>
           </div>
         )}
 
@@ -291,8 +291,7 @@ function ActivePill({ label, small }) {
 function SubBtn({ busy, onClick, label, disabled, small }) {
   return (
     <button onClick={onClick} disabled={busy || disabled}
-      className={`rounded-full font-bold uppercase tracking-wide text-white shadow-[0_8px_22px_rgba(216,27,96,0.3)] transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:shadow-none ${small ? 'px-4 py-2 text-[12px]' : 'px-5 py-2.5 text-sm'}`}
-      style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>
+      className={`rounded-full border border-[#c9a227] bg-[#7b1e3b] font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#5e1730] disabled:opacity-50 ${small ? 'px-4 py-2 text-[12px]' : 'px-5 py-2.5 text-sm'}`}>
       {busy ? 'Saving…' : label}
     </button>
   )

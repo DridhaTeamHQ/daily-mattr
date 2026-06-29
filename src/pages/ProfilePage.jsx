@@ -90,7 +90,7 @@ export default function ProfilePage() {
           <label className="mt-4 block text-sm text-gray-600">Name</label>
           <div className="mt-1 flex gap-2">
             <input value={name} onChange={(e) => setName(e.target.value)} className="flex-1 rounded-xl border border-[#c9a227]/40 px-4 py-2.5 outline-none focus:border-[#d81b60]" placeholder="Your name" />
-            <button onClick={saveName} className="rounded-xl px-5 font-semibold text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>Save</button>
+            <button onClick={saveName} className="rounded-xl border border-[#c9a227] bg-[#7b1e3b] px-5 font-semibold text-white transition-colors hover:bg-[#5e1730]">Save</button>
           </div>
           <p className="mt-3 text-sm text-gray-500">Email: <span className="text-gray-800">{prefs.profile?.email || user?.email}</span></p>
         </section>
@@ -109,7 +109,7 @@ export default function ProfilePage() {
           ) : prefs.subscriptions.length === 0 ? (
             <div className="mt-4 rounded-xl bg-[#fff7e6] p-6 text-center">
               <p className="text-gray-600">You have no active subscriptions yet.</p>
-              <Link to="/subscribe" className="mt-3 inline-block rounded-full px-5 py-2.5 text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>Browse newsletters</Link>
+              <Link to="/subscribe" className="mt-3 inline-block rounded-full border border-[#c9a227] bg-[#7b1e3b] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#5e1730]">Browse newsletters</Link>
             </div>
           ) : (
             <ul className="mt-4 divide-y divide-gray-100">

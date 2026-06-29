@@ -260,7 +260,7 @@ function SearchTabs({ tab, setTab, query, setQuery, tabs }) {
                 className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
                   on ? 'text-white' : 'text-[#7b1e3b] hover:text-[#d81b60]'
                 }`}
-                style={on ? { background: 'linear-gradient(135deg, #F4A300, #D81B60)' } : undefined}
+                style={on ? { background: '#7b1e3b' } : undefined}
               >
                 {t.label}
               </button>
