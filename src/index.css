@@ -20,3 +20,31 @@
     font-family: 'Roboto', 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
   }
 }
+
+/* Desi-maximalism scrollbar — gold thumb on a faint gold track, wine on hover.
+   Applies to the page and every inner scroll area (e.g. the reading list). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c9a227 rgba(201, 162, 39, 0.12);
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: rgba(201, 162, 39, 0.1);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d4af37, #b8860b);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #7b1e3b;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
