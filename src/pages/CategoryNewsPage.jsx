@@ -4,7 +4,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import NewsletterNav from '../components/NewsletterNav'
 import Footer from '../components/Footer'
 import { SwipeCard, SwipeHint, ReadNav, MobileReadBar, BrowseSheet } from '../components/ReadingNav'
+import ReadingProgress from '../components/ReadingProgress'
+import ShareRow from '../components/ShareRow'
 import { fetchNewsletter } from '../lib/newsApi'
+import { readTime } from '../lib/readTime'
 import { useLiveData } from '../lib/useLiveData'
 import { NEWSLETTER_THEMES } from '../lib/newsletterThemes'
 import '../styles/desi.css'
@@ -273,11 +276,10 @@ function FeatureCard({ category, article }) {
   return (
     <Link
       to={`/${category}/${article.id}`}
-      className="desi-card desi-frame block rounded-2xl p-6 transition-transform hover:-translate-y-0.5 sm:p-8"
-      style={{ '--band': '#7B1E3B' }}
+      className="group block rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-gray-300 hover:shadow-[0_18px_44px_-28px_rgba(17,24,39,0.4)] sm:p-8"
     >
       <div className="flex flex-wrap items-center gap-2" style={SANS}>
-        <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #7B1E3B)' }}>
+        <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: '#7B1E3B' }}>
           ✦ In-depth
         </span>
         {article.bucket && (
@@ -285,17 +287,17 @@ function FeatureCard({ category, article }) {
             {article.bucket}
           </span>
         )}
-        <span className="text-[11px] text-gray-400">Long read</span>
+        <span className="text-[11px] text-gray-400">{readTime(article.body, article.summary)} min read</span>
       </div>
-      <h3 className="mt-4 text-2xl font-bold leading-snug text-gray-900 sm:text-3xl" style={SERIF}>
+      <h3 className="mt-4 text-2xl font-bold leading-snug text-gray-900 decoration-[#7b1e3b]/50 decoration-2 underline-offset-4 group-hover:underline sm:text-3xl" style={SERIF}>
         {article.headline}
       </h3>
-      <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-gray-700" style={SANS}>
+      <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-gray-600" style={SANS}>
         {article.summary}
       </p>
       <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-bold text-[#7b1e3b]" style={SANS}>
         Read the full feature
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </span>
     </Link>
   )
@@ -306,18 +308,18 @@ function StoryCard({ category, article, band }) {
   return (
     <Link
       to={`/${category}/${article.id}`}
-      className="desi-card flex h-full flex-col rounded-2xl p-5 shadow-sm transition-transform hover:-translate-y-0.5"
-      style={{ '--band': b }}
+      className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_16px_36px_-28px_rgba(17,24,39,0.4)]"
     >
       <CardTags article={article} band={b} />
-      <h4 className="mt-3 text-[17px] font-bold leading-snug text-gray-900" style={SERIF}>
+      <h4 className="mt-3 text-[17px] font-bold leading-snug text-gray-900 decoration-[#7b1e3b]/50 decoration-2 underline-offset-4 group-hover:underline" style={SERIF}>
         {article.headline}
       </h4>
-      <p className="mt-2 line-clamp-4 flex-1 text-[13px] leading-relaxed text-gray-700" style={SANS}>
+      <p className="mt-2 line-clamp-4 flex-1 text-[13px] leading-relaxed text-gray-600" style={SANS}>
         {article.summary}
       </p>
-      <div className="mt-4">
+      <div className="mt-4 flex items-center justify-between gap-2">
         <Sources count={article.sourceCount || (article.tags?.length || 2) + 1} sources={article.sources} />
+        <span className="shrink-0 text-[12px] text-gray-400" style={SANS}>{readTime(article.body, article.summary)} min</span>
       </div>
     </Link>
   )
@@ -458,6 +460,7 @@ function Reading({ category, items, articleId }) {
 
   return (
     <div className="mx-auto mt-6 max-w-[1600px] px-4 pb-28 sm:mt-10 sm:px-8 sm:pb-8 lg:px-14">
+      <ReadingProgress />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         {/* The article — FIRST in the DOM (content-first); pulled into the right
             column on desktop via grid placement, never CSS order, so the
@@ -499,12 +502,14 @@ function Reading({ category, items, articleId }) {
             </span>
             <span>·</span>
             <span>{dateLabel(article.publishedAt)}</span>
+            <span aria-hidden>·</span>
+            <span>{readTime(article.body, article.summary)} min read</span>
           </div>
           <div className="mt-5">
             <Sources count={article.sourceCount || (article.tags?.length || 2) + 1} sources={article.sources} />
           </div>
 
-          <div className="mt-8 space-y-5 text-[16px] leading-[1.8] text-gray-700" style={SANS}>
+          <div className="article-body mt-8 space-y-5 text-[17px] leading-[1.8] text-gray-700" style={SANS}>
             {isLong && article.body ? (
               // Case study / long feature: the agent's full curated write-up.
               article.body
@@ -556,7 +561,8 @@ function Reading({ category, items, articleId }) {
               ✦ Curated and written by Daily Mattr from {article.sourceCount || 'multiple'} Indian newsrooms.
             </p>
           )}
-              <ReadNav prev={prev} next={next} onPrev={goPrev} onNext={goNext} />
+          <ShareRow title={article.headline} />
+          <ReadNav prev={prev} next={next} onPrev={goPrev} onNext={goNext} />
           </SwipeCard>
         </div>
 

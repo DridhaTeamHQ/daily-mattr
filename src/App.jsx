@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop'
+import ScrollTopButton from './components/ScrollTopButton'
 import NewsletterPage from './pages/NewsletterPage'
 import CategoryNewsPage from './pages/CategoryNewsPage'
 import CaseStudiesPage from './pages/CaseStudiesPage'
@@ -25,6 +26,7 @@ function App() {
         <Route path="/:category" element={<CategoryNewsPage />} />
         <Route path="/:category/:articleId" element={<CategoryNewsPage />} />
       </Routes>
+      <ScrollTopButton />
     </>
   )
 }

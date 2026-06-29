@@ -8,6 +8,7 @@ import {
   WEEKDAYS,
 } from '../lib/subscribeOptions'
 import EditionPreview from './EditionPreview'
+import Petals from './Petals'
 
 // Figma-exact "Build your edition" form (node 1:1512). Palette: white, black,
 // #7900d9, with the #f4e9ff selected tint. Roboto throughout.
@@ -103,7 +104,8 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
     return (
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="lg:sticky lg:top-24 lg:self-start"><EditionPreview rhythm={rhythm} days={days} categories={categories} name={name} summary={summary} /></div>
-        <div className="desi-frame rounded-[24px] bg-[#fffdf5] p-8 text-center sm:p-10" style={SANS}>
+        <div className="desi-frame relative overflow-hidden rounded-[24px] bg-[#fffdf5] p-8 text-center sm:p-10" style={SANS}>
+          <Petals />
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fff0d6] text-[#d81b60]">
             <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </div>

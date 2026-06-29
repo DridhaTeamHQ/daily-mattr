@@ -48,3 +48,18 @@
 *::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* Long-form reading: comfortable measure + an editorial drop cap on the first
+   paragraph. Applied via the .article-body class on the article text wrapper. */
+.article-body {
+  max-width: 68ch;
+}
+.article-body > p:first-of-type::first-letter {
+  float: left;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 3.4rem;
+  line-height: 0.78;
+  margin: 0.12em 0.6rem 0 0;
+  color: #7b1e3b;
+}
