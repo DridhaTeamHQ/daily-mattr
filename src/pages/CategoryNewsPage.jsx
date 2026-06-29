@@ -370,7 +370,7 @@ function LoadError({ message, onRetry }) {
     <div className="mx-auto max-w-[1600px] px-4 py-20 text-center sm:px-8 lg:px-14" style={SANS}>
       <p className="text-[15px] text-[#7b1e3b]">Couldn’t load stories.</p>
       <p className="mt-1 text-[13px] text-gray-500 break-words">{message}</p>
-      <button onClick={onRetry} className="mt-4 rounded-full px-5 py-2.5 text-[13px] font-bold uppercase tracking-wide text-white" style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}>
+      <button onClick={onRetry} className="mt-4 rounded-full border border-[#c9a227] bg-[#7b1e3b] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#5e1730]">
         Retry
       </button>
     </div>
@@ -597,8 +597,8 @@ function Reading({ category, items, articleId }) {
               href={article.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-bold text-white shadow-[0_8px_24px_rgba(216,27,96,0.35)]"
-              style={{ ...SANS, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
+              className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#c9a227] bg-[#7b1e3b] px-6 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-[#5e1730]"
+              style={SANS}
             >
               Read the full story at {article.source}
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -638,7 +638,8 @@ export default function CategoryNewsPage() {
     <div className="desi-paper min-h-screen text-gray-900">
       <NewsletterNav />
       <div className="pt-24 sm:pt-28">
-        <CategoryHero theme={theme} />
+        {/* Reading an article lands you on the article — no full hero to scroll past. */}
+        {!articleId && <CategoryHero theme={theme} />}
 
         {error && !data ? (
           <LoadError message={error} onRetry={reload} />

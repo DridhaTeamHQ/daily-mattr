@@ -51,8 +51,8 @@ export default function NewsletterNav() {
               <>
                 <Link
                   to="/profile"
-                  className="rounded-[50px] px-5 py-2.5 text-[13px] font-semibold text-white whitespace-nowrap shadow-[0_8px_24px_rgba(216,27,96,0.35)] transition-transform hover:scale-[1.03]"
-                  style={{ ...ROBOTO, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
+                  className="rounded-[50px] border border-[#c9a227] bg-[#7b1e3b] px-5 py-2.5 text-[13px] font-semibold text-white whitespace-nowrap transition-colors hover:bg-[#5e1730]"
+                  style={ROBOTO}
                 >
                   Profile
                 </Link>
@@ -67,8 +67,8 @@ export default function NewsletterNav() {
             ) : (
               <Link
                 to="/login?redirect=/subscribe"
-                className="rounded-[50px] px-6 py-3 text-[14px] font-semibold text-white whitespace-nowrap shadow-[0_8px_24px_rgba(216,27,96,0.35)] transition-transform hover:scale-[1.03]"
-                style={{ ...ROBOTO, background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
+                className="rounded-[50px] border border-[#c9a227] bg-[#7b1e3b] px-6 py-3 text-[14px] font-semibold text-white whitespace-nowrap transition-colors hover:bg-[#5e1730]"
+                style={ROBOTO}
               >
                 Login
               </Link>
