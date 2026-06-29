@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import NewsletterNav from '../components/NewsletterNav'
 import Footer from '../components/Footer'
 import NewsletterHero from '../components/NewsletterHero'
+import ScrollBanner from '../components/ScrollBanner'
 import ThemeSelector from '../components/ThemeSelector'
 import NewsletterSubscribe from '../components/NewsletterSubscribe'
 import EditionStories from '../components/EditionStories'
@@ -20,6 +21,8 @@ const NewsletterPage = () => {
       <NewsletterNav />
 
       <NewsletterHero />
+
+      <ScrollBanner />
 
       <main>
         {/* Live: today's approved stories + the case-study spotlight */}
