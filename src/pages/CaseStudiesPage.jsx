@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import React, { useMemo, useRef, useState } from 'react'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { motion, useReducedMotion } from 'framer-motion'
 import NewsletterNav from '../components/NewsletterNav'
 import Footer from '../components/Footer'
+import { SwipeCard, SwipeHint, ReadNav, MobileReadBar, BrowseSheet } from '../components/ReadingNav'
 import { fetchCaseStudies } from '../lib/content'
 import { useLiveData } from '../lib/useLiveData'
 import '../styles/desi.css'
@@ -108,7 +109,25 @@ function CaseList({ items }) {
 }
 
 function CaseReading({ items, id }) {
-  const item = items.find((c) => c.id === id) || items[0]
+  const navigate = useNavigate()
+  const reduce = useReducedMotion()
+  const idx = Math.max(0, items.findIndex((c) => c.id === id))
+  const item = items[idx] || items[0]
+  const prev = items[idx - 1]
+  const next = items[idx + 1]
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const dirRef = useRef(1)
+
+  const goTo = (target, dir) => {
+    if (!target) return
+    dirRef.current = dir
+    setSheetOpen(false)
+    navigate(`/case-studies/${target.id}`)
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+  }
+  const goNext = () => goTo(next, 1)
+  const goPrev = () => goTo(prev, -1)
+
   if (!item) {
     return (
       <div className="mx-auto max-w-[1600px] px-4 py-24 text-center sm:px-8 lg:px-14" style={SANS}>
@@ -123,12 +142,59 @@ function CaseReading({ items, id }) {
     .split(/\n\n+/)
     .map((p) => p.trim())
     .filter(Boolean)
+  const enterX = reduce ? 0 : dirRef.current >= 0 ? 44 : -44
 
   return (
-    <div className="mx-auto mt-10 max-w-[1600px] px-4 pb-8 sm:px-8 lg:px-14">
+    <div className="mx-auto mt-6 max-w-[1600px] px-4 pb-28 sm:mt-10 sm:px-8 sm:pb-8 lg:px-14">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
-        {/* left on desktop, BELOW the open case on mobile (content-first) */}
-        <aside className="order-2 lg:order-1 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto lg:pr-2">
+        {/* The open case — FIRST in the DOM (content-first); right column on
+            desktop via grid placement. Swipe left/right to change cases. */}
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+          <SwipeCard id={item.id} enterX={enterX} reduce={reduce} onNext={goNext} onPrev={goPrev}>
+            <div className="mb-4 flex items-center gap-2 text-[12px]" style={SANS}>
+              <Link to="/case-studies" className="font-medium text-[#d81b60] hover:underline">← All case studies</Link>
+            </div>
+            <SwipeHint index={idx} total={items.length} />
+            <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ ...SANS, background: WINE }}>
+              ◆ Case Study
+            </span>
+            <h1 className="mt-3 text-3xl font-bold leading-tight text-gray-900 sm:text-4xl" style={SERIF}>{item.headline}</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px] text-gray-500" style={SANS}>
+              {item.source && <span>{item.source}</span>}
+              {item.source && item.publishedAt && <span>·</span>}
+              {item.publishedAt && <span>{dateLabel(item.publishedAt)}</span>}
+            </div>
+
+            <div className="desi-divider my-7"><span className="desi-divider__motif" style={SANS}>❖</span></div>
+
+            <div className="space-y-5 text-[16px] leading-[1.8] text-gray-700" style={SANS}>
+              {paras.map((p, i) => (
+                <p key={i} className={i === 0 ? 'text-[18px] leading-[1.7] text-gray-800' : ''}>{p}</p>
+              ))}
+            </div>
+
+            {item.sourceUrl && (
+              <a
+                href={item.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#c9a227] bg-[#7b1e3b] px-6 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-[#5e1730]"
+                style={SANS}
+              >
+                Read the source at {item.source || 'origin'}
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M7 17L17 7M9 7h8v8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
+            )}
+
+            <ReadNav prev={prev} next={next} onPrev={goPrev} onNext={goNext} />
+          </SwipeCard>
+        </div>
+
+        {/* "More cases" — AFTER the case in the DOM; left column on desktop,
+            hidden on phones (bottom bar + sheet + swipe handle navigation). */}
+        <aside className="hidden lg:col-start-1 lg:row-start-1 lg:block lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto lg:pr-2">
           <div className="desi-divider mb-5">
             <span className="desi-divider__motif" style={SANS}>◆ More cases ◆</span>
           </div>
@@ -138,7 +204,7 @@ function CaseReading({ items, id }) {
                 key={c.id}
                 to={`/case-studies/${c.id}`}
                 className={`rounded-xl border p-4 transition-colors ${
-                  c.id === item.id ? 'border-[#7b1e3b] bg-[#fff0d6]' : 'border-[#c9a227]/25 bg-[#fffdf5] hover:border-[#c9a227]/50'
+                  c.id === item.id ? 'border-[#7b1e3b] bg-[#fff0d6]' : 'border-gray-200 bg-white hover:border-gray-300'
                 }`}
               >
                 <h4 className="text-[15px] font-bold leading-snug text-gray-900" style={SERIF}>{c.headline}</h4>
@@ -147,52 +213,10 @@ function CaseReading({ items, id }) {
             ))}
           </div>
         </aside>
-
-        {/* right on desktop, FIRST on mobile */}
-        <motion.article
-          key={item.id}
-          className="order-1 lg:order-2 min-w-0"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="mb-4 flex items-center gap-2 text-[12px]" style={SANS}>
-            <Link to="/case-studies" className="font-medium text-[#d81b60] hover:underline">← All case studies</Link>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ ...SANS, background: WINE }}>
-            ◆ Case Study
-          </span>
-          <h1 className="mt-3 text-3xl font-bold leading-tight text-gray-900 sm:text-4xl" style={SERIF}>{item.headline}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px] text-gray-500" style={SANS}>
-            {item.source && <span>{item.source}</span>}
-            {item.source && item.publishedAt && <span>·</span>}
-            {item.publishedAt && <span>{dateLabel(item.publishedAt)}</span>}
-          </div>
-
-          <div className="desi-divider my-7"><span className="desi-divider__motif" style={SANS}>❖</span></div>
-
-          <div className="space-y-5 text-[16px] leading-[1.8] text-gray-700" style={SANS}>
-            {paras.map((p, i) => (
-              <p key={i} className={i === 0 ? 'text-[18px] leading-[1.7] text-gray-800' : ''}>{p}</p>
-            ))}
-          </div>
-
-          {item.sourceUrl && (
-            <a
-              href={item.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#c9a227] bg-[#7b1e3b] px-6 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-[#5e1730]"
-              style={SANS}
-            >
-              Read the source at {item.source || 'origin'}
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M7 17L17 7M9 7h8v8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-          )}
-        </motion.article>
       </div>
+
+      <MobileReadBar prev={prev} next={next} onPrev={goPrev} onNext={goNext} onBrowse={() => setSheetOpen(true)} label="Browse cases" />
+      <BrowseSheet open={sheetOpen} onClose={() => setSheetOpen(false)} items={items} currentId={item.id} onPick={(c) => goTo(c, 0)} title="All cases" />
     </div>
   )
 }

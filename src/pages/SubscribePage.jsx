@@ -258,7 +258,7 @@ export default function SubscribePage() {
 function ProductCard({ n, band, title, cadence, blurb, active, activeLabel, children }) {
   return (
     <section className="desi-frame overflow-hidden rounded-3xl bg-[#fffdf5]">
-      <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${band}, #F4A300)` }} />
+      <div className="h-1 w-full" style={{ background: band }} />
       <div className="p-6 sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-4">

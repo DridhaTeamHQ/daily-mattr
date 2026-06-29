@@ -19,24 +19,9 @@ const NewsletterPage = () => {
     <div className="min-h-screen bg-[#faf9f6] text-gray-900">
       <NewsletterNav />
 
-      {/* Hero pins (native sticky) and gently recedes while the collage banner
-          rises and covers it — see NewsletterPage.css. */}
-      <div className="nl-stack">
-        <div className="nl-hero-pin">
-          <NewsletterHero />
-        </div>
+      <NewsletterHero />
 
-        <div className="nl-banner">
-          {/* Edge-to-edge collage banner (full-bleed) */}
-          <img
-            src="/newsletter/banner.png"
-            alt="Daily Mattr — general headlines, real estate, policy, money and wellness"
-            className="block w-full h-auto"
-          />
-        </div>
-      </div>
-
-      <main className="nl-after">
+      <main>
         {/* Live: today's approved stories + the case-study spotlight */}
         <div id="stories" className="mt-16 scroll-mt-24">
           <EditionStories />
