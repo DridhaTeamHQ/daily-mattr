@@ -19,16 +19,6 @@ const CalendarIcon = (props) => (
     <path d="M3 9h18M8 3v4M16 3v4" strokeLinecap="round" />
   </svg>
 )
-const Chevron = ({ up, ...p }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-5 w-5 transition-transform ${up ? 'rotate-180' : ''}`} {...p}>
-    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-const Tick = (p) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#d81b60" strokeWidth="2" className="h-5 w-5 shrink-0" {...p}>
-    <path d="M5 12.5l4.5 4.5L19 7" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
 
 export default function NewsletterSubscribe({ categories: categoriesProp, onCategoriesChange }) {
   const controlled = Array.isArray(categoriesProp)
@@ -101,13 +91,13 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
   }
 
   // ---- desi-maximalism tokens (jewel + gold on warm ivory) ----
-  const headline = 'text-[17px] font-medium text-[#1c1c1e] leading-snug'
-  const desc = 'text-[15px] text-[#1c1c1e] leading-snug'
-  const pill = (active) =>
-    `flex items-center justify-between gap-2 rounded-[32px] border px-6 py-[14px] text-[15px] font-medium text-[rgba(28,28,30,0.93)] transition-colors ${
-      active ? 'bg-[#fff0d6] border-[#d81b60]' : 'bg-white border-[#c9a227]/35 hover:border-[#c9a227]/70'
+  const chip = (active) =>
+    `rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+      active ? 'bg-[#fff0d6] border-[#d81b60] text-[#7b1e3b]' : 'bg-white border-[#c9a227]/35 text-gray-700 hover:border-[#c9a227]/70'
     }`
-  const summaryBadge = 'rounded-[44px] bg-[#fff0d6] px-3.5 py-[7px] text-[15px] font-medium text-[#7b1e3b]'
+  const inputCls =
+    'w-full rounded-[12px] border border-[#c9a227]/35 px-4 py-3 text-[15px] text-[#1c1c1e] outline-none transition-colors placeholder:text-[#6b6b73] focus:border-[#d81b60]'
+  const summaryBadge = 'rounded-full bg-[#fff0d6] px-3 py-1 text-[13px] font-medium text-[#7b1e3b]'
 
   if (status.state === 'success') {
     return (
@@ -131,135 +121,105 @@ export default function NewsletterSubscribe({ categories: categoriesProp, onCate
         <EditionPreview rhythm={rhythm} days={days} categories={categories} name={name} summary={summary} />
       </div>
 
-      {/* RIGHT — desi builder card */}
-      <form onSubmit={onSubmit} className="desi-frame overflow-hidden rounded-[24px] bg-[#fffdf5]" style={SANS}>
-        {/* Schedule header */}
-        <div className="flex items-center gap-4 border-b border-[#c9a227]/35 bg-gradient-to-r from-[#f7ecd6] to-[#fbe9d6] px-8 py-6">
-          <CalendarIcon className="h-6 w-6 text-[#b8860b]" />
-          <h3 className="text-[22px] font-semibold text-[#7b1e3b]" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>Schedule</h3>
+      {/* RIGHT — compact desi builder card */}
+      <form onSubmit={onSubmit} className="desi-frame rounded-[24px] bg-[#fffdf5] p-6 sm:p-7" style={SANS}>
+        {/* Header + live summary */}
+        <div className="flex flex-wrap items-center gap-3">
+          <CalendarIcon className="h-5 w-5 text-[#b8860b]" />
+          <h3 className="text-[20px] font-bold text-[#7b1e3b]" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
+            Build your edition
+          </h3>
+          {summary && <span className={`${summaryBadge} ml-auto`}>{summary}</span>}
         </div>
 
-        {/* Choose your delivery rhythm */}
-        <div className="border-b border-[#c9a227]/30 pb-8">
-          <div className="flex flex-col gap-2 px-8 pb-2 pt-8">
-            <p className="text-[18px] font-medium text-black">Choose your delivery rhythm.</p>
-            {summary && <span className={`${summaryBadge} self-start`}>{summary}</span>}
-          </div>
-
-          <div className="flex flex-col gap-2 px-8">
+        {/* Delivery rhythm — segmented toggle + inline day chips */}
+        <div className="mt-5">
+          <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#b8860b]">Delivery rhythm</p>
+          <div className="mt-2 inline-flex rounded-full border border-[#c9a227]/40 bg-white p-1">
             {RHYTHMS.map((r) => {
               const active = rhythm === r.id
-              const collapsible = r.id !== 'daily'
               return (
-                <div
+                <button
                   key={r.id}
-                  role="button"
-                  tabIndex={0}
+                  type="button"
                   onClick={() => { triggerHaptic('light'); setRhythm(r.id) }}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { triggerHaptic('light'); setRhythm(r.id) } }}
-                  className={`cursor-pointer rounded-[12px] border px-5 py-[15px] transition-colors ${active ? 'bg-[#fff0d6] border-[#d81b60]' : 'bg-white border-[#c9a227]/35 hover:border-[#c9a227]/70'}`}
+                  className={`rounded-full px-6 py-2 text-[14px] font-semibold transition-colors ${active ? 'text-white' : 'text-[#7b1e3b] hover:text-[#d81b60]'}`}
+                  style={active ? { background: '#7b1e3b' } : undefined}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className={headline}>{r.label}</p>
-                      <p className={desc}>{r.desc}</p>
-                    </div>
-                    {collapsible && <Chevron up={active} className="h-5 w-5 shrink-0 text-[#1c1c1e]" />}
-                  </div>
-
-                  <AnimatePresence initial={false}>
-                    {active && r.id === 'weekly' && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <div className="grid grid-cols-2 gap-2 pt-3">
-                          {WEEKDAYS.map((w) => (
-                            <button
-                              type="button"
-                              key={w.id}
-                              onClick={(e) => { e.stopPropagation(); selectDay(w.id) }}
-                              className={pill(days[0] === w.id)}
-                            >
-                              <span>{w.label}</span>
-                              {days[0] === w.id && <Tick />}
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="border-b border-[#c9a227]/30 pb-6">
-          <div className="flex items-center justify-between px-8 py-4">
-            <div className="min-w-0">
-              <p className="text-[18px] font-medium text-[#1c1c1e]">Categories</p>
-              <p className={desc}>Choose what matters to you.</p>
-            </div>
-            <span className={`${summaryBadge} shrink-0`}>{categories.length} Selected</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2 px-8 py-2">
-            <button type="button" onClick={toggleAll} className={pill(allSelected)}>
-              <span>All</span>
-              {allSelected && <Tick />}
-            </button>
-            {SUBSCRIBE_CATEGORIES.map((c) => {
-              const active = categories.includes(c.slug)
-              return (
-                <button type="button" key={c.slug} onClick={() => toggleCategory(c.slug)} className={pill(active)}>
-                  <span className="truncate">{c.label}</span>
-                  {active && <Tick />}
+                  {r.label}
                 </button>
               )
             })}
           </div>
-        </div>
 
-        {/* Claim your edition */}
-        <div className="flex flex-col gap-4">
-          <div className="px-8 pb-4 pt-8">
-            <h3 className="text-[22px] font-semibold text-black">Claim your edition</h3>
-          </div>
-          <div className="flex flex-col gap-6">
-            <label className="flex flex-col gap-3 px-8">
-              <span className="text-[15px] text-[#1c1c1e]">Your preferred name</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
-                className="rounded-[12px] border border-[#c9a227]/35 py-[15px] pl-6 pr-8 text-[16px] text-[#1c1c1e] outline-none transition-colors placeholder:text-[#6b6b73] focus:border-[#d81b60]"
-              />
-            </label>
-            <label className="flex flex-col gap-3 px-8">
-              <span className="text-[15px] text-[#1c1c1e]">Your email</span>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="rounded-[12px] border border-[#c9a227]/35 py-[15px] pl-6 pr-8 text-[16px] text-[#1c1c1e] outline-none transition-colors placeholder:text-[#6b6b73] focus:border-[#d81b60]"
-              />
-            </label>
-
-            {status.state === 'error' && <p className="px-8 text-[14px] text-red-500">{status.msg}</p>}
-
-            <div className="px-8 pb-2">
-              <button
-                type="submit"
-                disabled={status.state === 'loading'}
-                className="w-full rounded-[12px] py-[15px] text-[16px] font-bold uppercase tracking-wide text-white shadow-[0_10px_28px_rgba(216,27,96,0.35)] transition-transform hover:scale-[1.01] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #F4A300, #D81B60)' }}
+          <AnimatePresence initial={false}>
+            {rhythm === 'weekly' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
               >
-                {status.state === 'loading' ? 'SUBSCRIBING…' : 'SUBSCRIBE'}
+                <p className="mt-3 text-[13px] text-gray-500">Arrives on</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {WEEKDAYS.map((w) => (
+                    <button key={w.id} type="button" onClick={() => selectDay(w.id)} className={chip(days[0] === w.id)}>
+                      {w.label.slice(0, 3)}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Categories — compact chips */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#b8860b]">Categories</p>
+            <span className="text-[12px] text-gray-500">{categories.length} selected</span>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <button type="button" onClick={toggleAll} className={chip(allSelected)}>All</button>
+            {SUBSCRIBE_CATEGORIES.map((c) => (
+              <button key={c.slug} type="button" onClick={() => toggleCategory(c.slug)} className={chip(categories.includes(c.slug))}>
+                {c.label}
               </button>
-            </div>
+            ))}
           </div>
         </div>
+
+        {/* Claim — name + email side by side */}
+        <div className="mt-6">
+          <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#b8860b]">Claim your edition</p>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className={inputCls}
+            />
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your email address"
+              className={inputCls}
+            />
+          </div>
+        </div>
+
+        {status.state === 'error' && <p className="mt-3 text-[13px] text-red-500">{status.msg}</p>}
+
+        <button
+          type="submit"
+          disabled={status.state === 'loading'}
+          className="mt-5 w-full rounded-full border border-[#c9a227] bg-[#7b1e3b] py-3 text-[15px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#5e1730] disabled:opacity-60"
+        >
+          {status.state === 'loading' ? 'Subscribing…' : 'Subscribe'}
+        </button>
       </form>
     </div>
   )
