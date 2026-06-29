@@ -1,37 +1,30 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { triggerHaptic } from '../utils/haptics'
 import { NEWSLETTER_THEMES } from '../lib/newsletterThemes'
 
-// "Select Your Theme" — the category cover-card grid (Figma frame 1:1337).
-// `selected` is an array of category slugs; `onToggle(slug)` adds/removes one.
-export default function ThemeSelector({ selected = [], onToggle }) {
-  // The newsletter page follows the light Figma design regardless of the site theme.
-  const dark = false
-
+// "Explore the editions" — the category cover-card grid. Each card links to its
+// stories page (Case Studies has its own page via cat.href).
+export default function ThemeSelector() {
   return (
     <section id="themes" className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-14 mt-16 scroll-mt-28">
       <div className="mb-8">
-        <h2 className={`text-4xl sm:text-5xl font-extrabold tracking-tight ${dark ? 'text-white' : 'text-gray-900'}`}>
-          Select Your Theme
+        <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">
+          Explore the editions
         </h2>
-        <p className={`mt-2 text-base sm:text-lg ${dark ? 'text-gray-300' : 'text-gray-600'}`}>
-          Choose the editorial pillars for your personal wrap.
+        <p className="mt-2 text-base sm:text-lg text-gray-600">
+          Browse every category — the day's headlines, the topics, and the case studies.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {NEWSLETTER_THEMES.map((cat, i) => {
-          const active = selected.includes(cat.slug)
           return (
             <motion.div
               key={cat.slug}
               whileHover={{ y: -4 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-              className={`group text-left rounded-2xl p-4 flex flex-col gap-4 transition-colors bg-[#fbf7f0] border ${
-                active ? 'border-[#d81b60]' : 'border-[#c9a227]/20 hover:border-[#c9a227]/50'
-              }`}
+              className="group text-left rounded-2xl p-4 flex flex-col gap-4 transition-colors bg-[#fbf7f0] border border-[#c9a227]/20 hover:border-[#c9a227]/50"
             >
               {/* Cover + title link to the category's stories feed (or dedicated page) */}
               <Link to={cat.href || `/${cat.slug}`} className="flex flex-col gap-4">
@@ -73,26 +66,14 @@ export default function ThemeSelector({ selected = [], onToggle }) {
                 <p className="text-base leading-relaxed text-gray-600">{cat.desc}</p>
               </Link>
 
-              {/* Case Studies is a browse-only card (its own page); the rest toggle into the wrap */}
-              {cat.href ? (
-                <Link to={cat.href} className="inline-flex items-center gap-2 py-1 text-base font-medium text-[#7b1e3b] hover:text-[#d81b60]">
-                  Read case studies
-                  <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => { triggerHaptic('light'); onToggle?.(cat.slug) }}
-                  className={`inline-flex items-center gap-2 py-1 text-base font-medium ${active ? 'text-[#d81b60]' : 'text-gray-900 hover:text-[#d81b60]'}`}
-                >
-                  {active ? (
-                    <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.7l-5.7 5.7a1 1 0 01-1.4 0L7.3 13a1 1 0 011.4-1.4l1.6 1.6 5-5a1 1 0 011.4 1.4z" /></svg>
-                  ) : (
-                    <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" strokeLinecap="round" /></svg>
-                  )}
-                  {active ? 'Added to wrap' : 'Add to wrap'}
-                </button>
-              )}
+              {/* Browse-only: link to the category's stories page (or the case-studies page). */}
+              <Link
+                to={cat.href || `/${cat.slug}`}
+                className="inline-flex items-center gap-2 py-1 text-base font-medium text-[#7b1e3b] hover:text-[#d81b60]"
+              >
+                {cat.href ? 'Read case studies' : 'Read more'}
+                <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </Link>
             </motion.div>
           )
         })}
