@@ -155,15 +155,6 @@ function CaseReading({ items, id }) {
               <Link to="/case-studies" className="font-medium text-[#d81b60] hover:underline">← All case studies</Link>
             </div>
             <SwipeHint index={idx} total={items.length} />
-            <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200">
-              <img
-                src="/newsletter/headers/corporate-cases.jpg"
-                alt=""
-                loading="lazy"
-                className="h-48 w-full object-cover object-bottom sm:h-64"
-                onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }}
-              />
-            </div>
             <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ ...SANS, background: WINE }}>
               ◆ Case Study
             </span>
