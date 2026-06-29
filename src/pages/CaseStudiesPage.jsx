@@ -156,8 +156,8 @@ function CaseReading({ items, id }) {
   return (
     <div className="mx-auto mt-10 max-w-[1600px] px-4 pb-8 sm:px-8 lg:px-14">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
-        {/* left: other cases */}
-        <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto lg:pr-2">
+        {/* left on desktop, BELOW the open case on mobile (content-first) */}
+        <aside className="order-2 lg:order-1 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto lg:pr-2">
           <div className="desi-divider mb-5">
             <span className="desi-divider__motif" style={SANS}>◆ More cases ◆</span>
           </div>
@@ -177,10 +177,10 @@ function CaseReading({ items, id }) {
           </div>
         </aside>
 
-        {/* right: open case */}
+        {/* right on desktop, FIRST on mobile */}
         <motion.article
           key={item.id}
-          className="min-w-0"
+          className="order-1 lg:order-2 min-w-0"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}

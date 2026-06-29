@@ -32,16 +32,34 @@ function slugFor(category) {
 // (e.g. "…/article#shortly-corporate-case-<uuid>").
 const cleanUrl = (u) => (u ? u.split('#shortly')[0] || u : '')
 
+// Source feeds sometimes hand us HTML entities in titles/summaries (e.g.
+// "&#124;", "UK&#8217;s", "&amp;"). Decode them so headlines read cleanly.
+const NAMED_ENTITIES = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  hellip: '…', mdash: '—', ndash: '–', lsquo: '‘', rsquo: '’',
+  ldquo: '“', rdquo: '”', deg: '°', eacute: 'é',
+}
+function decodeEntities(s) {
+  if (!s || typeof s !== 'string' || s.indexOf('&') === -1) return s || ''
+  return s.replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (m, code) => {
+    if (code[0] === '#') {
+      const n = code[1] === 'x' || code[1] === 'X' ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10)
+      return Number.isFinite(n) ? String.fromCodePoint(n) : m
+    }
+    return Object.prototype.hasOwnProperty.call(NAMED_ENTITIES, code) ? NAMED_ENTITIES[code] : m
+  })
+}
+
 function normalize(row) {
   const bucket = row.category || row.topic || ''
   const isCase = row.category === CASE_STUDY_CATEGORY
   return {
     id: row.id,
     kind: isCase ? 'case_study' : 'article',
-    headline: row.edited_title || row.title,
-    summary: row.edited_summary || row.summary || '',
-    body: row.edited_summary || row.summary || '',
-    source: row.source || '',
+    headline: decodeEntities(row.edited_title || row.title),
+    summary: decodeEntities(row.edited_summary || row.summary || ''),
+    body: decodeEntities(row.edited_summary || row.summary || ''),
+    source: decodeEntities(row.source || ''),
     sourceUrl: cleanUrl(row.url),
     publishedAt: row.reviewed_at || row.scraped_at || row.created_at,
     category: row.category || null,
@@ -94,10 +112,10 @@ export async function fetchCaseStudies() {
   return (data || []).map((c) => ({
     id: c.id,
     kind: 'case_study',
-    headline: c.headline,
-    summary: c.summary || '',
-    body: c.detail || c.summary || '',
-    source: c.source || '',
+    headline: decodeEntities(c.headline),
+    summary: decodeEntities(c.summary || ''),
+    body: decodeEntities(c.detail || c.summary || ''),
+    source: decodeEntities(c.source || ''),
     sourceUrl: c.source_url || '',
     publishedAt: c.generated_at,
     company: c.company || null,
@@ -120,10 +138,10 @@ export async function fetchFeatures() {
     id: `feature-${d.id}`,         // prefixed so it never collides with a brief id
     kind: 'feature',
     slug: d.topic_slug,
-    headline: d.headline,
-    summary: d.summary || '',
-    body: d.detail || d.summary || '',
-    source: d.primary_source_title || '',
+    headline: decodeEntities(d.headline),
+    summary: decodeEntities(d.summary || ''),
+    body: decodeEntities(d.detail || d.summary || ''),
+    source: decodeEntities(d.primary_source_title || ''),
     sourceUrl: d.primary_source_url || '',
     publishedAt: d.generated_at,
     bucket: d.topic_name,

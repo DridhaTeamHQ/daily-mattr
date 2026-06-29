@@ -464,9 +464,26 @@ function Feed({ category, articles, features }) {
 
 // ---- reading state ----------------------------------------------------------
 function Reading({ category, items, articleId }) {
-  const article = items.find((a) => a.id === articleId) || items[0]
+  const navigate = useNavigate()
+  const reduce = useReducedMotion()
+  const idx = Math.max(0, items.findIndex((a) => a.id === articleId))
+  const article = items[idx] || items[0]
+  const prev = items[idx - 1]
+  const next = items[idx + 1]
   const groups = groupByDate(items)
   const isLong = isCase(article) || article?.kind === 'feature'
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const dirRef = useRef(1)
+
+  const goTo = (target, dir) => {
+    if (!target) return
+    dirRef.current = dir
+    setSheetOpen(false)
+    navigate(`/${category}/${target.id}`)
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+  }
+  const goNext = () => goTo(next, 1)
+  const goPrev = () => goTo(prev, -1)
 
   if (!article) {
     return (
@@ -479,50 +496,45 @@ function Reading({ category, items, articleId }) {
     )
   }
 
-  return (
-    <div className="mx-auto mt-10 max-w-[1600px] px-4 pb-8 sm:px-8 lg:px-14">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-        {/* left: condensed list */}
-        <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto lg:pr-2">
-          {groups.map(([label, items]) => (
-            <div key={label}>
-              <DateHeading>{label}</DateHeading>
-              <div className="flex flex-col gap-3">
-                {items.map((a) => (
-                  <Link
-                    key={a.id}
-                    to={`/${category}/${a.id}`}
-                    className={`rounded-xl border p-4 transition-colors ${
-                      a.id === article.id
-                        ? 'border-[#c9a227] bg-[#fff7e0]'
-                        : 'border-[#c9a227]/25 bg-[#fffdf5] hover:border-[#c9a227]/50'
-                    }`}
-                  >
-                    <h4 className="text-[15px] font-bold leading-snug text-gray-900" style={SERIF}>
-                      {a.headline}
-                    </h4>
-                    <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-gray-500" style={SANS}>
-                      {a.summary}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </aside>
+  const enterX = reduce ? 0 : dirRef.current >= 0 ? 44 : -44
 
-        {/* right: open article */}
-        <motion.article
-          key={article.id}
-          className="min-w-0"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        >
+  return (
+    <div className="mx-auto mt-6 max-w-[1600px] px-4 pb-28 sm:mt-10 sm:px-8 sm:pb-8 lg:px-14">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        {/* The article — FIRST in the DOM (content-first); pulled into the right
+            column on desktop via grid placement, never CSS order, so the
+            screen-reader/tab order stays correct. Swipe left/right to change. */}
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.article
+              key={article.id}
+              className="min-w-0 touch-pan-y select-none lg:select-text"
+              drag={reduce ? false : 'x'}
+              dragDirectionLock
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              onDragEnd={(e, info) => {
+                if (info.offset.x <= -70 || info.velocity.x < -480) goNext()
+                else if (info.offset.x >= 70 || info.velocity.x > 480) goPrev()
+              }}
+              whileDrag={{ cursor: 'grabbing' }}
+              initial={{ opacity: 0, x: enterX }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: reduce ? 0 : -enterX }}
+              transition={{ duration: reduce ? 0.2 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+            >
           <div className="mb-4 flex items-center gap-2 text-[12px] text-gray-500" style={SANS}>
             <Link to={`/${category}`} className="font-medium text-[#d81b60] hover:underline">
               ← All {themeFor(category).label} stories
             </Link>
+          </div>
+          {/* Swipe affordance + position (phones) */}
+          <div className="mb-5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-400 lg:hidden" style={SANS}>
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Swipe
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <span className="ml-1 text-gray-300">·</span>
+            <span className="text-[#b8860b]">{idx + 1} / {items.length}</span>
           </div>
           <div className="mb-3 flex flex-wrap items-center gap-2" style={SANS}>
             {isCase(article) ? (
@@ -610,9 +622,138 @@ function Reading({ category, items, articleId }) {
               ✦ Curated and written by Daily Mattr from {article.sourceCount || 'multiple'} Indian newsrooms.
             </p>
           )}
-        </motion.article>
+              <ReadNav prev={prev} next={next} onPrev={goPrev} onNext={goNext} />
+            </motion.article>
+          </AnimatePresence>
+        </div>
+
+        {/* "More stories" — AFTER the article in the DOM; pulled into the left
+            column on desktop. Hidden on phones, where the bottom bar + sheet and
+            swipe handle story navigation. */}
+        <aside className="hidden lg:col-start-1 lg:row-start-1 lg:block lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto lg:pr-2">
+          {groups.map(([label, items]) => (
+            <div key={label}>
+              <DateHeading>{label}</DateHeading>
+              <div className="flex flex-col gap-3">
+                {items.map((a) => (
+                  <Link
+                    key={a.id}
+                    to={`/${category}/${a.id}`}
+                    className={`rounded-xl border p-4 transition-colors ${
+                      a.id === article.id
+                        ? 'border-[#c9a227] bg-[#fff7e0]'
+                        : 'border-[#c9a227]/25 bg-[#fffdf5] hover:border-[#c9a227]/50'
+                    }`}
+                  >
+                    <h4 className="text-[15px] font-bold leading-snug text-gray-900" style={SERIF}>
+                      {a.headline}
+                    </h4>
+                    <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-gray-500" style={SANS}>
+                      {a.summary}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </aside>
+      </div>
+
+      {/* Thumb-zone toolbar + browse sheet (phones only) */}
+      <MobileReadBar prev={prev} next={next} onPrev={goPrev} onNext={goNext} onBrowse={() => setSheetOpen(true)} />
+      <BrowseSheet open={sheetOpen} onClose={() => setSheetOpen(false)} groups={groups} currentId={article.id} onPick={(a) => goTo(a, 0)} />
+    </div>
+  )
+}
+
+// Inline previous/next pager shown at the end of an article.
+function ReadNav({ prev, next, onPrev, onNext }) {
+  if (!prev && !next) return null
+  return (
+    <div className="mt-12 grid gap-3 border-t border-[#c9a227]/25 pt-6 sm:grid-cols-2" style={SANS}>
+      {prev ? (
+        <button onClick={onPrev} className="flex flex-col items-start rounded-2xl border border-[#c9a227]/30 bg-[#fffdf5] p-4 text-left transition-colors hover:border-[#c9a227]/70">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#b8860b]">&larr; Previous</span>
+          <span className="mt-1 line-clamp-2 text-[14px] font-semibold text-gray-800" style={SERIF}>{prev.headline}</span>
+        </button>
+      ) : (
+        <span className="hidden sm:block" />
+      )}
+      {next ? (
+        <button onClick={onNext} className="flex flex-col items-end rounded-2xl border border-[#c9a227]/30 bg-[#fffdf5] p-4 text-right transition-colors hover:border-[#c9a227]/70">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#b8860b]">Next &rarr;</span>
+          <span className="mt-1 line-clamp-2 text-[14px] font-semibold text-gray-800" style={SERIF}>{next.headline}</span>
+        </button>
+      ) : (
+        <span className="hidden sm:block" />
+      )}
+    </div>
+  )
+}
+
+// Fixed bottom toolbar on phones: previous · browse · next (thumb-reach zone).
+function MobileReadBar({ prev, next, onPrev, onNext, onBrowse }) {
+  const arrow = 'flex h-11 w-11 items-center justify-center rounded-full text-[#7b1e3b] transition-colors hover:bg-[#fff0d6] disabled:opacity-30'
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden" style={SANS}>
+      <div className="mx-auto flex max-w-sm items-center justify-between gap-2 rounded-full border border-[#c9a227]/40 bg-[#fffdf5]/95 p-1.5 shadow-[0_10px_30px_rgba(106,27,90,0.18)] backdrop-blur-md">
+        <button onClick={onPrev} disabled={!prev} aria-label="Previous story" className={arrow}>
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
+        <button onClick={onBrowse} className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-[#7b1e3b] px-4 text-[13px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#5e1730]">
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          Browse
+        </button>
+        <button onClick={onNext} disabled={!next} aria-label="Next story" className={arrow}>
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
       </div>
     </div>
+  )
+}
+
+// Bottom sheet listing every story for quick jumping (phones).
+function BrowseSheet({ open, onClose, groups, currentId, onPick }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div className="fixed inset-0 z-50 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+          <motion.div
+            className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-auto rounded-t-3xl border-t border-[#c9a227]/40 bg-[#fffdf5] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            style={SANS}
+          >
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[#c9a227]/40" />
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-[18px] font-bold text-[#7b1e3b]" style={SERIF}>All stories</h3>
+              <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full text-[#7b1e3b] hover:bg-[#fff0d6]">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              </button>
+            </div>
+            {groups.map(([label, items]) => (
+              <div key={label} className="mb-3">
+                <p className="px-1 pb-2 pt-2 text-[11px] font-bold uppercase tracking-wider text-[#b8860b]">{label}</p>
+                <div className="flex flex-col gap-2">
+                  {items.map((a) => (
+                    <button
+                      key={a.id}
+                      onClick={() => onPick(a)}
+                      className={`rounded-xl border p-3 text-left transition-colors ${a.id === currentId ? 'border-[#7b1e3b] bg-[#fff0d6]' : 'border-[#c9a227]/25 bg-white hover:border-[#c9a227]/50'}`}
+                    >
+                      <h4 className="line-clamp-2 text-[14px] font-bold leading-snug text-gray-900" style={SERIF}>{a.headline}</h4>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
