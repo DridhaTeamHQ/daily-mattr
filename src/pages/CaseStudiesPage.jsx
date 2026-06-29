@@ -152,7 +152,7 @@ function CaseReading({ items, id }) {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
         {/* The open case — FIRST in the DOM (content-first); right column on
             desktop via grid placement. Swipe left/right to change cases. */}
-        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+        <div className="min-w-0 overflow-x-clip lg:col-start-2 lg:row-start-1">
           <SwipeCard id={item.id} enterX={enterX} reduce={reduce} onNext={goNext} onPrev={goPrev}>
             <div className="mb-4 flex items-center gap-2 text-[12px]" style={SANS}>
               <Link to="/case-studies" className="font-medium text-[#d81b60] hover:underline">← All case studies</Link>

@@ -81,8 +81,18 @@ export default function ProfilePage() {
       <div className="desi-jhalar" style={{ '--jhalar': '#c9a227' }} />
 
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-3xl font-bold text-[#7b1e3b]" style={SERIF}>Your profile</h1>
-        {msg && <div className="mt-3 rounded-lg bg-[#eef6ec] px-3 py-2 text-sm text-[#2e6b3c] border border-[#bcd9c1]">{msg}</div>}
+        <div className="flex items-center gap-4">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#c9a227] bg-[#7b1e3b] text-lg font-bold text-[#f6e7c9]" style={SERIF}>
+            {(name || prefs.profile?.email || user?.email || 'D').trim().charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-3xl font-bold text-gray-900" style={SERIF}>
+              {name ? `Hello, ${name.split(' ')[0]}` : 'Your profile'}
+            </h1>
+            <p className="truncate text-sm text-gray-500">{prefs.profile?.email || user?.email}</p>
+          </div>
+        </div>
+        {msg && <div className="mt-4 rounded-lg bg-[#eef6ec] px-3 py-2 text-sm text-[#2e6b3c] border border-[#bcd9c1]">{msg}</div>}
 
         {/* Account details */}
         <section className="mt-6 desi-frame rounded-2xl bg-[#fffdf5] p-6">
@@ -107,9 +117,13 @@ export default function ProfilePage() {
           {loading ? (
             <p className="mt-4 text-gray-500">Loading…</p>
           ) : prefs.subscriptions.length === 0 ? (
-            <div className="mt-4 rounded-xl bg-[#fff7e6] p-6 text-center">
-              <p className="text-gray-600">You have no active subscriptions yet.</p>
-              <Link to="/subscribe" className="mt-3 inline-block rounded-full border border-[#c9a227] bg-[#7b1e3b] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#5e1730]">Browse newsletters</Link>
+            <div className="mt-4 rounded-xl border border-[#c9a227]/30 bg-[#fff7e6] p-8 text-center">
+              <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-white text-[#7b1e3b] shadow-sm">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="m3 7 9 6 9-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </div>
+              <p className="font-semibold text-gray-700">No active subscriptions yet</p>
+              <p className="mt-1 text-sm text-gray-500">Pick the editions you want and they&rsquo;ll land in your inbox.</p>
+              <Link to="/subscribe" className="mt-4 inline-block rounded-full border border-[#c9a227] bg-[#7b1e3b] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#5e1730]">Browse newsletters</Link>
             </div>
           ) : (
             <ul className="mt-4 divide-y divide-gray-100">

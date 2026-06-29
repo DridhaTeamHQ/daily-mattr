@@ -18,7 +18,7 @@ export function SwipeCard({ id, enterX = 44, reduce = false, onNext, onPrev, chi
         drag={reduce ? false : 'x'}
         dragDirectionLock
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.18}
+        dragElastic={0.1}
         onDragEnd={(e, info) => {
           if (info.offset.x <= -70 || info.velocity.x < -480) onNext?.()
           else if (info.offset.x >= 70 || info.velocity.x > 480) onPrev?.()

@@ -465,7 +465,7 @@ function Reading({ category, items, articleId }) {
         {/* The article — FIRST in the DOM (content-first); pulled into the right
             column on desktop via grid placement, never CSS order, so the
             screen-reader/tab order stays correct. Swipe left/right to change. */}
-        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+        <div className="min-w-0 overflow-x-clip lg:col-start-2 lg:row-start-1">
           <SwipeCard id={article.id} enterX={enterX} reduce={reduce} onNext={goNext} onPrev={goPrev}>
           <div className="mb-4 flex items-center gap-2 text-[12px] text-gray-500" style={SANS}>
             <Link to={`/${category}`} className="font-medium text-[#d81b60] hover:underline">
