@@ -75,14 +75,15 @@ export function ReadNav({ prev, next, onPrev, onNext }) {
 
 // Fixed bottom toolbar on phones: previous · browse · next (thumb-reach zone).
 export function MobileReadBar({ prev, next, onPrev, onNext, onBrowse, label = 'Browse' }) {
-  const arrow = 'flex h-11 w-11 items-center justify-center rounded-full text-[#7b1e3b] transition-colors hover:bg-[#fff0d6] disabled:opacity-30'
+  const arrow = 'flex h-11 w-11 items-center justify-center rounded-full text-[#5e1730] transition-colors hover:bg-white/60 disabled:opacity-30'
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden" style={SANS}>
-      <div className="mx-auto flex max-w-sm items-center justify-between gap-2 rounded-full border border-gray-200 bg-white/95 p-1.5 shadow-[0_10px_30px_rgba(17,24,39,0.14)] backdrop-blur-md">
+      {/* Liquid-glass bar: translucent, blurred, with a soft top sheen + edge highlight. */}
+      <div className="mx-auto flex max-w-sm items-center justify-between gap-2 rounded-full border border-white/60 bg-gradient-to-b from-white/55 to-white/20 p-1.5 shadow-[0_10px_34px_rgba(17,24,39,0.22)] ring-1 ring-black/[0.04] backdrop-blur-2xl backdrop-saturate-150">
         <button onClick={onPrev} disabled={!prev} aria-label="Previous" className={arrow}>
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
-        <button onClick={onBrowse} className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-[#7b1e3b] px-4 text-[13px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#5e1730]">
+        <button onClick={onBrowse} className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-white/30 bg-[#7b1e3b]/90 px-4 text-[13px] font-semibold uppercase tracking-wide text-white shadow-sm backdrop-blur-md transition-colors hover:bg-[#5e1730]">
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
           {label}
         </button>

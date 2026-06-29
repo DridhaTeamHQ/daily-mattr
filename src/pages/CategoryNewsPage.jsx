@@ -470,6 +470,15 @@ function Reading({ category, items, articleId }) {
             </Link>
           </div>
           <SwipeHint index={idx} total={items.length} />
+          <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200">
+            <img
+              src={`/newsletter/headers/${category}.jpg`}
+              alt=""
+              loading="lazy"
+              className="h-48 w-full object-cover object-bottom sm:h-64"
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }}
+            />
+          </div>
           <div className="mb-3 flex flex-wrap items-center gap-2" style={SANS}>
             {isCase(article) ? (
               <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: CASE_BAND }}>
