@@ -38,7 +38,7 @@ export default function LmFaq() {
 
   return (
     <section id="faq" className="bg-white">
-      <div className="mx-auto grid w-full max-w-[1330px] grid-cols-1 gap-12 px-4 py-[84px] sm:px-8 lg:grid-cols-[minmax(0,471px)_minmax(0,609px)] lg:justify-between lg:gap-10 lg:px-8 xl:px-0">
+      <div className="mx-auto grid w-full max-w-[1394px] grid-cols-1 gap-12 px-4 py-[84px] sm:px-8 lg:grid-cols-[minmax(0,471px)_minmax(0,609px)] lg:justify-between lg:gap-10">
         {/* Left column */}
         <Reveal className="flex flex-col gap-[24px]">
           <div className="relative inline-grid place-items-start">

@@ -43,7 +43,8 @@ export default function LmCategoryGrid({ selected = [] }) {
 
   return (
     <section id="categories" className="bg-white">
-      <div className="mx-auto w-full max-w-[1329px] px-4 pt-[71px] sm:px-8 xl:px-0">
+      {/* 1329 content + 64 gutters — px stays on at every width */}
+      <div className="mx-auto w-full max-w-[1393px] px-4 pt-[71px] sm:px-8">
         {/* Header row */}
         <Reveal className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
           <div className="flex max-w-[611px] flex-col gap-[24px]">

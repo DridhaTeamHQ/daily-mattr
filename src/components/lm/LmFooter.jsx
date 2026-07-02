@@ -30,7 +30,7 @@ function FooterLink({ item }) {
 export default function LmFooter() {
   return (
     <footer id="footer" className="relative overflow-hidden bg-lm-200">
-      <div className="mx-auto flex w-full max-w-[1253px] flex-col gap-[32px] px-4 pt-[69px] sm:px-8 xl:px-0">
+      <div className="mx-auto flex w-full max-w-[1317px] flex-col gap-[32px] px-4 pt-[69px] sm:px-8">
         <div className="flex flex-col items-start justify-between gap-10 md:flex-row">
           {/* Brand block */}
           <div className="flex w-full max-w-[343px] flex-col gap-[16px]">
