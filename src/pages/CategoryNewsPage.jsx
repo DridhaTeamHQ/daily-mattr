@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import LmNav from '../components/lm/LmNav'
 import LmCategoryHero from '../components/lm/LmCategoryHero'
+import LmCategoryBar from '../components/lm/LmCategoryBar'
 import LmArticleFeed from '../components/lm/LmArticleFeed'
 import LmFaq from '../components/lm/LmFaq'
 import LmFooter from '../components/lm/LmFooter'
@@ -48,6 +49,15 @@ export default function CategoryNewsPage() {
 
   const { data: items, loading } = useLiveData(fetcher, [slug], { intervalMs: 30000 })
 
+  // All / Long reads / Briefs — long = features & case studies.
+  const [filter, setFilter] = useState('all')
+  const filtered = useMemo(() => {
+    const list = items || []
+    if (filter === 'long') return list.filter((a) => a.kind === 'feature' || a.kind === 'case_study')
+    if (filter === 'short') return list.filter((a) => a.kind === 'article')
+    return list
+  }, [items, filter])
+
   // Unknown category → 404 (the /:category route matches any single segment).
   if (!cat && slug !== 'general') return <NotFoundPage />
 
@@ -59,7 +69,18 @@ export default function CategoryNewsPage() {
     <div className="min-h-screen bg-white font-bevietnam text-lm-800">
       <LmNav tone="dark" />
       <LmCategoryHero title={heroTitle} tagline={tagline} image={heroImage} slug={slug} />
-      <LmArticleFeed items={items || []} loading={loading} />
+      <LmCategoryBar active={slug} filter={filter} onFilter={setFilter} />
+      <LmArticleFeed
+        items={filtered}
+        loading={loading}
+        emptyLabel={
+          filter === 'long'
+            ? 'No long reads here yet — switch to Briefs or check back soon.'
+            : filter === 'short'
+              ? 'No briefs here yet — switch to Long reads or check back soon.'
+              : 'No stories here yet — check back soon.'
+        }
+      />
       <LmFaq />
       <LmFooter />
     </div>

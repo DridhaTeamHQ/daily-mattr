@@ -50,6 +50,20 @@ function decodeEntities(s) {
   })
 }
 
+// Older approved rows carry raw CMS artifacts in their summaries
+// ("Published on: …", "3 min read", "Listen to this article"). Strip them at
+// display time; new agent-written summaries are already clean.
+function stripArtifacts(s) {
+  if (!s) return ''
+  return s
+    .replace(/Published on:\s*\d{1,2}\s+\w+\s+\d{4},?\s*\d{1,2}:\d{2}\s*[ap]m/gi, ' ')
+    .replace(/Updated:\s*\w+\s+\d{1,2},\s*\d{4}[^.]*?(IST)?/gi, ' ')
+    .replace(/\b\d+\s*min read\b/gi, ' ')
+    .replace(/\bListen to this article\b/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
 function normalize(row) {
   const bucket = row.category || row.topic || ''
   const isCase = row.category === CASE_STUDY_CATEGORY
@@ -57,8 +71,8 @@ function normalize(row) {
     id: row.id,
     kind: isCase ? 'case_study' : 'article',
     headline: decodeEntities(row.edited_title || row.title),
-    summary: decodeEntities(row.edited_summary || row.summary || ''),
-    body: decodeEntities(row.edited_summary || row.summary || ''),
+    summary: stripArtifacts(decodeEntities(row.edited_summary || row.summary || '')),
+    body: stripArtifacts(decodeEntities(row.edited_summary || row.summary || '')),
     source: decodeEntities(row.source || ''),
     sourceUrl: cleanUrl(row.url),
     publishedAt: row.reviewed_at || row.scraped_at || row.created_at,

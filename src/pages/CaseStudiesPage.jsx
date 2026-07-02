@@ -1,6 +1,7 @@
 import React from 'react'
 import LmNav from '../components/lm/LmNav'
 import LmCategoryHero from '../components/lm/LmCategoryHero'
+import LmCategoryBar from '../components/lm/LmCategoryBar'
 import LmArticleFeed from '../components/lm/LmArticleFeed'
 import LmFaq from '../components/lm/LmFaq'
 import LmFooter from '../components/lm/LmFooter'
@@ -23,6 +24,8 @@ export default function CaseStudiesPage() {
         image={cat?.poster || cat?.image}
         slug="case-studies"
       />
+      {/* Everything here is a long read — no filter needed */}
+      <LmCategoryBar active="case-studies" showFilter={false} />
       <LmArticleFeed items={items || []} loading={loading} emptyLabel="No case studies published yet — check back soon." />
       <LmFaq />
       <LmFooter />
