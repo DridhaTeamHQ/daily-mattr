@@ -150,29 +150,67 @@ export default function LmNav({ tone = 'light' }) {
         )}
       </AnimatePresence>
 
-      {/* Mobile sheet */}
-      {mobileOpen && (
-        <div className="border-t border-lm-200 bg-white px-4 pb-6 pt-2 lg:hidden">
-          {links.map((l) => (
-            <Link key={l.label} to={l.to} onClick={() => setMobileOpen(false)} className="block py-[10px] font-bevietnam text-[15px] font-medium text-lm-800">
-              {l.label}
-            </Link>
-          ))}
-          <p className="pb-[4px] pt-[12px] font-bevietnam text-[11px] font-semibold uppercase tracking-[2px] text-lm-500">Long Mattrs</p>
-          <div className="grid grid-cols-2 gap-x-3">
-            {LM_CATEGORIES.map((c) => (
-              <Link
-                key={c.slug}
-                to={c.slug === 'case-studies' ? '/case-studies' : `/${c.slug}`}
-                onClick={() => setMobileOpen(false)}
-                className="block py-[8px] font-bevietnam text-[14px] text-lm-600"
-              >
-                {c.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Mobile menu — animated sheet with mini mega-menu tiles */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0, transition: { duration: 0.2, ease: 'easeIn' } }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="max-h-[calc(100dvh-70px)] overflow-y-auto border-t border-lm-200 bg-white lg:hidden"
+          >
+            <div className="px-4 pb-8 pt-4">
+              {links.map((l, i) => (
+                <motion.div
+                  key={l.label}
+                  initial={{ opacity: 0, x: -14 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.05 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Link
+                    to={l.to}
+                    onClick={() => setMobileOpen(false)}
+                    className="block border-b border-dashed border-lm-200 py-[14px] font-bevietnam text-[17px] font-medium text-lm-800"
+                  >
+                    {l.label}
+                  </Link>
+                </motion.div>
+              ))}
+              <p className="pb-[10px] pt-[20px] font-bevietnam text-[11px] font-semibold uppercase tracking-[2px] text-lm-500">Long Mattrs</p>
+              <div className="grid grid-cols-3 gap-[8px]">
+                {LM_CATEGORIES.map((c, i) => (
+                  <motion.div
+                    key={c.slug}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.15 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <Link
+                      to={c.slug === 'case-studies' ? '/case-studies' : `/${c.slug}`}
+                      onClick={() => setMobileOpen(false)}
+                      className="relative block aspect-[3/4] overflow-hidden rounded-[12px] bg-lm-200"
+                    >
+                      <img
+                        alt={c.title}
+                        src={c.tile}
+                        decoding="async"
+                        onError={(e) => { e.currentTarget.src = c.poster || c.image }}
+                        className="absolute inset-0 size-full object-cover"
+                      />
+                      <span aria-hidden className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/75 to-transparent" />
+                      <span className="absolute inset-x-1 bottom-[8px] text-center font-bevietnam text-[11px] font-semibold leading-tight text-white drop-shadow">
+                        {c.hero || c.title}
+                      </span>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

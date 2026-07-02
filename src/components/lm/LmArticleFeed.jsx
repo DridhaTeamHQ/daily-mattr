@@ -160,7 +160,7 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[64px] px-4 py-[48px] sm:px-8 lg:px-[32px]">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[40px] px-4 py-[32px] sm:gap-[64px] sm:px-8 sm:py-[48px] lg:px-[32px]">
       {shown.map((g, gi) => (
         <motion.section
           key={g.key}
@@ -171,7 +171,7 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
         >
           {/* Date header */}
           <div className="mb-[16px] flex items-center gap-[16px]">
-            <h2 className={`whitespace-nowrap font-roboto text-[20px] font-bold leading-[64px] sm:text-[24px] ${g.today ? 'text-[#0F0F11]' : 'text-lm-500'}`} style={rb}>
+            <h2 className={`whitespace-nowrap font-roboto text-[18px] font-bold leading-[44px] sm:text-[24px] sm:leading-[64px] ${g.today ? 'text-[#0F0F11]' : 'text-lm-500'}`} style={rb}>
               {g.label}
             </h2>
             <div className="h-px flex-1 bg-lm-400" />

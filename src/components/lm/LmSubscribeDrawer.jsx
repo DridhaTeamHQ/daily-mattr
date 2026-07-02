@@ -264,7 +264,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
     <LmDrawer open={open} onClose={() => { onClose(); reset() }} width={589} scrim={0.7}>
       <div className="flex min-h-full flex-col bg-[#F4F4F6]">
         {/* Header bar */}
-        <div className="flex items-center justify-between border-b border-lm-200 bg-white px-[32px] py-[16px]">
+        <div className="flex items-center justify-between border-b border-lm-200 bg-white px-4 py-[16px] sm:px-[32px]">
           <div>
             <p className="font-bevietnam text-[12px] font-medium uppercase tracking-[1.5px] text-lm-500">
               {step === 3 ? 'All set' : `Step ${step} of 2`}
@@ -279,7 +279,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-[24px] py-[20px]">
+        <div className="flex-1 overflow-y-auto px-4 py-[20px] sm:px-[24px]">
           {step === 1 && (
             <div className="flex flex-col gap-[16px]">
               {/* Topic picker — shows what's currently selected; add/remove freely */}
@@ -509,7 +509,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
         </div>
 
         {/* Footer bar */}
-        <div className="border-t border-lm-200 bg-white px-[32px] py-[16px]">
+        <div className="border-t border-lm-200 bg-white px-4 py-[16px] sm:px-[32px]">
           {step === 1 && (
             <button
               type="button"

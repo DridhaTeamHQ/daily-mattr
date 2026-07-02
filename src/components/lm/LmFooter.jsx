@@ -30,7 +30,7 @@ function FooterLink({ item }) {
 export default function LmFooter() {
   return (
     <footer id="footer" className="relative overflow-hidden bg-lm-200">
-      <div className="mx-auto flex w-full max-w-[1317px] flex-col gap-[32px] px-4 pt-[69px] sm:px-8">
+      <div className="mx-auto flex w-full max-w-[1317px] flex-col gap-[32px] px-4 pt-[48px] sm:px-8 sm:pt-[69px]">
         <div className="flex flex-col items-start justify-between gap-10 md:flex-row">
           {/* Brand block */}
           <div className="flex w-full max-w-[343px] flex-col gap-[16px]">
@@ -51,7 +51,7 @@ export default function LmFooter() {
           </div>
 
           {/* Link columns */}
-          <div className="flex gap-[63px] text-[14px]">
+          <div className="flex flex-wrap gap-10 text-[14px] sm:gap-[63px]">
             <div className="flex w-[133px] flex-col gap-[16px]">
               <p className="font-roboto uppercase leading-[1.26] tracking-[0.7px] text-lm-500" style={rb}>Product</p>
               <div className="flex flex-col gap-[12px]">

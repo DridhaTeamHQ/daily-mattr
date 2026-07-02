@@ -44,7 +44,7 @@ export default function LmCategoryGrid({ selected = [] }) {
   return (
     <section id="categories" className="bg-white">
       {/* 1329 content + 64 gutters — px stays on at every width */}
-      <div className="mx-auto w-full max-w-[1393px] px-4 pt-[71px] sm:px-8">
+      <div className="mx-auto w-full max-w-[1393px] px-4 pt-[48px] sm:px-8 sm:pt-[71px]">
         {/* Header row */}
         <Reveal className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
           <div className="flex max-w-[611px] flex-col gap-[24px]">
@@ -61,7 +61,7 @@ export default function LmCategoryGrid({ selected = [] }) {
         </Reveal>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 gap-[24px] pb-[80px] pt-[64px] sm:grid-cols-2 lg:grid-cols-3 lg:pt-[74px]">
+        <div className="grid grid-cols-1 gap-[16px] pb-[56px] pt-[36px] sm:grid-cols-2 sm:gap-[24px] sm:pb-[80px] sm:pt-[64px] lg:grid-cols-3 lg:pt-[74px]">
           {LM_CATEGORIES.map((cat) => {
             const isSelected = isOn(cat.slug)
             const to = cat.slug === 'case-studies' ? '/case-studies' : `/${cat.slug}`

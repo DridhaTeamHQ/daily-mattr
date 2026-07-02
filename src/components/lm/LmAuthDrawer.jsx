@@ -87,12 +87,12 @@ export default function LmAuthDrawer({ open, onClose }) {
         {!isAccount && <Wordmark />}
 
         {view === 'login' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-[20px] px-8 pb-24">
+          <div className="flex flex-1 flex-col items-center justify-center gap-[20px] px-5 pb-24 sm:px-8">
             <p className="font-bevietnam text-[18px] font-medium text-lm-800">Log in to Mattr</p>
-            <button type="button" disabled={busy} onClick={google} className="w-[283px] rounded-[60px] bg-[#5673E5] py-[14px] text-center font-bevietnam text-[14px] font-medium text-white hover:brightness-105">
+            <button type="button" disabled={busy} onClick={google} className="w-full max-w-[283px] rounded-[60px] bg-[#5673E5] py-[14px] text-center font-bevietnam text-[14px] font-medium text-white hover:brightness-105">
               Continue with Google
             </button>
-            <button type="button" onClick={() => setView('email')} className="w-[283px] rounded-[60px] border border-lm-200 bg-white py-[14px] text-center font-bevietnam text-[14px] font-medium text-lm-800 hover:border-lm-400">
+            <button type="button" onClick={() => setView('email')} className="w-full max-w-[283px] rounded-[60px] border border-lm-200 bg-white py-[14px] text-center font-bevietnam text-[14px] font-medium text-lm-800 hover:border-lm-400">
               Continue with email
             </button>
             <p className="font-bevietnam text-[13px] text-lm-500">
@@ -103,16 +103,16 @@ export default function LmAuthDrawer({ open, onClose }) {
         )}
 
         {view === 'email' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-[20px] px-8 pb-24">
+          <div className="flex flex-1 flex-col items-center justify-center gap-[20px] px-5 pb-24 sm:px-8">
             <p className="font-roboto text-[18px] font-medium text-lm-800" style={rb}>What’s your email address?</p>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address..."
-              className={`${inputCls} w-[337px]`}
+              className={`${inputCls} max-w-[337px]`}
             />
-            <button type="button" disabled={busy} onClick={() => sendMagicLink()} className="w-[337px] rounded-[60px] bg-lm-700 py-[14px] text-center font-roboto text-[15px] font-semibold text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.25)]" style={rb}>
+            <button type="button" disabled={busy} onClick={() => sendMagicLink()} className="w-full max-w-[337px] rounded-[60px] bg-lm-700 py-[14px] text-center font-roboto text-[15px] font-semibold text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.25)]" style={rb}>
               Continue with email
             </button>
             {notice && <p className="max-w-[337px] text-center font-bevietnam text-[13px] text-lm-500">{notice}</p>}
@@ -124,15 +124,15 @@ export default function LmAuthDrawer({ open, onClose }) {
         )}
 
         {view === 'signup' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-[16px] px-8 pb-24">
+          <div className="flex flex-1 flex-col items-center justify-center gap-[16px] px-5 pb-24 sm:px-8">
             <p className="font-bevietnam text-[18px] font-medium text-lm-800">Create an account</p>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email address..." className={`${inputCls} w-[337px]`} />
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" className={`${inputCls} w-[337px]`} />
-            <input type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="Enter your mobile number" className={`${inputCls} w-[337px]`} />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email address..." className={`${inputCls} max-w-[337px]`} />
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" className={`${inputCls} max-w-[337px]`} />
+            <input type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="Enter your mobile number" className={`${inputCls} max-w-[337px]`} />
             <p className="max-w-[337px] text-center font-roboto text-[13px] text-lm-500" style={rb}>
               By creating an account, you agree to our <a href="#faq" className="underline">terms &amp; conditions</a> and <a href="#faq" className="underline">Privacy Policy</a>
             </p>
-            <button type="button" disabled={busy} onClick={() => sendMagicLink({ signup: true })} className="w-[337px] rounded-[60px] bg-lm-700 py-[14px] text-center font-roboto text-[15px] font-semibold text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.25)]" style={rb}>
+            <button type="button" disabled={busy} onClick={() => sendMagicLink({ signup: true })} className="w-full max-w-[337px] rounded-[60px] bg-lm-700 py-[14px] text-center font-roboto text-[15px] font-semibold text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.25)]" style={rb}>
               Create account
             </button>
             {notice && <p className="max-w-[337px] text-center font-bevietnam text-[13px] text-lm-500">{notice}</p>}
@@ -140,14 +140,14 @@ export default function LmAuthDrawer({ open, onClose }) {
               Already have an account?{' '}
               <button type="button" onClick={() => setView('login')} className="font-semibold text-lm-800 underline">Login</button>
             </p>
-            <button type="button" disabled={busy} onClick={google} className="w-[337px] rounded-[60px] bg-[#5673E5] py-[14px] text-center font-bevietnam text-[14px] font-medium text-white hover:brightness-105">
+            <button type="button" disabled={busy} onClick={google} className="w-full max-w-[337px] rounded-[60px] bg-[#5673E5] py-[14px] text-center font-bevietnam text-[14px] font-medium text-white hover:brightness-105">
               Continue with Google
             </button>
           </div>
         )}
 
         {view === 'success' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-[16px] px-8 pb-24 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-[16px] px-5 pb-24 sm:px-8 text-center">
             <img alt="" src="/figma/icon-tick-circle-success-96.svg" className="size-[64px]" />
             <p className="font-bevietnam text-[18px] font-semibold text-lm-800">Account created successfully</p>
             <p className="max-w-[320px] font-bevietnam text-[14px] leading-[1.5] text-lm-500">
