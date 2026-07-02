@@ -6,8 +6,8 @@ export const LM_CATEGORIES = [
   {
     slug: 'general',
     tile: '/figma/menu/international.png',
-    title: 'The Daily',
-    hero: 'The Daily',
+    title: 'General',
+    hero: 'General',
     desc: "The day's biggest stories across India, world, business, sports and tech — in ten sharp reads.",
     bg: '#FFF2EB',
     image: '/figma/category-international.png',

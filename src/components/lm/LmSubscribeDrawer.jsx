@@ -16,12 +16,12 @@ import { useLmDrawer } from './LmDrawerContext'
 // - Guests → legacy `subscribers` table via the subscribers edge function.
 //
 // EDITION RULES:
-// 1. The Daily (general wrap) is DAILY-ONLY.
-// 2. Every other category offers Daily OR Weekly (weekly = one Mon–Sat day).
+// 1. General (the daily wrap) is DAILY-ONLY.
+// 2. Every other category offers Daily OR Weekly. Daily = that topic's case
+//    study each morning; Weekly = the topic's short articles on the chosen day.
 // 3. For the 4 topic categories, each weekday carries AT MOST ONE weekly
 //    edition (existing editions block their day — the old "blocked" map).
-// 4. Corporate Cases optionally carries case_study_categories (focus areas).
-// 5. Source preference (top / mixed / wide) applies to news editions.
+// 4. Source preference (top / mixed / wide) applies to the General edition.
 const rb = { fontVariationSettings: '"wdth" 100' }
 // The agent sends Mon–Sat; Sunday is deliberately excluded.
 const DAYS = [
@@ -32,11 +32,8 @@ const SHORT_DAY = Object.fromEntries(Object.entries(FULL_DAY).map(([s, f]) => [f
 const dayLabel = (id) => (DAYS.find(([d]) => d === id) || [])[1] || ''
 // Guest (legacy) categories: the subscribers edge function accepts our slugs directly.
 const REAL_CATEGORY = (slug) => slug
-const isDailyOnly = (t) => t.slug === 'general' // The Daily: daily mails only
+const isDailyOnly = (t) => t.slug === 'general' // General: daily mails only
 const isSmallArticle = (t) => t.account?.type === 'category_small_articles' // one-per-weekday rule
-const isCaseStudy = (t) => t.account?.type === 'case_study_daily'
-// Focus-area options for the case-study edition = every other category.
-const CS_FOCUS_OPTIONS = LM_CATEGORIES.filter((c) => !isCaseStudy(c))
 
 function OptionRow({ label, hint, selected, onClick }) {
   return (
@@ -69,7 +66,6 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
   const [choices, setChoices] = useState({})
   // Weekdays reserved by the user's EXISTING topic editions: day -> account slug.
   const [takenDays, setTakenDays] = useState({})
-  const [csCats, setCsCats] = useState([]) // case-study focus areas
   const [sourcePref, setSourcePref] = useState('top')
   const [name, setName] = useState('')
   const [email, setEmail] = useState(user?.email || '')
@@ -126,7 +122,6 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                 ? { rhythm: 'weekly', day: SHORT_DAY[sub.weekday] }
                 : { rhythm: sub.rhythm || 'daily' }
               if (sub.source_preference) setSourcePref(sub.source_preference)
-              if (sub.case_study_categories?.length) setCsCats(sub.case_study_categories)
             }
             return next
           })
@@ -194,7 +189,6 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
               weekday: c.rhythm === 'weekly' && c.day ? FULL_DAY[c.day] : undefined,
               send_days: c.rhythm === 'weekly' && c.day ? [c.day] : undefined,
               source_preference: sourcePref,
-              case_study_categories: isCaseStudy(t) && csCats.length ? csCats : undefined,
             })
           } catch (err) {
             failures.push(`${t.title}: ${err.message}`)
@@ -310,13 +304,13 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                       <>
                         <OptionRow
                           label="Daily Deep Dive"
-                          hint={isCaseStudy(t) ? 'One case study every morning' : 'Fresh briefs every morning'}
+                          hint="The topic's case study, every morning"
                           selected={c.rhythm === 'daily'}
                           onClick={() => setChoice(t.slug, { rhythm: 'daily', day: undefined })}
                         />
                         <OptionRow
                           label="Weekly Round-up"
-                          hint="The week's best, on the day you pick"
+                          hint="Short articles, on the day you pick"
                           selected={c.rhythm === 'weekly'}
                           onClick={() => pickWeekly(t)}
                         />
@@ -358,31 +352,6 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                       </div>
                     )}
 
-                    {/* Case studies: optional focus areas */}
-                    {isCaseStudy(t) && (
-                      <div className="flex flex-col gap-[8px] pt-[4px]">
-                        <p className="font-bevietnam text-[13px] text-lm-500">Focus areas (optional)</p>
-                        <div className="flex flex-wrap gap-[8px]">
-                          {CS_FOCUS_OPTIONS.map((opt) => {
-                            const on = csCats.includes(opt.account.slug)
-                            return (
-                              <button
-                                key={opt.slug}
-                                type="button"
-                                onClick={() =>
-                                  setCsCats((x) => (on ? x.filter((v) => v !== opt.account.slug) : [...x, opt.account.slug]))
-                                }
-                                className={`rounded-[40px] border px-[12px] py-[7px] font-bevietnam text-[12px] font-medium ${
-                                  on ? 'border-lm-800 bg-lm-800 text-white' : 'border-lm-200 bg-white text-lm-600'
-                                }`}
-                              >
-                                {opt.title}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )
               })}
