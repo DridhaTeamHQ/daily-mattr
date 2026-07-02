@@ -8,6 +8,7 @@ import LmFooter from '../components/lm/LmFooter'
 import { lmCategoryBySlug } from '../components/lm/lmCategories'
 import { fetchApproved, fetchFeaturesByCategory } from '../lib/content'
 import { useLiveData } from '../lib/useLiveData'
+import NotFoundPage from './NotFoundPage'
 
 // Category reading page — Figma "Home" frame 1:5336: dark hero + date-grouped
 // article briefs. Handles both agent categories (real-estate, policy-partner,
@@ -46,6 +47,9 @@ export default function CategoryNewsPage() {
   }, [slug, cat])
 
   const { data: items, loading } = useLiveData(fetcher, [slug], { intervalMs: 30000 })
+
+  // Unknown category → 404 (the /:category route matches any single segment).
+  if (!cat && slug !== 'general') return <NotFoundPage />
 
   const heroTitle = cat?.hero || cat?.title || (slug === 'general' ? 'The Daily' : slug)
   const tagline = cat?.desc || 'The stories worth knowing — curated, summarized, and grouped by day.'

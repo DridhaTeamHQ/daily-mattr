@@ -5,6 +5,7 @@
 export const LM_CATEGORIES = [
   {
     slug: 'technology-ai',
+    account: { slug: 'technology', type: 'news_rhythm' },
     tile: '/figma/menu/technology-ai.png',
     title: 'Technology and AI',
     hero: 'Tech & AI',
@@ -15,6 +16,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'money-matters',
+    account: { slug: 'money-matters', type: 'category_small_articles' },
     tile: '/figma/menu/money-matters.png',
     title: 'Money & Stock Markets',
     hero: 'Money & Markets',
@@ -25,6 +27,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'sports',
+    account: { slug: 'sports', type: 'news_rhythm' },
     tile: '/figma/menu/sports.png',
     title: 'Sports',
     desc: 'Match highlights, player stories, tournaments, transfers.',
@@ -35,6 +38,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'case-studies',
+    account: { slug: 'corporate-case', type: 'case_study_daily' },
     tile: '/figma/menu/case-studies.png',
     title: 'Corporate Cases',
     hero: 'Corporate Cases',
@@ -46,6 +50,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'national',
+    account: { slug: 'national', type: 'news_rhythm' },
     tile: '/figma/menu/national.png',
     title: 'National',
     desc: "India's biggest stories, government policies, infrastructure, everything shaping the nation.",
@@ -55,6 +60,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'international',
+    account: { slug: 'international', type: 'news_rhythm' },
     tile: '/figma/menu/international.png',
     title: 'International',
     desc: 'Global headlines, geopolitics, world markets, and the stories shaping every continent.',
@@ -65,6 +71,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'wellness-daily',
+    account: { slug: 'wellness-daily', type: 'category_small_articles' },
     tile: '/figma/menu/wellness-daily.png',
     title: 'Wellness Daily',
     desc: 'Evidence-led health, fitness, sleep, and mental-wellness stories for working professionals.',
@@ -74,6 +81,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'policy-partner',
+    account: { slug: 'policy-partner', type: 'category_small_articles' },
     tile: '/figma/menu/policy-partner.png',
     title: 'Politics & Power',
     hero: 'Politics & Power',
@@ -84,6 +92,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'real-estate',
+    account: { slug: 'real-estate', type: 'category_small_articles' },
     tile: '/figma/menu/real-estate.png',
     title: 'Real Estate',
     desc: 'Launches, handovers, infrastructure, and regulation across India’s big property markets.',
