@@ -19,12 +19,12 @@ export default function LmCategoryHero({ title, tagline, image, slug }) {
           className="absolute left-1/2 top-1/2 h-[1440px] w-[508px] max-w-none -translate-x-1/2 -translate-y-1/2 -rotate-90 object-cover opacity-40"
         />
       )}
-      <div className="relative mx-auto flex min-h-[340px] w-full max-w-[1294px] flex-col justify-end gap-8 px-4 pb-[56px] pt-[64px] sm:px-8 lg:min-h-[438px] lg:flex-row lg:items-end lg:justify-between lg:px-0">
+      <div className="relative mx-auto flex min-h-[340px] w-full max-w-[1294px] flex-col justify-end gap-8 px-4 pb-[clamp(36px,3.9vw,56px)] pt-[64px] sm:px-8 lg:min-h-[clamp(340px,30.4vw,438px)] lg:flex-row lg:items-end lg:justify-between lg:px-8 xl:px-0">
         <motion.h1
           initial={{ opacity: 0, y: 48 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-          className="font-bevietnam font-semibold leading-none tracking-[-0.08em] text-white text-[13vw] sm:text-[10vw] lg:text-[126px]"
+          className="font-bevietnam font-semibold leading-none tracking-[-0.08em] text-white text-[13vw] sm:text-[10vw] lg:text-[clamp(72px,8.75vw,126px)]"
         >
           {title}
         </motion.h1>

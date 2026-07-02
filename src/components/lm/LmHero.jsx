@@ -9,7 +9,7 @@ export default function LmHero() {
   const { openSubscribe } = useLmDrawer()
   return (
     <section className="px-[8px] pt-[82px]">
-      <div className="relative mx-auto h-[560px] w-full max-w-[1424px] overflow-hidden rounded-[24px] bg-[#0d150b] sm:h-[640px] lg:h-[738px]">
+      <div className="relative mx-auto h-[560px] w-full max-w-[1424px] overflow-hidden rounded-[24px] bg-[#0d150b] sm:h-[640px] lg:h-[clamp(560px,51.3vw,738px)]">
         {/* Media slot — the poster always paints; the video layers in only once a
             real clip exists at /figma/hero-video.mp4 (missing file = removed). */}
         <img
@@ -35,13 +35,13 @@ export default function LmHero() {
         />
 
         {/* Copy overlay — staged entrance on load */}
-        <div className="absolute inset-x-4 top-[27%] flex flex-col items-center gap-[32px] text-center text-white lg:top-[279px] lg:gap-[56px]">
+        <div className="absolute inset-x-4 top-[27%] flex flex-col items-center gap-[32px] text-center text-white lg:top-[37.8%] lg:gap-[clamp(36px,3.9vw,56px)]">
           <div className="flex w-full flex-col items-center gap-[12px]">
             <motion.h1
               initial={{ opacity: 0, y: 40, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="whitespace-nowrap font-bevietnam font-bold uppercase leading-[1.2] tracking-[-0.08em] text-[15vw] sm:text-[13vw] lg:text-[166px] lg:tracking-[-13.28px]"
+              className="whitespace-nowrap font-bevietnam font-bold uppercase leading-[1.2] tracking-[-0.08em] text-[15vw] sm:text-[13vw] lg:text-[clamp(110px,11.5vw,166px)]"
             >
               Long Mattr
             </motion.h1>

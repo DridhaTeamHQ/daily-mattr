@@ -38,7 +38,7 @@ export default function LmFaq() {
 
   return (
     <section id="faq" className="bg-white">
-      <div className="mx-auto grid w-full max-w-[1330px] grid-cols-1 gap-12 px-4 py-[84px] sm:px-8 lg:grid-cols-[471px_609px] lg:justify-between lg:gap-0 lg:px-0">
+      <div className="mx-auto grid w-full max-w-[1330px] grid-cols-1 gap-12 px-4 py-[84px] sm:px-8 lg:grid-cols-[minmax(0,471px)_minmax(0,609px)] lg:justify-between lg:gap-10 lg:px-8 xl:px-0">
         {/* Left column */}
         <Reveal className="flex flex-col gap-[24px]">
           <div className="relative inline-grid place-items-start">
@@ -46,7 +46,7 @@ export default function LmFaq() {
               <span className="bg-black px-[2px] text-white">QUESTIONS,</span> ANSWERED
             </p>
           </div>
-          <h2 className="font-bevietnam text-[40px] font-medium leading-[1.26] tracking-[-2.8px] text-lm-800 sm:text-[56px]">
+          <h2 className="font-bevietnam text-[40px] font-medium leading-[1.26] tracking-[-0.05em] text-lm-800 sm:text-[clamp(40px,3.9vw,56px)]">
             Frequently asked<br />questions
           </h2>
           <p className="max-w-[453px] font-bevietnam text-[18px] leading-[1.46] text-lm-600">

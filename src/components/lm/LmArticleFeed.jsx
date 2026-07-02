@@ -113,7 +113,8 @@ function CompactCard({ item }) {
 function Block({ items }) {
   const [lead, second, halfA, halfB, ...compacts] = items
   return (
-    <div className="flex flex-col gap-[8px] lg:grid lg:grid-cols-[895px_1fr]">
+    // 895:473 columns in the 1440 design — keep the ratio fluid on laptops.
+    <div className="flex flex-col gap-[8px] lg:grid lg:grid-cols-[minmax(0,1.89fr)_minmax(0,1fr)]">
       <div className="flex flex-col gap-[8px]">
         {lead && <FeaturedCard item={lead} lead />}
         {second && <FeaturedCard item={second} />}

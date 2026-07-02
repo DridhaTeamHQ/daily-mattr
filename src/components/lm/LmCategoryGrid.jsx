@@ -50,7 +50,7 @@ export default function LmCategoryGrid({ selected = [] }) {
             <p className="font-bevietnam text-[15px] font-semibold leading-[1.26] tracking-[2.7px] text-black sm:text-[18px]">
               EXPLORE <span className="bg-black px-[2px] text-white">CATEGORIES</span>
             </p>
-            <h2 className="font-bevietnam text-[40px] font-medium leading-[1.26] tracking-[-2.8px] text-lm-800 sm:text-[56px]">
+            <h2 className="font-bevietnam text-[40px] font-medium leading-[1.26] tracking-[-0.05em] text-lm-800 sm:text-[clamp(40px,3.9vw,56px)]">
               Choose the categories<br className="hidden sm:block" /> that matter to you
             </h2>
           </div>
@@ -75,7 +75,7 @@ export default function LmCategoryGrid({ selected = [] }) {
                 className="flex flex-col gap-[12px] overflow-hidden rounded-[24px]"
                 style={{ backgroundColor: cat.bg }}
               >
-                <Link to={to} className="block h-[263px] w-full overflow-hidden">
+                <Link to={to} className="block h-[220px] w-full overflow-hidden lg:h-[clamp(200px,18.3vw,263px)]">
                   <img
                     alt={cat.title}
                     src={cat.image}
