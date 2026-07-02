@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { siteUrl } from '../lib/siteOrigin'
 
 const AuthContext = createContext(null)
 
@@ -23,13 +24,14 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // Google OAuth. `redirectTo` brings the user back to where they started (and any
-  // pending subscribe intent is preserved in the URL).
+  // Google OAuth. `redirectTo` is a PATH ("/real-estate"); it is resolved
+  // against the canonical origin so sign-in always lands on longmattr.com
+  // (not the vercel.app fallback), except in local dev.
   const signInWithGoogle = useCallback(async (redirectTo) => {
-    const target = redirectTo || window.location.href
+    const path = redirectTo && redirectTo.startsWith('/') ? redirectTo : window.location.pathname
     return supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: target },
+      options: { redirectTo: siteUrl(path) },
     })
   }, [])
 

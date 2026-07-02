@@ -3,6 +3,9 @@ import LmDrawer from './LmDrawer'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabaseClient'
 import { getMyPreferences, unsubscribe, updateProfileName } from '../../lib/newsletterPrefs'
+import { siteUrl } from '../../lib/siteOrigin'
+import { LM_CATEGORIES } from './lmCategories'
+import { useLmDrawer } from './LmDrawerContext'
 
 // Auth / account drawer — Figma overlays 05-10 (564px, bg #F4F4F6, centered
 // Playfair wordmark; account states white with avatar header + pill tabs).
@@ -55,7 +58,7 @@ export default function LmAuthDrawer({ open, onClose }) {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          emailRedirectTo: window.location.origin + window.location.pathname,
+          emailRedirectTo: siteUrl(window.location.pathname),
           data: opts.signup ? { full_name: name.trim() || undefined, mobile: mobile.trim() || undefined } : undefined,
         },
       })
@@ -163,6 +166,7 @@ export default function LmAuthDrawer({ open, onClose }) {
 }
 
 function AccountPanel({ user, onSignOut }) {
+  const { openSubscribe } = useLmDrawer()
   const [tab, setTab] = useState('general')
   const meta = user?.user_metadata || {}
   const [name, setName] = useState(meta.full_name || meta.name || '')
@@ -241,7 +245,8 @@ function AccountPanel({ user, onSignOut }) {
           {!subs && <p className="font-bevietnam text-[14px] text-lm-500">Loading your editions…</p>}
           {subs && subs.length === 0 && <p className="font-bevietnam text-[14px] text-lm-500">No editions yet — subscribe to a category to get started.</p>}
           {subs && subs.map((s) => {
-            const label = (s.category_slug || '').split('-').map((w) => w[0]?.toUpperCase() + w.slice(1)).join(' ')
+            const lm = LM_CATEGORIES.find((c) => c.account?.slug === s.category_slug)
+            const label = lm?.title || (s.category_slug || '').split('-').map((w) => w[0]?.toUpperCase() + w.slice(1)).join(' ')
             const day = s.weekday ? s.weekday[0].toUpperCase() + s.weekday.slice(1) : null
             return (
               <div key={s.id} className="flex items-center justify-between rounded-[16px] border border-lm-200 bg-white px-[16px] py-[12px]">
@@ -249,13 +254,24 @@ function AccountPanel({ user, onSignOut }) {
                   <p className="font-bevietnam text-[15px] font-semibold text-lm-800">{label}</p>
                   <p className="font-bevietnam text-[12px] text-[#2563EB]">{day ? `Weekly · ${day}` : 'Daily'}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={async () => { await unsubscribe(s.category_slug).catch(() => {}); setSubs((x) => x.filter((y) => y.id !== s.id)) }}
-                  className="rounded-[100px] border border-lm-300 px-[12px] py-[6px] font-bevietnam text-[12px] font-medium text-lm-500 hover:border-lm-700 hover:text-lm-800"
-                >
-                  Remove
-                </button>
+                <div className="flex items-center gap-[6px]">
+                  {lm && (
+                    <button
+                      type="button"
+                      onClick={() => openSubscribe([lm.slug])}
+                      className="rounded-[100px] bg-lm-800 px-[12px] py-[6px] font-bevietnam text-[12px] font-medium text-white hover:bg-black"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={async () => { await unsubscribe(s.category_slug).catch(() => {}); setSubs((x) => x.filter((y) => y.id !== s.id)) }}
+                    className="rounded-[100px] border border-lm-300 px-[12px] py-[6px] font-bevietnam text-[12px] font-medium text-lm-500 hover:border-lm-700 hover:text-lm-800"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             )
           })}
