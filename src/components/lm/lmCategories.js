@@ -5,6 +5,7 @@
 export const LM_CATEGORIES = [
   {
     slug: 'technology-ai',
+    tile: '/figma/menu/technology-ai.png',
     title: 'Technology and AI',
     hero: 'Tech & AI',
     desc: 'Stay ahead with AI breakthroughs, startup launches, and emerging technologies.',
@@ -14,6 +15,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'money-matters',
+    tile: '/figma/menu/money-matters.png',
     title: 'Money & Stock Markets',
     hero: 'Money & Markets',
     desc: 'Get market updates, business trends, investing insights, IPOs, personal finance.',
@@ -23,6 +25,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'sports',
+    tile: '/figma/menu/sports.png',
     title: 'Sports',
     desc: 'Match highlights, player stories, tournaments, transfers.',
     bg: '#EDF7F1',
@@ -32,6 +35,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'case-studies',
+    tile: '/figma/menu/case-studies.png',
     title: 'Corporate Cases',
     hero: 'Corporate Cases',
     desc: 'One sharp business case study every day — strategy, market moves, and what they mean.',
@@ -42,6 +46,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'national',
+    tile: '/figma/menu/national.png',
     title: 'National',
     desc: "India's biggest stories, government policies, infrastructure, everything shaping the nation.",
     bg: '#EFF0E6',
@@ -50,6 +55,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'international',
+    tile: '/figma/menu/international.png',
     title: 'International',
     desc: 'Global headlines, geopolitics, world markets, and the stories shaping every continent.',
     bg: '#FFF2EB',
@@ -59,6 +65,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'wellness-daily',
+    tile: '/figma/menu/wellness-daily.png',
     title: 'Wellness Daily',
     desc: 'Evidence-led health, fitness, sleep, and mental-wellness stories for working professionals.',
     bg: '#E9F4EB',
@@ -67,6 +74,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'policy-partner',
+    tile: '/figma/menu/policy-partner.png',
     title: 'Politics & Power',
     hero: 'Politics & Power',
     desc: 'Policy in plain English — courts, regulators, and the decisions that touch your life.',
@@ -76,6 +84,7 @@ export const LM_CATEGORIES = [
   },
   {
     slug: 'real-estate',
+    tile: '/figma/menu/real-estate.png',
     title: 'Real Estate',
     desc: 'Launches, handovers, infrastructure, and regulation across India’s big property markets.',
     bg: '#EBF4FF',
