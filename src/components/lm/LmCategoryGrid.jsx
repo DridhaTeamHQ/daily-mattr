@@ -37,7 +37,8 @@ function CardButton({ selected, onClick }) {
 }
 
 export default function LmCategoryGrid({ selected = [] }) {
-  const { openSubscribe } = useLmDrawer()
+  const { openSubscribe, subscribedSlugs } = useLmDrawer()
+  const isOn = (slug) => selected.includes(slug) || subscribedSlugs.includes(slug)
   const handleToggle = (cat) => openSubscribe([cat.slug])
 
   return (
@@ -61,7 +62,7 @@ export default function LmCategoryGrid({ selected = [] }) {
         {/* Grid */}
         <div className="grid grid-cols-1 gap-[24px] pb-[80px] pt-[64px] sm:grid-cols-2 lg:grid-cols-3 lg:pt-[74px]">
           {LM_CATEGORIES.map((cat) => {
-            const isSelected = selected.includes(cat.slug)
+            const isSelected = isOn(cat.slug)
             const to = cat.slug === 'case-studies' ? '/case-studies' : `/${cat.slug}`
             return (
               <motion.article

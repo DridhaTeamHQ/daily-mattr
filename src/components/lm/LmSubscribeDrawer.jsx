@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import LmDrawer from './LmDrawer'
 import { LM_CATEGORIES, lmCategoryBySlug } from './lmCategories'
 import { subscribeNewsletter } from '../../lib/subscribeApi'
 import { useAuth } from '../../context/AuthContext'
+import { useLmDrawer } from './LmDrawerContext'
 
 // Subscribe drawer — Figma overlays 01-04 ("Setup your edition", 589px,
 // bg #F4F4F6, white header/footer bars). Step 1: per-topic Daily Deep Dive vs
@@ -41,7 +42,10 @@ function OptionRow({ label, hint, selected, onClick }) {
 
 export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
   const { user } = useAuth()
+  const { markSubscribed } = useLmDrawer()
   const [step, setStep] = useState(1)
+  // selected: slugs of the categories currently in the edition.
+  const [selected, setSelected] = useState([])
   // choices: slug -> { rhythm: 'daily'|'weekly', day: 'fri' }
   const [choices, setChoices] = useState({})
   const [name, setName] = useState('')
@@ -50,13 +54,37 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
-  const topics = useMemo(() => {
-    return (slugs.length ? slugs : ['general']).map(
-      (s) => lmCategoryBySlug(s) || { slug: s, title: s === 'general' ? 'The Daily — all categories' : s }
-    )
-  }, [slugs])
+  // Opening (re)seeds the selection with whatever card/button launched the drawer.
+  useEffect(() => {
+    if (open) {
+      setSelected(slugs.filter((s) => lmCategoryBySlug(s)))
+      setStep(1)
+      setError('')
+    }
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const complete = topics.every((t) => {
+  const topics = useMemo(
+    () => selected.map((s) => lmCategoryBySlug(s)).filter(Boolean),
+    [selected]
+  )
+
+  const allSelected = selected.length === LM_CATEGORIES.length
+  const toggleTopic = (slug) =>
+    setSelected((s) => (s.includes(slug) ? s.filter((x) => x !== slug) : [...s, slug]))
+  // Subscribe all: select every category; anything without a rhythm defaults
+  // to Daily Deep Dive so one more click completes the flow.
+  const selectAll = () => {
+    setSelected(LM_CATEGORIES.map((c) => c.slug))
+    setChoices((c) => {
+      const next = { ...c }
+      for (const cat of LM_CATEGORIES) {
+        if (!next[cat.slug]?.rhythm) next[cat.slug] = { rhythm: 'daily' }
+      }
+      return next
+    })
+  }
+
+  const complete = topics.length > 0 && topics.every((t) => {
     const c = choices[t.slug]
     return c && (c.rhythm === 'daily' || (c.rhythm === 'weekly' && c.day))
   })
@@ -85,6 +113,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
           source_preference: 'top',
         })
       }
+      markSubscribed(selected)
       setStep(3)
     } catch (e) {
       setError(e.message || 'Subscription failed — try again.')
@@ -93,7 +122,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
     }
   }
 
-  const reset = () => { setStep(1); setChoices({}); setError('') }
+  const reset = () => { setStep(1); setChoices({}); setSelected([]); setError('') }
 
   return (
     <LmDrawer open={open} onClose={() => { onClose(); reset() }} width={589} scrim={0.7}>
@@ -117,6 +146,45 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px]">
           {step === 1 && (
             <div className="flex flex-col gap-[16px]">
+              {/* Topic picker — shows what's currently selected; add/remove freely */}
+              <div className="flex flex-col gap-[10px] rounded-[16px] bg-white p-[16px]">
+                <div className="flex items-center justify-between">
+                  <p className="font-bevietnam text-[13px] font-semibold uppercase tracking-[1px] text-lm-500">
+                    Your topics {selected.length > 0 && `· ${selected.length} selected`}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => (allSelected ? setSelected([]) : selectAll())}
+                    className={`rounded-[100px] px-[14px] py-[7px] font-bevietnam text-[12px] font-semibold ${
+                      allSelected ? 'border border-lm-300 text-lm-500' : 'bg-lm-800 text-white'
+                    }`}
+                  >
+                    {allSelected ? 'Clear all' : 'Subscribe all'}
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-[8px]">
+                  {LM_CATEGORIES.map((c) => {
+                    const on = selected.includes(c.slug)
+                    return (
+                      <button
+                        key={c.slug}
+                        type="button"
+                        onClick={() => toggleTopic(c.slug)}
+                        className={`flex items-center gap-[6px] rounded-[40px] border px-[12px] py-[8px] font-bevietnam text-[13px] font-medium transition-colors ${
+                          on ? 'border-lm-800 bg-lm-800 text-white' : 'border-lm-200 bg-white text-lm-600 hover:border-lm-400'
+                        }`}
+                      >
+                        <span className="text-[14px] leading-none">{on ? '✓' : '+'}</span>
+                        {c.title}
+                      </button>
+                    )
+                  })}
+                </div>
+                {topics.length === 0 && (
+                  <p className="font-bevietnam text-[13px] text-lm-500">Pick at least one topic — or hit “Subscribe all”.</p>
+                )}
+              </div>
+
               {topics.map((t) => {
                 const c = choices[t.slug] || {}
                 return (
