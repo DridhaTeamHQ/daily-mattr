@@ -32,10 +32,10 @@ const DAYS = [
 const FULL_DAY = { mon: 'monday', tue: 'tuesday', wed: 'wednesday', thu: 'thursday', fri: 'friday', sat: 'saturday' }
 const SHORT_DAY = Object.fromEntries(Object.entries(FULL_DAY).map(([s, f]) => [f, s]))
 const dayLabel = (id) => (DAYS.find(([d]) => d === id) || [])[1] || ''
-// Guest (legacy) categories: agent categories map 1:1; topic cards ride the
-// general daily wrap.
-const REAL_CATEGORY = (slug) =>
-  ['real-estate', 'policy-partner', 'money-matters', 'wellness-daily'].includes(slug) ? slug : 'general'
+// Guest (legacy) categories: the subscribers edge function accepts our slugs
+// directly (general / case-studies / the 4 agent categories) and derives the
+// right plan from them.
+const REAL_CATEGORY = (slug) => slug
 const isDailyOnly = (t) => t.account?.type === 'case_study_daily'
 const isWeeklyOnly = (t) => t.account?.type === 'category_small_articles'
 // Focus-area options for the case-study edition = every other category

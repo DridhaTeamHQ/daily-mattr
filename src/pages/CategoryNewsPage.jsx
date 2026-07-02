@@ -28,9 +28,9 @@ export default function CategoryNewsPage() {
       ])
       const feed = cat?.feed || {}
       const matches = (a) => {
+        if (feed.general && a.slug === 'general') return true
         if (feed.category && a.slug === slug) return true
         if (feed.topics && a.slug === 'general' && feed.topics.includes(a.topic)) return true
-        if (!cat && slug === 'general' && a.slug === 'general') return true
         return false
       }
       const list = [...features, ...articles.filter(matches)]
