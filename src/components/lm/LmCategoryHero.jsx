@@ -37,7 +37,7 @@ export default function LmCategoryHero({ title, tagline, image, slug }) {
           {tagline && (
             <p className="font-bevietnam text-[16px] leading-[1.46] text-white sm:text-[18px] lg:text-right">{tagline}</p>
           )}
-          <div className="flex items-center">
+          <div className="flex items-center gap-[8px]">
             <button
               type="button"
               onClick={() => openSubscribe(slug ? [slug] : [])}

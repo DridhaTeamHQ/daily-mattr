@@ -15,51 +15,39 @@
   }
 
   body {
-    background: #faf9f6;
-    color: #111827;
-    font-family: 'Roboto', 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #141417;
+    font-family: 'Be Vietnam Pro', 'Roboto', ui-sans-serif, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+  }
+
+  ::selection {
+    background: #141417;
+    color: #ffffff;
   }
 }
 
-/* Desi-maximalism scrollbar — gold thumb on a faint gold track, wine on hover.
-   Applies to the page and every inner scroll area (e.g. the reading list). */
+/* LONG MATTR scrollbar — slim neutral thumb, invisible track. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c9a227 rgba(201, 162, 39, 0.12);
+  scrollbar-color: #b8b8c0 transparent;
 }
 *::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 *::-webkit-scrollbar-track {
-  background: rgba(201, 162, 39, 0.1);
-  border-radius: 999px;
+  background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #d4af37, #b8860b);
+  background: #b8b8c0;
   border: 2px solid transparent;
   background-clip: padding-box;
   border-radius: 999px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #7b1e3b;
+  background: #6b6b73;
   background-clip: padding-box;
 }
 *::-webkit-scrollbar-corner {
   background: transparent;
-}
-
-/* Long-form reading: comfortable measure + an editorial drop cap on the first
-   paragraph. Applied via the .article-body class on the article text wrapper. */
-.article-body {
-  max-width: 68ch;
-}
-.article-body > p:first-of-type::first-letter {
-  float: left;
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-weight: 700;
-  font-size: 3.4rem;
-  line-height: 0.78;
-  margin: 0.12em 0.6rem 0 0;
-  color: #7b1e3b;
 }

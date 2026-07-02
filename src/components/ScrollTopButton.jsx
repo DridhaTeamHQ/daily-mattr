@@ -23,7 +23,7 @@ export default function ScrollTopButton() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 12 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-6 right-6 z-30 hidden h-11 w-11 items-center justify-center rounded-full border border-[#c9a227]/50 bg-white/70 text-[#7b1e3b] shadow-[0_8px_24px_rgba(17,24,39,0.18)] backdrop-blur-md transition-colors hover:bg-white lg:flex"
+          className="fixed bottom-6 right-6 z-30 hidden h-11 w-11 items-center justify-center rounded-full border border-lm-300 bg-white/80 text-lm-800 shadow-[0_8px_24px_rgba(17,24,39,0.14)] backdrop-blur-md transition-colors hover:bg-white lg:flex"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </motion.button>

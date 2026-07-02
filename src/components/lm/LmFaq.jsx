@@ -52,7 +52,7 @@ export default function LmFaq() {
           <p className="max-w-[453px] font-bevietnam text-[18px] leading-[1.46] text-lm-600">
             Learn how Long Mattr work, what you’ll receive, how to choose categories, and how to manage your editions anytime.
           </p>
-          <div className="mt-[24px] flex items-center">
+          <div className="mt-[24px] flex items-center gap-[8px]">
             <button
               type="button"
               onClick={() => openSubscribe([])}
