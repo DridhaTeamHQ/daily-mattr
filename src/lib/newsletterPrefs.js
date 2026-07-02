@@ -78,12 +78,15 @@ async function rowForCategory(userId, slug) {
 }
 
 // category = a newsletter_categories row. opts: { weekday, rhythm, send_days, source_preference }
+// Every edition type supports rhythm 'daily' | 'weekly'; weekly editions carry
+// a weekday (required for the topic categories, optional metadata otherwise).
 export async function subscribe(category, opts = {}) {
   const { data: auth } = await supabase.auth.getUser()
   const user = auth?.user
   if (!user) throw new Error('Please sign in to subscribe.')
 
-  if (category.newsletter_type === 'category_small_articles' && !opts.weekday) {
+  const rhythm = opts.rhythm || (category.newsletter_type === 'case_study_daily' ? 'daily' : 'weekly')
+  if (category.newsletter_type === 'category_small_articles' && rhythm === 'weekly' && !opts.weekday) {
     throw new Error('Choose a weekday for this category.')
   }
 
@@ -91,10 +94,10 @@ export async function subscribe(category, opts = {}) {
     user_id: user.id,
     category_slug: category.slug,
     newsletter_type: category.newsletter_type,
-    weekday: category.newsletter_type === 'category_small_articles' ? opts.weekday : null,
-    rhythm: category.newsletter_type === 'news_rhythm' ? (opts.rhythm || 'weekly') : null,
-    send_days: category.newsletter_type === 'news_rhythm' ? (opts.send_days || null) : null,
-    source_preference: category.newsletter_type === 'news_rhythm' ? (opts.source_preference || 'top') : null,
+    weekday: rhythm === 'weekly' ? (opts.weekday || null) : null,
+    rhythm,
+    send_days: opts.send_days || null,
+    source_preference: opts.source_preference || 'top',
     case_study_categories:
       category.newsletter_type === 'case_study_daily'
         ? (opts.case_study_categories?.length ? opts.case_study_categories : null)
