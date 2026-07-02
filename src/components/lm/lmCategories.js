@@ -1,0 +1,87 @@
+// LONG MATTR category registry — the 9 design cards (Figma node 1:282) mapped
+// onto the site's real feeds. `slug` is the /:category route; `feed` tells
+// CategoryNewsPage what to load: agent categories come from `articles.category`,
+// general-news cards filter `articles.topic`.
+export const LM_CATEGORIES = [
+  {
+    slug: 'technology-ai',
+    title: 'Technology and AI',
+    hero: 'Tech & AI',
+    desc: 'Stay ahead with AI breakthroughs, startup launches, and emerging technologies.',
+    bg: '#EBF3FF',
+    image: '/figma/category-tech-ai.png',
+    feed: { topics: ['Technology', 'Science'] },
+  },
+  {
+    slug: 'money-matters',
+    title: 'Money & Stock Markets',
+    hero: 'Money & Markets',
+    desc: 'Get market updates, business trends, investing insights, IPOs, personal finance.',
+    bg: '#F5F0FF',
+    image: '/figma/category-money-markets.png',
+    feed: { category: 'Money Matters', topics: ['Business'] },
+  },
+  {
+    slug: 'sports',
+    title: 'Sports',
+    desc: 'Match highlights, player stories, tournaments, transfers.',
+    bg: '#EDF7F1',
+    image: '/figma/category-sports.gif',
+    poster: '/figma/category-sports-still.png',
+    feed: { topics: ['Sports'] },
+  },
+  {
+    slug: 'case-studies',
+    title: 'Corporate Cases',
+    hero: 'Corporate Cases',
+    desc: 'One sharp business case study every day — strategy, market moves, and what they mean.',
+    bg: '#F4F4F6',
+    image: '/figma/category-entertainment.gif',
+    poster: '/figma/category-entertainment-still.png',
+    feed: { caseStudies: true },
+  },
+  {
+    slug: 'national',
+    title: 'National',
+    desc: "India's biggest stories, government policies, infrastructure, everything shaping the nation.",
+    bg: '#EFF0E6',
+    image: '/figma/category-national-politics.png',
+    feed: { topics: ['India', 'Explained'] },
+  },
+  {
+    slug: 'international',
+    title: 'International',
+    desc: 'Global headlines, geopolitics, world markets, and the stories shaping every continent.',
+    bg: '#FFF2EB',
+    image: '/figma/category-international.png',
+    imageBase: '/figma/category-international-base.png',
+    feed: { topics: ['World'] },
+  },
+  {
+    slug: 'wellness-daily',
+    title: 'Wellness Daily',
+    desc: 'Evidence-led health, fitness, sleep, and mental-wellness stories for working professionals.',
+    bg: '#E9F4EB',
+    image: '/figma/category-wellness.png',
+    feed: { category: 'Wellness Daily' },
+  },
+  {
+    slug: 'policy-partner',
+    title: 'Politics & Power',
+    hero: 'Politics & Power',
+    desc: 'Policy in plain English — courts, regulators, and the decisions that touch your life.',
+    bg: '#ECE6F0',
+    image: '/figma/category-national-politics.png',
+    feed: { category: 'Policy Partner' },
+  },
+  {
+    slug: 'real-estate',
+    title: 'Real Estate',
+    desc: 'Launches, handovers, infrastructure, and regulation across India’s big property markets.',
+    bg: '#EBF4FF',
+    image: '/figma/category-real-estate.png',
+    feed: { category: 'Real Estate' },
+  },
+]
+
+export const lmCategoryBySlug = (slug) => LM_CATEGORIES.find((c) => c.slug === slug) || null

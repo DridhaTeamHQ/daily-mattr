@@ -2,6 +2,8 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop'
 import ScrollTopButton from './components/ScrollTopButton'
+import { LmDrawerProvider } from './components/lm/LmDrawerContext'
+import LmDrawerHost from './components/lm/LmDrawerHost'
 import NewsletterPage from './pages/NewsletterPage'
 import CategoryNewsPage from './pages/CategoryNewsPage'
 import CaseStudiesPage from './pages/CaseStudiesPage'
@@ -12,7 +14,7 @@ import RequireAuth from './components/RequireAuth'
 
 function App() {
   return (
-    <>
+    <LmDrawerProvider>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<NewsletterPage />} />
@@ -27,7 +29,8 @@ function App() {
         <Route path="/:category/:articleId" element={<CategoryNewsPage />} />
       </Routes>
       <ScrollTopButton />
-    </>
+      <LmDrawerHost />
+    </LmDrawerProvider>
   )
 }
 

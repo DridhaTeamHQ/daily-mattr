@@ -6,7 +6,25 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // LONG MATTR design system (Figma R0PWgZZF2fEQt7bn6V6KPx)
+        bevietnam: ['"Be Vietnam Pro"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        playfair: ['Playfair', '"Playfair Display"', 'Georgia', 'serif'],
+        roboto: ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
+        // Figma "Neutral colors | Light Mode" variables
+        lm: {
+          0: '#FFFFFF',
+          50: '#FAFAFB',
+          200: '#E5E5EA',
+          300: '#D1D1D6',
+          400: '#B8B8C0',
+          500: '#6B6B73',
+          600: '#4A4A52',
+          700: '#1C1C1E',
+          800: '#141417',
+        },
         primary: '#7c3aed',
         secondary: '#a855f7',
         accent: '#c084fc',
