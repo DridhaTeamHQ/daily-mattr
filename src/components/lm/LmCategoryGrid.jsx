@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { LM_CATEGORIES } from './lmCategories'
 import { useLmDrawer } from './LmDrawerContext'
 import Reveal from './Reveal'
@@ -8,6 +8,7 @@ import Reveal from './Reveal'
 // Categories — Figma node 1:282 (1440x2389). Header row (eyebrow with black
 // marker highlight + 56px H2 left, right-aligned blurb) above a 3x3 grid of
 // pastel cards: image (263px), 32px title, 18px description, pill button.
+// Multi-select enabled: clicking cards selects them, showing a bottom banner to set up edition.
 const rb = { fontVariationSettings: '"wdth" 100' }
 const GLOW = '/figma/cat-button-glow.svg'
 
@@ -16,10 +17,10 @@ function CardButton({ selected, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex items-center justify-center gap-[8px] overflow-hidden rounded-[50px] px-[24px] py-[16px] font-roboto text-[15px] font-semibold ${
+      className={`relative flex items-center justify-center gap-[8px] overflow-hidden rounded-[50px] px-[24px] py-[16px] font-roboto text-[15px] font-semibold transition-all duration-200 ${
         selected
-          ? 'bg-lm-700 text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.15)]'
-          : 'border border-solid border-black/10 bg-white text-lm-800'
+          ? 'bg-[#141417] text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.2)] scale-[1.02]'
+          : 'border border-solid border-black/10 bg-white text-lm-800 hover:border-black/30'
       }`}
       style={rb}
     >
@@ -36,10 +37,22 @@ function CardButton({ selected, onClick }) {
   )
 }
 
-export default function LmCategoryGrid({ selected = [] }) {
+export default function LmCategoryGrid({ selectedSlugs = [], onToggle }) {
   const { openSubscribe, subscribedSlugs } = useLmDrawer()
-  const isOn = (slug) => selected.includes(slug) || subscribedSlugs.includes(slug)
-  const handleToggle = (cat) => openSubscribe([cat.slug])
+  const [localSelected, setLocalSelected] = useState([])
+
+  const activeSlugs = onToggle ? selectedSlugs : localSelected
+  const handleToggle = (cat) => {
+    if (onToggle) {
+      onToggle(cat)
+    } else {
+      setLocalSelected((prev) =>
+        prev.includes(cat.slug) ? prev.filter((s) => s !== cat.slug) : [...prev, cat.slug]
+      )
+    }
+  }
+
+  const isOn = (slug) => activeSlugs.includes(slug) || subscribedSlugs.includes(slug)
 
   return (
     <section id="categories" className="bg-white">
@@ -51,7 +64,7 @@ export default function LmCategoryGrid({ selected = [] }) {
             <p className="font-bevietnam text-[15px] font-semibold leading-[1.26] tracking-[2.7px] text-black sm:text-[18px]">
               EXPLORE <span className="bg-black px-[2px] text-white">CATEGORIES</span>
             </p>
-            <h2 className="font-bevietnam text-[40px] font-medium leading-[1.26] tracking-[-0.05em] text-lm-800 sm:text-[clamp(40px,3.9vw,56px)]">
+            <h2 className="font-bevietnam text-[40px] font-medium leading-[1.26] tracking-[0.05em] text-lm-800 sm:text-[clamp(40px,3.9vw,56px)]">
               Choose the categories<br className="hidden sm:block" /> that matter to you
             </h2>
           </div>

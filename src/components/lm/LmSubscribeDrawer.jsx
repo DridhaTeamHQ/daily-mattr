@@ -35,6 +35,31 @@ const REAL_CATEGORY = (slug) => slug
 const isDailyOnly = (t) => t.slug === 'general' // General: daily mails only
 const isSmallArticle = (t) => t.account?.type === 'category_small_articles' // one-per-weekday rule
 
+const getDayName = (dayId) => {
+  if (!dayId || !FULL_DAY[dayId]) return 'your chosen day'
+  const name = FULL_DAY[dayId]
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
+const getDeliveryMessage = (t, c) => {
+  if (isDailyOnly(t)) {
+    return 'You will receive 10 key headlines every day'
+  }
+  const rhythm = c?.rhythm
+  if (!rhythm) return null
+  const dayStr = getDayName(c.day)
+  if (rhythm === 'daily') {
+    return `You will receive 1 detailed ${t.title} story every day`
+  }
+  if (rhythm === 'weekly') {
+    return `You will receive 5 key ${t.title} headlines once a week on ${dayStr}`
+  }
+  if (rhythm === 'both') {
+    return `You will receive 1 detailed ${t.title} story every day + 5 key headlines once a week on ${dayStr}`
+  }
+  return null
+}
+
 function OptionRow({ label, hint, selected, onClick }) {
   return (
     <button
@@ -75,10 +100,11 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
 
   // ---- weekday ownership (topic categories only) ---------------------------
   const dayOwner = (dayId, topic, currChoices, selList) => {
-    if (!isSmallArticle(topic)) return null
+    if (isDailyOnly(topic)) return null
     for (const other of LM_CATEGORIES) {
-      if (other.slug === topic.slug || !isSmallArticle(other)) continue
-      if (selList.includes(other.slug) && currChoices[other.slug]?.rhythm === 'weekly' && currChoices[other.slug]?.day === dayId) {
+      if (other.slug === topic.slug || isDailyOnly(other)) continue
+      const r = currChoices[other.slug]?.rhythm
+      if (selList.includes(other.slug) && (r === 'weekly' || r === 'both') && currChoices[other.slug]?.day === dayId) {
         return other.title
       }
     }
@@ -152,22 +178,59 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
     const c = choices[t.slug]
     if (!c?.rhythm) return false
     if (c.rhythm === 'daily') return true
-    if (!c.day) return false
-    return !dayOwner(c.day, t, choices, selected)
+    if (c.rhythm === 'weekly' || c.rhythm === 'both') {
+      if (!c.day) return false
+      return !dayOwner(c.day, t, choices, selected)
+    }
+    return false
   }
   const complete = topics.length > 0 && topics.every(choiceComplete)
 
   const setChoice = (slug, patch) =>
     setChoices((c) => ({ ...c, [slug]: { ...(c[slug] || {}), ...patch } }))
 
-  const pickWeekly = (t) => {
-    const current = choices[t.slug] || {}
-    const day = current.day || freeDayFor(t, choices, selected) || 'fri'
-    setChoice(t.slug, { rhythm: 'weekly', day })
+  const toggleDaily = (t) => {
+    const c = choices[t.slug] || {}
+    const dailyOn = c.rhythm === 'daily' || c.rhythm === 'both'
+    const weeklyOn = c.rhythm === 'weekly' || c.rhythm === 'both'
+    if (dailyOn) {
+      if (weeklyOn) {
+        setChoice(t.slug, { rhythm: 'weekly' })
+      } else {
+        toggleTopic(t.slug)
+      }
+    } else {
+      if (weeklyOn) {
+        setChoice(t.slug, { rhythm: 'both' })
+      } else {
+        setChoice(t.slug, { rhythm: 'daily', day: undefined })
+      }
+    }
+  }
+
+  const toggleWeekly = (t) => {
+    const c = choices[t.slug] || {}
+    const dailyOn = c.rhythm === 'daily' || c.rhythm === 'both'
+    const weeklyOn = c.rhythm === 'weekly' || c.rhythm === 'both'
+    if (weeklyOn) {
+      if (dailyOn) {
+        setChoice(t.slug, { rhythm: 'daily', day: undefined })
+      } else {
+        toggleTopic(t.slug)
+      }
+    } else {
+      const day = c.day || freeDayFor(t, choices, selected) || 'fri'
+      if (dailyOn) {
+        setChoice(t.slug, { rhythm: 'both', day })
+      } else {
+        setChoice(t.slug, { rhythm: 'weekly', day })
+      }
+    }
   }
 
   const scheduleLabel = (t) => {
     const c = choices[t.slug] || {}
+    if (c.rhythm === 'both') return `Daily + Weekly (${dayLabel(c.day)})`
     return c.rhythm === 'weekly' ? `Weekly · ${dayLabel(c.day)}` : 'Daily'
   }
 
@@ -186,8 +249,8 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
           try {
             await accountSubscribe(categoryRow, {
               rhythm: c.rhythm || 'daily',
-              weekday: c.rhythm === 'weekly' && c.day ? FULL_DAY[c.day] : undefined,
-              send_days: c.rhythm === 'weekly' && c.day ? [c.day] : undefined,
+              weekday: (c.rhythm === 'weekly' || c.rhythm === 'both') && c.day ? FULL_DAY[c.day] : undefined,
+              send_days: (c.rhythm === 'weekly' || c.rhythm === 'both') && c.day ? [c.day] : undefined,
               source_preference: sourcePref,
             })
           } catch (err) {
@@ -208,7 +271,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
             name: name.trim() || undefined,
             email: email.trim(),
             rhythm: c.rhythm || 'daily',
-            send_days: c.rhythm === 'weekly' && c.day ? [c.day] : undefined,
+            send_days: (c.rhythm === 'weekly' || c.rhythm === 'both') && c.day ? [c.day] : undefined,
             categories: [real],
             source_preference: sourcePref,
           })
@@ -296,7 +359,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                       // The Daily: daily mails only — a single, always-on option.
                       <OptionRow
                         label="Daily Deep Dive"
-                        hint="Ten sharp stories, every morning"
+                        hint="10 key headlines every day"
                         selected
                         onClick={() => setChoice(t.slug, { rhythm: 'daily', day: undefined })}
                       />
@@ -304,20 +367,20 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                       <>
                         <OptionRow
                           label="Daily Deep Dive"
-                          hint="The topic's case study, every morning"
-                          selected={c.rhythm === 'daily'}
-                          onClick={() => setChoice(t.slug, { rhythm: 'daily', day: undefined })}
+                          hint="1 detailed story every day"
+                          selected={c.rhythm === 'daily' || c.rhythm === 'both'}
+                          onClick={() => toggleDaily(t)}
                         />
                         <OptionRow
                           label="Weekly Round-up"
-                          hint="Short articles, on the day you pick"
-                          selected={c.rhythm === 'weekly'}
-                          onClick={() => pickWeekly(t)}
+                          hint="5 key headlines once a week"
+                          selected={c.rhythm === 'weekly' || c.rhythm === 'both'}
+                          onClick={() => toggleWeekly(t)}
                         />
                       </>
                     )}
 
-                    {!isDailyOnly(t) && c.rhythm === 'weekly' && (
+                    {!isDailyOnly(t) && (c.rhythm === 'weekly' || c.rhythm === 'both') && (
                       <div className="flex flex-col gap-[8px] pt-[4px]">
                         <p className="font-bevietnam text-[13px] text-lm-500">Choose a delivery day</p>
                         <div className="flex flex-wrap gap-[8px]">
@@ -344,7 +407,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                             )
                           })}
                         </div>
-                        {isSmallArticle(t) && DAYS.some(([id]) => dayOwner(id, t, choices, selected)) && (
+                        {!isDailyOnly(t) && DAYS.some(([id]) => dayOwner(id, t, choices, selected)) && (
                           <p className="font-bevietnam text-[12px] text-lm-400">
                             Crossed-out days already carry another edition — one topic per day.
                           </p>
@@ -352,6 +415,11 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                       </div>
                     )}
 
+                    {getDeliveryMessage(t, c) && (
+                      <p className="pt-[4px] font-bevietnam text-[13px] font-medium text-[#2563EB]">
+                        {getDeliveryMessage(t, c)}
+                      </p>
+                    )}
                   </div>
                 )
               })}

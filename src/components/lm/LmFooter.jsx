@@ -2,11 +2,11 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-// Footer — Figma node 1:202 (1440x799). #E5E5EA panel: brand blurb + link
-// columns, right-aligned copyright, and the giant cropped "DailyMattr'."
-// Playfair wordmark bleeding off the bottom.
+// Footer — redesigned top section matching user screenshot: stacked wordmark & tagline,
+// email subscribe pill, uppercase column headers with underline dash, chevron links,
+// horizontal divider, and right-aligned copyright.
+// Giant cropped "DailyMattr'." wordmark preserved at the bottom.
 const pf = { fontVariationSettings: '"opsz" 12, "wdth" 100' }
-const rb = { fontVariationSettings: '"wdth" 100' }
 
 const PRODUCT_LINKS = [
   { label: 'Home', to: '/' },
@@ -21,70 +21,134 @@ const LONGMATTR_LINKS = [
 ]
 
 function FooterLink({ item }) {
-  const cls = 'font-roboto text-[14px] font-medium leading-[1.46] text-lm-800 hover:text-black'
-  return item.href
-    ? <a href={item.href} className={cls} style={rb}>{item.label}</a>
-    : <Link to={item.to} className={cls} style={rb}>{item.label}</Link>
+  const cls = 'flex items-center gap-2.5 font-bevietnam text-[14px] sm:text-[15px] font-medium text-[#4A4A52] transition-colors hover:text-black'
+  const content = (
+    <>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#8E8E98] shrink-0">
+        <path d="m9 18 6-6-6-6" />
+      </svg>
+      <span>{item.label}</span>
+    </>
+  )
+  return item.href ? (
+    <a href={item.href} className={cls}>
+      {content}
+    </a>
+  ) : (
+    <Link to={item.to} className={cls}>
+      {content}
+    </Link>
+  )
 }
 
 export default function LmFooter() {
   return (
     <footer id="footer" className="relative overflow-hidden bg-lm-200">
-      <div className="mx-auto flex w-full max-w-[1317px] flex-col gap-[32px] px-4 pt-[48px] sm:px-8 sm:pt-[69px]">
-        <div className="flex flex-col items-start justify-between gap-10 md:flex-row">
-          {/* Brand block */}
-          <div className="flex w-full max-w-[343px] flex-col gap-[16px]">
-            <div className="flex items-center gap-[4px] whitespace-nowrap text-lm-800">
+      <div className="mx-auto flex w-full max-w-[1317px] flex-col px-4 pt-[48px] sm:px-8 sm:pt-[69px]">
+        <div className="flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-16">
+          {/* Brand block + subscribe input */}
+          <div className="flex w-full max-w-[480px] flex-col gap-6">
+            <div className="flex flex-col gap-1 text-lm-800">
               <p className="leading-none">
-                <span className="font-playfair font-extrabold text-[24px] tracking-[-1.2px]" style={pf}>the</span>
-                <span className="font-playfair font-black text-[32px] tracking-[-1.6px]" style={pf}>Ma</span>
-                <span className="font-playfair font-black text-[32px] tracking-[-2.56px]" style={pf}>tt</span>
-                <span className="font-playfair font-black text-[32px]" style={pf}>r</span>
-                <span className="font-playfair font-black text-[32px] text-lm-500" style={pf}>’</span>
-                <span className="font-playfair font-black text-[32px]" style={pf}>.</span>
+                <span className="font-playfair font-extrabold text-[36px] tracking-[-0.04em] sm:text-[44px]" style={pf}>the</span>
+                <span className="font-playfair font-black text-[42px] tracking-[-0.04em] sm:text-[52px]" style={pf}>Ma</span>
+                <span className="font-playfair font-black text-[42px] tracking-[-0.06em] sm:text-[52px]" style={pf}>tt</span>
+                <span className="font-playfair font-black text-[42px] sm:text-[52px]" style={pf}>r</span>
+                <span className="font-playfair font-black text-[42px] text-lm-500 sm:text-[52px]" style={pf}>’</span>
+                <span className="font-playfair font-black text-[42px] sm:text-[52px]" style={pf}>.</span>
               </p>
-              <p className="font-roboto text-[24px] font-semibold leading-[1.26] sm:text-[32px]" style={rb}>your deeper read.</p>
+              <p className="font-playfair text-[28px] font-bold leading-tight tracking-[-0.02em] text-lm-800 sm:text-[36px]" style={pf}>
+                your deeper read.
+              </p>
             </div>
-            <p className="font-roboto text-[18px] leading-[1.46] text-lm-600" style={rb}>
+
+            <p className="max-w-[440px] font-bevietnam text-[15px] leading-[1.6] text-[#6E6E77] sm:text-[16px]">
               Long Matters brings you the story behind the headline — with context, clarity, and perspective that help you understand what really matters.
             </p>
+
+            {/* Email Subscribe Bar */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                window.location.href = '/subscribe'
+              }}
+              className="mt-2 flex w-full max-w-[460px] items-center justify-between gap-2 rounded-full border border-white bg-white/80 p-1.5 shadow-sm backdrop-blur-sm"
+            >
+              <div className="flex flex-1 items-center gap-3 pl-3 sm:pl-4">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-[#8E8E98]">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full bg-transparent font-bevietnam text-[14px] text-lm-800 placeholder:text-[#8E8E98] focus:outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="flex shrink-0 items-center gap-2 rounded-full bg-[#141417] px-5 py-2.5 font-bevietnam text-[14px] font-medium text-white transition-all duration-200 hover:scale-[1.02] hover:bg-black sm:px-6"
+              >
+                <span>Subscribe</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </button>
+            </form>
           </div>
 
           {/* Link columns */}
-          <div className="flex flex-wrap gap-10 text-[14px] sm:gap-[63px]">
-            <div className="flex w-[133px] flex-col gap-[16px]">
-              <p className="font-roboto uppercase leading-[1.26] tracking-[0.7px] text-lm-500" style={rb}>Product</p>
-              <div className="flex flex-col gap-[12px]">
-                {PRODUCT_LINKS.map((l) => <FooterLink key={l.label} item={l} />)}
+          <div className="flex flex-wrap gap-14 sm:gap-24 lg:pt-4">
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="font-bevietnam text-[13px] font-semibold tracking-[0.12em] text-[#6E6E77] uppercase">Product</p>
+                <div className="mt-2 h-[2px] w-6 bg-[#A1A1AA]" />
+              </div>
+              <div className="flex flex-col gap-3.5">
+                {PRODUCT_LINKS.map((l) => (
+                  <FooterLink key={l.label} item={l} />
+                ))}
               </div>
             </div>
-            <div className="flex flex-col gap-[16px]">
-              <p className="font-roboto uppercase leading-[1.26] tracking-[0.7px] text-lm-500" style={rb}>Long Mattr</p>
-              <div className="flex flex-col gap-[12px]">
-                {LONGMATTR_LINKS.map((l) => <FooterLink key={l.label} item={l} />)}
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="font-bevietnam text-[13px] font-semibold tracking-[0.12em] text-[#6E6E77] uppercase">Long Mattr</p>
+                <div className="mt-2 h-[2px] w-6 bg-[#A1A1AA]" />
+              </div>
+              <div className="flex flex-col gap-3.5">
+                {LONGMATTR_LINKS.map((l) => (
+                  <FooterLink key={l.label} item={l} />
+                ))}
               </div>
             </div>
           </div>
         </div>
-        <p className="self-end whitespace-nowrap font-roboto text-[14px] leading-[1.46] text-lm-600 sm:text-[18px]" style={rb}>
+
+        {/* Horizontal Divider line */}
+        <div className="mt-12 mb-6 w-full border-t border-[#D1D1D8]/80 sm:mt-16 sm:mb-8" />
+
+        {/* Copyright right-aligned */}
+        <p className="self-end text-right font-bevietnam text-[14px] font-medium text-[#6E6E77] sm:text-[15px]">
           © 2026 Dridhatechnologies. All rights reserved.
         </p>
       </div>
 
-      {/* Giant cropped wordmark — 251/335px on desktop, scaled down responsively */}
+      {/* Giant cropped wordmark — preserved exactly as requested */}
       <motion.p
         aria-hidden
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-20px' }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none mt-[40px] block select-none whitespace-nowrap pl-[24px] leading-[0.82] text-lm-800 sm:pl-[44px] lg:mt-[60px]">
-        <span className="font-playfair font-extrabold text-[17.5vw] tracking-[-0.05em]" style={pf}>Daily</span>
-        <span className="font-playfair font-black text-[23.3vw] tracking-[-0.05em]" style={pf}>Ma</span>
-        <span className="font-playfair font-black text-[23.3vw] tracking-[-0.08em]" style={pf}>tt</span>
-        <span className="font-playfair font-black text-[23.3vw]" style={pf}>r</span>
-        <span className="font-playfair font-black text-[23.3vw] text-lm-500" style={pf}>’</span>
-        <span className="font-playfair font-black text-[23.3vw]" style={pf}>.</span>
+        className="pointer-events-none mt-[40px] block select-none whitespace-nowrap pl-[24px] leading-[0.82] text-lm-800 sm:pl-[44px] lg:mt-[60px]"
+      >
+        <span className="font-playfair font-extrabold text-[13.8vw] tracking-[-0.05em]" style={pf}>Daily</span>
+        <span className="font-playfair font-black text-[18.5vw] tracking-[-0.05em]" style={pf}>Ma</span>
+        <span className="font-playfair font-black text-[18.5vw] tracking-[-0.08em]" style={pf}>tt</span>
+        <span className="font-playfair font-black text-[18.5vw]" style={pf}>r</span>
+        <span className="font-playfair font-black text-[18.5vw] text-lm-500" style={pf}>’</span>
+        <span className="font-playfair font-black text-[18.5vw]" style={pf}>.</span>
       </motion.p>
     </footer>
   )

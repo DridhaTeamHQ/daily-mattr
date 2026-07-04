@@ -44,7 +44,7 @@ export async function getMyPreferences() {
 
   const blocked = {}
   for (const s of subs || []) {
-    if (s.newsletter_type === 'category_small_articles' && s.weekday) blocked[s.weekday] = s.category_slug
+    if (s.weekday) blocked[s.weekday] = s.category_slug
   }
   return {
     profile: profile || { email: user.email, full_name: user.user_metadata?.full_name || '' },
@@ -86,7 +86,7 @@ export async function subscribe(category, opts = {}) {
   if (!user) throw new Error('Please sign in to subscribe.')
 
   const rhythm = opts.rhythm || (category.newsletter_type === 'case_study_daily' ? 'daily' : 'weekly')
-  if (category.newsletter_type === 'category_small_articles' && rhythm === 'weekly' && !opts.weekday) {
+  if (category.newsletter_type === 'category_small_articles' && (rhythm === 'weekly' || rhythm === 'both') && !opts.weekday) {
     throw new Error('Choose a weekday for this category.')
   }
 
@@ -94,7 +94,7 @@ export async function subscribe(category, opts = {}) {
     user_id: user.id,
     category_slug: category.slug,
     newsletter_type: category.newsletter_type,
-    weekday: rhythm === 'weekly' ? (opts.weekday || null) : null,
+    weekday: (rhythm === 'weekly' || rhythm === 'both') ? (opts.weekday || null) : null,
     rhythm,
     send_days: opts.send_days || null,
     source_preference: opts.source_preference || 'top',
