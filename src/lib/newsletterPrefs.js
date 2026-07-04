@@ -85,7 +85,7 @@ export async function subscribe(category, opts = {}) {
   const user = auth?.user
   if (!user) throw new Error('Please sign in to subscribe.')
 
-  const rhythm = opts.rhythm || (category.newsletter_type === 'case_study_daily' ? 'daily' : 'weekly')
+  const rhythm = opts.rhythm || (category.newsletter_type === 'news_rhythm' ? 'daily' : 'weekly')
   if (category.newsletter_type === 'category_small_articles' && (rhythm === 'weekly' || rhythm === 'both') && !opts.weekday) {
     throw new Error('Choose a weekday for this category.')
   }
@@ -98,10 +98,6 @@ export async function subscribe(category, opts = {}) {
     rhythm,
     send_days: opts.send_days || null,
     source_preference: opts.source_preference || 'top',
-    case_study_categories:
-      category.newsletter_type === 'case_study_daily'
-        ? (opts.case_study_categories?.length ? opts.case_study_categories : null)
-        : null,
     status: 'active',
     updated_at: new Date().toISOString(),
   }

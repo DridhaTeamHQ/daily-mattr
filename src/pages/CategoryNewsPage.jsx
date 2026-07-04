@@ -12,10 +12,9 @@ import { useLiveData } from '../lib/useLiveData'
 import NotFoundPage from './NotFoundPage'
 
 // Category reading page — Figma "Home" frame 1:5336: dark hero + date-grouped
-// article briefs. Handles both agent categories (real-estate, policy-partner,
-// money-matters, wellness-daily) and general-news topic slugs (technology-ai,
-// sports, national, international) plus the legacy /general feed.
-const AGENT_SLUGS = new Set(['real-estate', 'policy-partner', 'money-matters', 'wellness-daily'])
+// article briefs. Handles the 5 agent topics (each mixing short briefs with
+// its long-read case studies from editorial_drafts) plus the /general feed.
+const AGENT_SLUGS = new Set(['real-estate', 'automobile', 'health-wellness', 'tech-ai', 'markets-startups'])
 
 export default function CategoryNewsPage() {
   const { category: slug = 'general' } = useParams()
@@ -61,7 +60,7 @@ export default function CategoryNewsPage() {
   // Unknown category → 404 (the /:category route matches any single segment).
   if (!cat && slug !== 'general') return <NotFoundPage />
 
-  const heroTitle = cat?.hero || cat?.title || (slug === 'general' ? 'The Daily' : slug)
+  const heroTitle = cat?.hero || cat?.title || (slug === 'general' ? 'General' : slug)
   const tagline = cat?.desc || 'The stories worth knowing — curated, summarized, and grouped by day.'
   const heroImage = cat?.poster || cat?.image || '/figma/hero-tech-ai-bg.png'
 

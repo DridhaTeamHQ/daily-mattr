@@ -127,7 +127,7 @@ export default function LmNav({ tone = 'light' }) {
                   className="min-w-[124px] flex-1"
                 >
                   <Link
-                    to={c.slug === 'case-studies' ? '/case-studies' : `/${c.slug}`}
+                    to={`/${c.slug}`}
                     onClick={() => setCatsOpen(false)}
                     className="group relative block aspect-[3/4] overflow-hidden rounded-[14px] bg-lm-200"
                   >
@@ -188,7 +188,7 @@ export default function LmNav({ tone = 'light' }) {
                     transition={{ duration: 0.35, delay: 0.15 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
                   >
                     <Link
-                      to={c.slug === 'case-studies' ? '/case-studies' : `/${c.slug}`}
+                      to={`/${c.slug}`}
                       onClick={() => setMobileOpen(false)}
                       className="relative block aspect-[3/4] overflow-hidden rounded-[12px] bg-lm-200"
                     >

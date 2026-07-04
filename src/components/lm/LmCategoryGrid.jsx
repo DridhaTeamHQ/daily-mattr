@@ -77,7 +77,7 @@ export default function LmCategoryGrid({ selectedSlugs = [], onToggle }) {
         <div className="grid grid-cols-1 gap-[16px] pb-[56px] pt-[36px] sm:grid-cols-2 sm:gap-[24px] sm:pb-[80px] sm:pt-[64px] lg:grid-cols-3 lg:pt-[74px]">
           {LM_CATEGORIES.map((cat) => {
             const isSelected = isOn(cat.slug)
-            const to = cat.slug === 'case-studies' ? '/case-studies' : `/${cat.slug}`
+            const to = `/${cat.slug}`
             return (
               <motion.article
                 key={cat.slug}

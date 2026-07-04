@@ -3,28 +3,26 @@
 // make via edited_title / edited_summary) shows on the site automatically.
 //
 // The agent funnels everything into one table:
-//   • Case studies        -> category = 'Corporate Case'   (kind: 'case_study')
-//   • Topic short articles -> category in Real Estate / Policy Partner /
-//                             Money Matters / Wellness Daily (kind: 'article')
+//   • Topic short articles -> category in Real Estate / Automobile /
+//                             Health & Wellness / Tech & AI / Markets & Startups
+//                             (kind: 'article')
 //   • General news         -> category null, topic in India/World/Business/...
+// Long reads per topic come from editorial_drafts (kind: 'feature').
 // We only ever read status in ('approved','sent') — drafts/pending never show.
 
 import { supabase } from './supabaseClient'
 
-export const CASE_STUDY_CATEGORY = 'Corporate Case'
-
-// The four topic categories map 1:1 to their own pages. Everything else that
-// isn't a case study (general news tagged India/World/Business/Explained/… )
-// falls into the single "General" feed. Case studies are unmapped — they live
-// on their own /case-studies page, not inside a category feed.
+// The five topic categories map 1:1 to their own pages. Everything else
+// (general news tagged India/World/Business/Explained/…) falls into the
+// single "General" feed.
 const TOPIC_SLUG = {
   'Real Estate': 'real-estate',
-  'Policy Partner': 'policy-partner',
-  'Money Matters': 'money-matters',
-  'Wellness Daily': 'wellness-daily',
+  'Automobile': 'automobile',
+  'Health & Wellness': 'health-wellness',
+  'Tech & AI': 'tech-ai',
+  'Markets & Startups': 'markets-startups',
 }
 function slugFor(category) {
-  if (category === CASE_STUDY_CATEGORY) return null
   return TOPIC_SLUG[category] || 'general'
 }
 
@@ -66,10 +64,9 @@ function stripArtifacts(s) {
 
 function normalize(row) {
   const bucket = row.category || row.topic || ''
-  const isCase = row.category === CASE_STUDY_CATEGORY
   return {
     id: row.id,
-    kind: isCase ? 'case_study' : 'article',
+    kind: 'article',
     headline: decodeEntities(row.edited_title || row.title),
     summary: stripArtifacts(decodeEntities(row.edited_summary || row.summary || '')),
     body: stripArtifacts(decodeEntities(row.edited_summary || row.summary || '')),
@@ -112,35 +109,10 @@ export async function fetchApprovedByCategory(slug) {
   return all.filter((a) => a.slug === slug)
 }
 
-// Approved case studies, read from the source of truth: corporate_cases.
-// (The agent does not reliably mirror approved cases into `articles`, so reading
-// them from there missed them entirely.) Requires public read access to
-// corporate_cases (status approved/published).
-export async function fetchCaseStudies() {
-  const { data, error } = await supabase
-    .from('corporate_cases')
-    .select('id,headline,company,case_type,summary,detail,source,source_url,generated_at,updated_at,status')
-    .in('status', ['approved', 'published'])
-    .order('generated_at', { ascending: false })
-  if (error) throw error
-  return (data || []).map((c) => ({
-    id: c.id,
-    kind: 'case_study',
-    headline: decodeEntities(c.headline),
-    summary: decodeEntities(c.summary || ''),
-    body: decodeEntities(c.detail || c.summary || ''),
-    source: decodeEntities(c.source || ''),
-    sourceUrl: c.source_url || '',
-    publishedAt: c.generated_at,
-    company: c.company || null,
-    caseType: c.case_type || null,
-  }))
-}
-
-// Long-form topic FEATURES (the in-depth "thesis" per category) — the long
+// Long-form topic FEATURES (the daily case study per topic) — the long
 // counterpart to the short briefs in `articles`. Read from editorial_drafts.
-// topic_slug already matches our website slugs (real-estate / policy-partner /
-// money-matters / wellness-daily).
+// topic_slug already matches our website slugs (real-estate / automobile /
+// health-wellness / tech-ai / markets-startups).
 export async function fetchFeatures() {
   const { data, error } = await supabase
     .from('editorial_drafts')
@@ -167,23 +139,12 @@ export async function fetchFeaturesByCategory(slug) {
   return all.filter((f) => f.slug === slug)
 }
 
-// One pass for the home page: latest approved news stories + the case studies.
-export async function fetchEdition() {
-  const [articles, caseStudies] = await Promise.all([
-    fetchApproved(),
-    fetchCaseStudies().catch(() => []),
-  ])
-  return {
-    latest: articles.filter((a) => a.kind === 'article'),
-    caseStudies,
-  }
-}
-
 // Pretty label for a category slug (for chips/sections on the home page).
 export const SLUG_LABEL = {
   general: 'General',
   'real-estate': 'Real Estate',
-  'policy-partner': 'Policy Partner',
-  'money-matters': 'Money Matters',
-  'wellness-daily': 'Wellness Daily',
+  'automobile': 'Automobile',
+  'health-wellness': 'Health & Wellness',
+  'tech-ai': 'Tech & AI',
+  'markets-startups': 'Markets & Startups',
 }

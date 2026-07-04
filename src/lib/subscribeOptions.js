@@ -4,9 +4,10 @@
 export const SUBSCRIBE_CATEGORIES = [
   { slug: 'general', label: 'General' },
   { slug: 'real-estate', label: 'Real Estate' },
-  { slug: 'policy-partner', label: 'Policy Partner' },
-  { slug: 'money-matters', label: 'Money Matters' },
-  { slug: 'wellness-daily', label: 'Wellness Daily' },
+  { slug: 'automobile', label: 'Automobile' },
+  { slug: 'health-wellness', label: 'Health & Wellness' },
+  { slug: 'tech-ai', label: 'Tech & AI' },
+  { slug: 'markets-startups', label: 'Markets & Startups' },
 ]
 
 export const RHYTHMS = [
