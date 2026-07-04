@@ -65,9 +65,8 @@ function OptionRow({ label, hint, selected, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center justify-between rounded-[16px] border px-[16px] py-[11px] text-left ${
-        selected ? 'border-lm-700 bg-[#F4F4F6]' : 'border-lm-200 bg-white'
-      }`}
+      className={`flex w-full items-center justify-between rounded-[16px] border px-[16px] py-[11px] text-left ${selected ? 'border-lm-700 bg-[#F4F4F6]' : 'border-lm-200 bg-white'
+        }`}
     >
       <span>
         <span className="block font-bevietnam text-[15px] font-semibold text-lm-800">{label}</span>
@@ -152,7 +151,7 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
             return next
           })
         })
-        .catch(() => {})
+        .catch(() => { })
     }
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -319,9 +318,8 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                   <button
                     type="button"
                     onClick={() => (allSelected ? setSelected([]) : selectAll())}
-                    className={`rounded-[100px] px-[14px] py-[7px] font-bevietnam text-[12px] font-semibold ${
-                      allSelected ? 'border border-lm-300 text-lm-500' : 'bg-lm-800 text-white'
-                    }`}
+                    className={`rounded-[100px] px-[14px] py-[7px] font-bevietnam text-[12px] font-semibold ${allSelected ? 'border border-lm-300 text-lm-500' : 'bg-lm-800 text-white'
+                      }`}
                   >
                     {allSelected ? 'Clear all' : 'Subscribe all'}
                   </button>
@@ -334,11 +332,10 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                         key={c.slug}
                         type="button"
                         onClick={() => toggleTopic(c.slug)}
-                        className={`flex items-center gap-[6px] rounded-[40px] border px-[12px] py-[8px] font-bevietnam text-[13px] font-medium transition-colors ${
-                          on ? 'border-lm-800 bg-lm-800 text-white' : 'border-lm-200 bg-white text-lm-600 hover:border-lm-400'
-                        }`}
+                        className={`flex items-center gap-[6px] rounded-[40px] border px-[12px] py-[8px] font-bevietnam text-[13px] font-medium transition-colors ${on ? 'border-lm-800 bg-lm-800 text-white' : 'border-lm-200 bg-white text-lm-600 hover:border-lm-400'
+                          }`}
                       >
-                        <span className="text-[14px] leading-none">{on ? '✓' : '+'}</span>
+                        {!on && <span className="text-[14px] leading-none">+</span>}
                         {c.title}
                       </button>
                     )
@@ -394,13 +391,12 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
                                 disabled={!!owner}
                                 title={owner ? `Taken by ${owner}` : undefined}
                                 onClick={() => setChoice(t.slug, { day: id })}
-                                className={`rounded-[40px] border px-[16px] py-[8px] font-bevietnam text-[13px] font-medium ${
-                                  active
+                                className={`rounded-[40px] border px-[16px] py-[8px] font-bevietnam text-[13px] font-medium ${active
                                     ? 'border-lm-800 bg-lm-800 text-white'
                                     : owner
                                       ? 'cursor-not-allowed border-lm-200 bg-lm-50 text-lm-400 line-through'
                                       : 'border-lm-200 bg-white text-lm-600'
-                                }`}
+                                  }`}
                               >
                                 {label}
                               </button>
@@ -502,9 +498,8 @@ export default function LmSubscribeDrawer({ open, slugs = [], onClose }) {
               type="button"
               disabled={!complete}
               onClick={() => setStep(2)}
-              className={`h-[50px] w-full rounded-[35px] font-roboto text-[15px] font-semibold ${
-                complete ? 'bg-lm-700 text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.15)]' : 'bg-lm-200 text-lm-400'
-              }`}
+              className={`h-[50px] w-full rounded-[35px] font-roboto text-[15px] font-semibold ${complete ? 'bg-lm-700 text-white shadow-[0px_6px_25px_0px_rgba(0,0,0,0.15)]' : 'bg-lm-200 text-lm-400'
+                }`}
               style={rb}
             >
               Review {topics.length} {topics.length === 1 ? 'edition' : 'editions'}
