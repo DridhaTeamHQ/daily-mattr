@@ -13,24 +13,34 @@ export function factBand(score) {
   return { key: 'unverified', label: 'Unverified', text: '#9D1F1F', bg: 'rgba(224,96,96,0.12)' }
 }
 
+// How many independent outlets the claims were checked against (primary + siblings).
+function sourceCount(item) {
+  const n = item?.factNotes?.source_count
+  if (typeof n === 'number' && n > 0) return n
+  const arr = item?.factNotes?.sources
+  return Array.isArray(arr) ? arr.length : 0
+}
+
 // Small pill for article cards. Renders nothing when the story has no score
-// (older approvals predate fact checking).
+// (older approvals predate fact checking). When the claims were corroborated
+// across multiple outlets, the pill shows the source count.
 export function FactChip({ item, small = false }) {
   if (item?.factScore == null) return null
   const score = Math.round(item.factScore)
   const band = factBand(score)
+  const n = sourceCount(item)
   const pad = small ? 'px-[10px] py-[4px] text-[11px]' : 'px-[16px] py-[8px] text-[12px]'
   return (
     <span
       className={`inline-flex items-center gap-[6px] rounded-[34px] font-roboto font-bold uppercase ${pad}`}
       style={{ ...rb, color: band.text, background: band.bg }}
-      title={item.factNotes?.rationale || band.label}
+      title={n > 1 ? `Checked across ${n} sources — ${item.factNotes?.rationale || band.label}` : (item.factNotes?.rationale || band.label)}
     >
       <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M6 0.5L10.5 2.5V5.5C10.5 8.3 8.6 10.6 6 11.5C3.4 10.6 1.5 8.3 1.5 5.5V2.5L6 0.5Z" fill="currentColor" opacity="0.25" />
         <path d="M4 5.8L5.4 7.2L8 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      Fact {score}
+      Fact {score}{n > 1 ? ` · ${n} src` : ''}
     </span>
   )
 }
@@ -53,6 +63,8 @@ export function FactPanel({ item }) {
   const notes = item.factNotes || {}
   const claims = Array.isArray(notes.claims) ? notes.claims : []
   const signals = notes.signals || null
+  const sources = Array.isArray(notes.sources) ? notes.sources.filter((s) => s && s.url) : []
+  const nSources = sources.length || (typeof notes.source_count === 'number' ? notes.source_count : 0)
 
   return (
     <section className="mt-[32px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-lm-50 p-[20px] sm:p-[24px]">
@@ -68,7 +80,9 @@ export function FactPanel({ item }) {
             {band.label} · AI fact check
           </span>
           <span className="font-roboto text-[13px] text-lm-500" style={rb}>
-            Every claim graded against the original source at publish time.
+            {nSources > 1
+              ? `Claims checked across ${nSources} independent sources at publish time.`
+              : 'Every claim graded against the original source at publish time.'}
           </span>
         </div>
       </div>
@@ -107,6 +121,31 @@ export function FactPanel({ item }) {
               </span>
             )
           ))}
+        </div>
+      )}
+
+      {sources.length > 0 && (
+        <div className="mt-[16px] border-t border-[rgba(28,28,30,0.1)] pt-[14px]">
+          <p className="font-roboto text-[13px] font-bold uppercase tracking-wide text-lm-500" style={rb}>
+            {sources.length > 1 ? `Checked across ${sources.length} sources` : 'Source'}
+          </p>
+          <ul className="mt-[8px] flex flex-col gap-[6px]">
+            {sources.map((s, i) => (
+              <li key={i} className="flex items-center gap-[8px]">
+                <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-lm-200 px-[5px] font-roboto text-[11px] font-bold text-lm-700" style={rb}>{i + 1}</span>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-roboto text-[14px] text-lm-700 underline decoration-lm-300 underline-offset-2 hover:text-lm-800"
+                  style={rb}
+                >
+                  {s.source || 'Source'}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </section>
