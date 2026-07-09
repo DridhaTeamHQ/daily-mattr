@@ -80,6 +80,14 @@ function normalize(row) {
     edited: !!(row.edited_title || row.edited_summary),
     // prominence 1 = lead story -> treat as a "deep" read
     importance: row.prominence === 1 ? 9 : null,
+    // AI fact check (see email agent docs/FACT_CHECKING.md): 0-100 score,
+    // band label, and the per-claim audit trail rendered in the reader.
+    factScore: row.fact_score ?? null,
+    factLabel: row.fact_label || null,
+    factNotes: row.fact_notes || null,
+    // Alternate reader versions generated at approval:
+    // { eli5, tldr[], deep_dive, key_numbers[] }
+    versions: row.versions || null,
   }
 }
 
@@ -88,17 +96,24 @@ function normalize(row) {
 // statement timeout and fail the whole fetch; the list/reading views don't use
 // it (case-study bodies come from corporate_cases). Keeping this lean makes the
 // pull fast and reliable.
-const SELECT =
+const SELECT_BASE =
   'id,title,edited_title,summary,edited_summary,source,url,topic,category,section,prominence,status,reviewed_at,scraped_at,created_at'
+// Fact check + alternate versions arrived later; fall back to the base list if
+// the DB migration hasn't been applied yet so the feed never breaks on deploy order.
+const SELECT = `${SELECT_BASE},fact_score,fact_label,fact_notes,versions`
+
+const missingColumn = (error) => error && /column|does not exist/i.test(error.message || '')
 
 // Every approved item, newest first.
 export async function fetchApproved() {
-  const { data, error } = await supabase
+  const query = (cols) => supabase
     .from('articles')
-    .select(SELECT)
+    .select(cols)
     .in('status', ['approved', 'sent'])
     .order('reviewed_at', { ascending: false, nullsFirst: false })
     .order('scraped_at', { ascending: false })
+  let { data, error } = await query(SELECT)
+  if (missingColumn(error)) ({ data, error } = await query(SELECT_BASE))
   if (error) throw error
   return (data || []).map(normalize)
 }
@@ -114,11 +129,14 @@ export async function fetchApprovedByCategory(slug) {
 // topic_slug already matches our website slugs (real-estate / automobile /
 // health-wellness / tech-ai / markets-startups).
 export async function fetchFeatures() {
-  const { data, error } = await supabase
+  const FEATURE_BASE = 'id,topic_slug,topic_name,headline,summary,detail,primary_source_url,primary_source_title,generated_at,status'
+  const query = (cols) => supabase
     .from('editorial_drafts')
-    .select('id,topic_slug,topic_name,headline,summary,detail,primary_source_url,primary_source_title,generated_at,status')
+    .select(cols)
     .in('status', ['approved', 'published'])
     .order('generated_at', { ascending: false })
+  let { data, error } = await query(`${FEATURE_BASE},fact_score,fact_label,fact_notes,versions`)
+  if (missingColumn(error)) ({ data, error } = await query(FEATURE_BASE))
   if (error) throw error
   return (data || []).map((d) => ({
     id: `feature-${d.id}`,         // prefixed so it never collides with a brief id
@@ -131,6 +149,10 @@ export async function fetchFeatures() {
     sourceUrl: d.primary_source_url || '',
     publishedAt: d.generated_at,
     bucket: d.topic_name,
+    factScore: d.fact_score ?? null,
+    factLabel: d.fact_label || null,
+    factNotes: d.fact_notes || null,
+    versions: d.versions || null,
   }))
 }
 

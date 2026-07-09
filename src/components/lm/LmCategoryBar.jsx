@@ -7,6 +7,7 @@ const FILTERS = [
   ['all', 'All'],
   ['long', 'Long reads'],
   ['short', 'Briefs'],
+  ['fact', 'Fact checked'],
 ]
 
 export default function LmCategoryBar({ active, filter = 'all', onFilter, showFilter = true }) {

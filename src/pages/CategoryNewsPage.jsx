@@ -48,12 +48,19 @@ export default function CategoryNewsPage() {
 
   const { data: items, loading } = useLiveData(fetcher, [slug], { intervalMs: 30000 })
 
-  // All / Long reads / Briefs — long = features & case studies.
+  // All / Long reads / Briefs / Fact checked — long = features & case studies;
+  // fact = every AI-fact-scored story, best-verified first (the transparency view).
   const [filter, setFilter] = useState('all')
   const filtered = useMemo(() => {
     const list = items || []
     if (filter === 'long') return list.filter((a) => a.kind === 'feature' || a.kind === 'case_study')
     if (filter === 'short') return list.filter((a) => a.kind === 'article')
+    if (filter === 'fact') {
+      return list
+        .filter((a) => a.factScore != null)
+        .slice()
+        .sort((a, b) => b.factScore - a.factScore)
+    }
     return list
   }, [items, filter])
 
@@ -77,7 +84,9 @@ export default function CategoryNewsPage() {
             ? 'No long reads here yet — switch to Briefs or check back soon.'
             : filter === 'short'
               ? 'No briefs here yet — switch to Long reads or check back soon.'
-              : 'No stories here yet — check back soon.'
+              : filter === 'fact'
+                ? 'No fact-scored stories here yet — new approvals are scored automatically.'
+                : 'No stories here yet — check back soon.'
         }
       />
       <LmFaq />

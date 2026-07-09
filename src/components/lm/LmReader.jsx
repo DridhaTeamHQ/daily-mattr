@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { readTime } from '../../lib/readTime'
+import { FactChip, FactPanel } from './LmFactBadge'
 
 // Full-screen story reader — tap a card to enter, then swipe left/right
 // (or arrow keys / prev-next pills) to move through the feed in order.
@@ -18,9 +19,14 @@ function dateLabel(iso) {
 export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
   const [dir, setDir] = useState(0)
   const [hinted, setHinted] = useState(false)
+  // Reading mode — Original plus whatever alternate versions were generated at
+  // approval time ({ eli5, tldr[], deep_dive, key_numbers[] }).
+  const [mode, setMode] = useState('original')
   const item = items[index]
   const canPrev = index > 0
   const canNext = index < items.length - 1
+
+  useEffect(() => { setMode('original') }, [item?.id])
 
   const go = (delta) => {
     const next = index + delta
@@ -47,7 +53,26 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
 
   if (!item) return null
   const long = item.kind === 'case_study' || item.kind === 'feature'
-  const paragraphs = String(item.body || item.summary || '').split(/\n{2,}/).filter(Boolean)
+
+  const versions = item.versions || {}
+  const MODES = [
+    ['original', 'Original', true],
+    ['eli5', "Explain like I'm 5", !!versions.eli5],
+    ['tldr', '60-sec TL;DR', Array.isArray(versions.tldr) && versions.tldr.length > 0],
+    ['deep_dive', 'Deep dive', !!versions.deep_dive],
+    ['key_numbers', 'Key numbers', Array.isArray(versions.key_numbers) && versions.key_numbers.length > 0],
+  ].filter(([, , available]) => available)
+  const activeMode = MODES.some(([id]) => id === mode) ? mode : 'original'
+
+  const bodyText =
+    activeMode === 'eli5' ? versions.eli5
+    : activeMode === 'deep_dive' ? versions.deep_dive
+    : String(item.body || item.summary || '')
+  const bullets =
+    activeMode === 'tldr' ? versions.tldr
+    : activeMode === 'key_numbers' ? versions.key_numbers
+    : null
+  const paragraphs = String(bodyText || '').split(/\n{2,}/).filter(Boolean)
 
   return (
     <motion.div
@@ -97,6 +122,7 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
               <span className="rounded-[34px] bg-black/5 px-[14px] py-[7px] font-roboto text-[11px] font-bold uppercase text-lm-800" style={rb}>
                 {readTime(item.headline, item.body)} min read
               </span>
+              <FactChip item={item} small />
               <span className="font-bevietnam text-[13px] text-lm-500">{dateLabel(item.publishedAt)}</span>
             </div>
             <h1 className="pt-[18px] font-roboto text-[26px] font-bold leading-[1.28] text-black sm:text-[34px]" style={rb}>
@@ -105,13 +131,42 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
             {item.source && (
               <p className="pt-[10px] font-bevietnam text-[14px] text-lm-500">via {item.source}{item.company ? ` · ${item.company}` : ''}</p>
             )}
+            {/* Reading-mode switcher — only when alternate versions exist */}
+            {MODES.length > 1 && (
+              <div className="mt-[20px] flex flex-wrap items-center gap-[6px] rounded-[24px] border border-lm-200 bg-lm-50 p-[5px] sm:w-fit sm:rounded-[100px]">
+                {MODES.map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setMode(id)}
+                    className={`rounded-[100px] px-[14px] py-[7px] font-bevietnam text-[13px] font-semibold transition-all duration-200 ${
+                      activeMode === id ? 'bg-lm-800 text-white shadow' : 'text-lm-500 hover:text-lm-800'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="flex flex-col gap-[18px] pt-[24px]">
-              {paragraphs.map((p, i) => (
-                <p key={i} className="font-roboto text-[17px] leading-[1.7] text-lm-600 sm:text-[18px]" style={rb}>
-                  {p}
-                </p>
-              ))}
+              {bullets ? (
+                <ul className="flex flex-col gap-[14px]">
+                  {bullets.map((b, i) => (
+                    <li key={i} className="flex items-start gap-[12px] font-roboto text-[17px] leading-[1.7] text-lm-600 sm:text-[18px]" style={rb}>
+                      <span className="mt-[11px] size-[7px] shrink-0 rounded-full bg-lm-800" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                paragraphs.map((p, i) => (
+                  <p key={i} className="font-roboto text-[17px] leading-[1.7] text-lm-600 sm:text-[18px]" style={rb}>
+                    {p}
+                  </p>
+                ))
+              )}
             </div>
+            <FactPanel item={item} />
             {item.sourceUrl && (
               <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="mt-[32px] inline-flex items-center gap-[8px] rounded-[50px] border border-lm-300 px-[20px] py-[12px] font-roboto text-[14px] font-semibold text-lm-800 hover:border-lm-800" style={rb}>
                 Read the full source ↗

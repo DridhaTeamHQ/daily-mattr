@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { readTime } from '../../lib/readTime'
 import LmReader from './LmReader'
+import { FactChip } from './LmFactBadge'
 
 // Date-grouped article feed — Figma node 1:5453. Each date group: bold header
 // with hairline divider, then a two-column grid — left 895px (2 featured +
@@ -53,7 +54,7 @@ function Tags({ item }) {
   const mins = readTime(item.headline, item.body)
   const long = item.kind === 'case_study' || item.kind === 'feature'
   return (
-    <div className="flex items-center gap-[8px]">
+    <div className="flex flex-wrap items-center gap-[8px]">
       {long && (
         <span className="rounded-[34px] bg-[rgba(153,51,255,0.1)] px-[16px] py-[8px] font-roboto text-[12px] font-bold uppercase text-[#7900D9]" style={rb}>
           Long story
@@ -62,6 +63,7 @@ function Tags({ item }) {
       <span className="rounded-[34px] bg-black/5 px-[16px] py-[8px] font-roboto text-[12px] font-bold uppercase text-lm-800" style={rb}>
         {mins} min read
       </span>
+      <FactChip item={item} />
     </div>
   )
 }
@@ -94,7 +96,7 @@ function FeaturedCard({ item, lead = false, half = false, onOpen }) {
         lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)]'
       }`}
     >
-      {!half && <Tags item={item} />}
+      {half ? <div><FactChip item={item} small /></div> : <Tags item={item} />}
       <h3 className={`font-roboto font-bold text-black ${half ? 'text-[21px] leading-normal' : 'text-[24px] leading-[34px] sm:text-[32px] sm:leading-[44px]'}`} style={rb}>
         {item.headline}
       </h3>
@@ -107,6 +109,7 @@ function FeaturedCard({ item, lead = false, half = false, onOpen }) {
 function CompactCard({ item, onOpen }) {
   return (
     <article onClick={onOpen} className="flex cursor-pointer flex-col gap-[8px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[16px] transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)]">
+      {item.factScore != null && <div><FactChip item={item} small /></div>}
       <h3 className="font-roboto text-[21px] font-semibold leading-[1.36] text-black" style={rb}>{item.headline}</h3>
       <Excerpt item={item} size="sm" onOpen={onOpen} />
       <SourceRow item={item} />
