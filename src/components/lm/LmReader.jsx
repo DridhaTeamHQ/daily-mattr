@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { readTime } from '../../lib/readTime'
+import { SLUG_LABEL } from '../../lib/content'
 import { FactChip, FactPanel } from './LmFactBadge'
 
 // Full-screen story reader — tap a card to enter, then swipe left/right
@@ -87,7 +88,8 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
           ×
         </button>
         <p className="font-bevietnam text-[13px] font-semibold text-lm-500">
-          {item.bucket || item.topic || item.category || 'Story'} · {index + 1} / {items.length}
+          {/* Site category name — not the scraper's internal feed tag (Business/Explained/…) */}
+          {SLUG_LABEL[item.slug] || item.category || 'Story'} · {index + 1} / {items.length}
         </p>
         {item.sourceUrl ? (
           <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="rounded-[100px] bg-lm-800 px-[14px] py-[8px] font-roboto text-[12px] font-semibold text-white" style={rb}>
