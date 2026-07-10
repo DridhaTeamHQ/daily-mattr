@@ -78,8 +78,9 @@ function normalize(row) {
     bucket,                                   // raw agent label, used as a chip
     slug: slugFor(row.category),
     edited: !!(row.edited_title || row.edited_summary),
-    // prominence 1 = lead story -> treat as a "deep" read
-    importance: row.prominence === 1 ? 9 : null,
+    // Editor prominence, 1-5 where 5 = breaking (was wrongly read as 1 = lead).
+    prominence: row.prominence ?? null,
+    importance: row.prominence != null && row.prominence >= 4 ? row.prominence : null,
     // AI fact check (see email agent docs/FACT_CHECKING.md): 0-100 score,
     // band label, and the per-claim audit trail rendered in the reader.
     factScore: row.fact_score ?? null,
@@ -159,6 +160,28 @@ export async function fetchFeatures() {
 export async function fetchFeaturesByCategory(slug) {
   const all = await fetchFeatures()
   return all.filter((f) => f.slug === slug)
+}
+
+// Breaking score — MIRRORS the SQL single source of truth
+// (supabase/migrations breaking_score fn in the agent repo):
+// prominence x cross-outlet velocity x fact trust, decayed with ~5.5h half-life.
+export function breakingScore(item) {
+  const prominence = item.prominence ?? 2
+  const sources = Number(item?.factNotes?.source_count ?? 1)
+  const fact = item.factScore ?? 60
+  const ageHours = Math.max((Date.now() - new Date(item.publishedAt).getTime()) / 3_600_000, 0)
+  const raw = (prominence / 5) * 45 + (Math.min(Math.max(sources - 1, 0), 3) / 3) * 30 + (fact / 100) * 25
+  return raw * Math.exp(-ageHours / 8)
+}
+
+// True for stories worth the BREAKING banner: editor-rated high, corroborated
+// by 2+ outlets (or rated 5), fresh, and not in the unverified band.
+export function isBreaking(item) {
+  const prominence = item.prominence ?? 0
+  const sources = Number(item?.factNotes?.source_count ?? 1)
+  const ageHours = (Date.now() - new Date(item.publishedAt).getTime()) / 3_600_000
+  const factOk = item.factScore == null || item.factScore >= 40
+  return prominence >= 4 && (sources >= 2 || prominence === 5) && ageHours < 24 && factOk
 }
 
 // Pretty label for a category slug (for chips/sections on the home page).

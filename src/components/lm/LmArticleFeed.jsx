@@ -4,6 +4,7 @@ import { readTime } from '../../lib/readTime'
 import LmReader from './LmReader'
 import LmBreakingCarousel from './LmBreakingCarousel'
 import { FactChip } from './LmFactBadge'
+import { breakingScore, isBreaking } from '../../lib/content'
 
 // Date-grouped article feed — Figma node 1:5453. Each date group: bold header
 // with hairline divider, then a two-column grid — left 895px (2 featured +
@@ -335,12 +336,16 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
   const [readerIdx, setReaderIdx] = useState(null)
   const openItem = (it) => setReaderIdx(items.findIndex((x) => x.id === it.id))
 
-  // Breaking banner (General only): today's most prominent, best-verified
-  // stories from the newest batch.
+  // Breaking banner (General only) — the real algorithm: editor prominence x
+  // cross-outlet velocity x fact trust, freshness-decayed (mirrors the
+  // breaking_news SQL view). Falls back to the newest stories when nothing
+  // currently qualifies, so the banner never sits empty.
   const breaking = useMemo(() => {
     if (!fullStories) return []
+    const hot = items.filter(isBreaking).sort((a, b) => breakingScore(b) - breakingScore(a)).slice(0, 6)
+    if (hot.length > 0) return hot
     return [...items.slice(0, 10)]
-      .sort((a, b) => (b.importance || 0) - (a.importance || 0) || (b.factScore || 0) - (a.factScore || 0))
+      .sort((a, b) => breakingScore(b) - breakingScore(a))
       .slice(0, 6)
   }, [items, fullStories])
 
