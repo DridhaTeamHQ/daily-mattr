@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { readTime } from '../../lib/readTime'
 import LmReader from './LmReader'
+import LmBreakingCarousel from './LmBreakingCarousel'
 import { FactChip } from './LmFactBadge'
 
 // Date-grouped article feed — Figma node 1:5453. Each date group: bold header
@@ -114,7 +115,48 @@ function availableLenses(item) {
   )
 }
 
+// A tiny confetti of dots + ✦ sparks that bursts out of a lens pill when it's
+// activated. Pure framer-motion (no canvas); unmounts itself via the parent's
+// burst key changing.
+const PARTICLE_COLORS = ['#7900D9', '#141417', '#C49F17', '#0F9D69', '#E33B3B']
+function ParticleBurst() {
+  const parts = Array.from({ length: 14 }, (_, i) => {
+    const angle = (i / 14) * Math.PI * 2 + (i % 3) * 0.4
+    const dist = 26 + ((i * 7919) % 24)
+    return {
+      x: Math.cos(angle) * dist,
+      y: Math.sin(angle) * dist,
+      c: PARTICLE_COLORS[i % PARTICLE_COLORS.length],
+      s: 3 + (i % 3) * 1.5,
+      star: i % 5 === 0,
+      d: 0.5 + (i % 4) * 0.09,
+    }
+  })
+  return (
+    <span className="pointer-events-none absolute left-1/2 top-1/2 z-10" aria-hidden="true">
+      {parts.map((p, i) => (
+        <motion.span
+          key={i}
+          className="absolute"
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
+          animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.15, rotate: p.star ? 180 : 0 }}
+          transition={{ duration: p.d, ease: 'easeOut' }}
+          style={
+            p.star
+              ? { color: p.c, fontSize: 11, lineHeight: 1 }
+              : { width: p.s, height: p.s, borderRadius: 9999, background: p.c }
+          }
+        >
+          {p.star ? '✦' : null}
+        </motion.span>
+      ))}
+    </span>
+  )
+}
+
 function LensPills({ lenses, active, onPick, compact = false }) {
+  // Bumps on every activation so the burst re-fires even on the same pill.
+  const [burst, setBurst] = useState(null)
   return (
     <div className="flex flex-wrap items-center gap-[6px]" onClick={(e) => e.stopPropagation()}>
       <span className="font-roboto text-[12px] font-bold uppercase tracking-wide text-lm-400" style={rb}>✦</span>
@@ -122,8 +164,13 @@ function LensPills({ lenses, active, onPick, compact = false }) {
         <button
           key={id}
           type="button"
-          onClick={(e) => { e.stopPropagation(); onPick(active === id ? null : id) }}
-          className={`rounded-[100px] border font-bevietnam font-semibold transition-all duration-200 ${
+          onClick={(e) => {
+            e.stopPropagation()
+            const next = active === id ? null : id
+            if (next) setBurst({ id, n: (burst?.n || 0) + 1 })
+            onPick(next)
+          }}
+          className={`relative rounded-[100px] border font-bevietnam font-semibold transition-all duration-200 active:scale-95 ${
             compact ? 'px-[10px] py-[4px] text-[11px]' : 'px-[12px] py-[5px] text-[12px]'
           } ${
             active === id
@@ -131,11 +178,20 @@ function LensPills({ lenses, active, onPick, compact = false }) {
               : 'border-lm-300 bg-white text-lm-500 hover:border-lm-500 hover:text-lm-800'
           }`}
         >
+          {burst && burst.id === id && active === id && <ParticleBurst key={burst.n} />}
           {label}
         </button>
       ))}
     </div>
   )
+}
+
+// Staggered reveal for the version text — each line materialises out of a
+// slight blur, echoing the particle burst that opened it.
+const revealContainer = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }
+const revealItem = {
+  hidden: { opacity: 0, y: 10, filter: 'blur(5px)' },
+  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
 }
 
 function LensPanel({ item, lens, onClose }) {
@@ -146,9 +202,9 @@ function LensPanel({ item, lens, onClose }) {
   const paragraphs = String(text || '').split(/\n{2,}/).filter(Boolean)
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 8, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       onClick={(e) => e.stopPropagation()}
       className="flex flex-col gap-[10px] self-start rounded-[12px] border border-[rgba(28,28,30,0.08)] bg-lm-50 p-[16px]"
     >
@@ -165,20 +221,23 @@ function LensPanel({ item, lens, onClose }) {
           ×
         </button>
       </div>
-      {bullets ? (
-        <ul className="flex flex-col gap-[10px]">
-          {bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-[10px] font-roboto text-[15px] leading-[24px] text-lm-700" style={rb}>
-              <span className="mt-[9px] size-[6px] shrink-0 rounded-full bg-lm-800" />
-              {b}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        paragraphs.map((p, i) => (
-          <p key={i} className="font-roboto text-[15px] leading-[24px] text-lm-700" style={rb}>{p}</p>
-        ))
-      )}
+      {/* Keyed by lens so switching pills re-runs the reveal */}
+      <motion.div key={lens} variants={revealContainer} initial="hidden" animate="show" className="flex flex-col gap-[10px]">
+        {bullets ? (
+          <ul className="flex flex-col gap-[10px]">
+            {bullets.map((b, i) => (
+              <motion.li key={i} variants={revealItem} className="flex items-start gap-[10px] font-roboto text-[15px] leading-[24px] text-lm-700" style={rb}>
+                <span className="mt-[9px] size-[6px] shrink-0 rounded-full bg-lm-800" />
+                {b}
+              </motion.li>
+            ))}
+          </ul>
+        ) : (
+          paragraphs.map((p, i) => (
+            <motion.p key={i} variants={revealItem} className="font-roboto text-[15px] leading-[24px] text-lm-700" style={rb}>{p}</motion.p>
+          ))
+        )}
+      </motion.div>
     </motion.div>
   )
 }
@@ -194,7 +253,7 @@ function FeaturedCard({ item, lead = false, half = false, onOpen, fullStories = 
       onClick={onOpen}
       className={`flex cursor-pointer flex-col gap-[24px] rounded-[16px] bg-white p-[20px] transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] sm:p-[32px] ${
         lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)]'
-      }`}
+      } ${sideBySide ? 'lg:col-span-2' : ''}`}
     >
       {half ? <div><FactChip item={item} small /></div> : <Tags item={item} />}
       <h3 className={`font-roboto font-bold text-black ${half ? 'text-[21px] leading-normal' : 'text-[24px] leading-[34px] sm:text-[32px] sm:leading-[44px]'}`} style={rb}>
@@ -276,6 +335,15 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
   const [readerIdx, setReaderIdx] = useState(null)
   const openItem = (it) => setReaderIdx(items.findIndex((x) => x.id === it.id))
 
+  // Breaking banner (General only): today's most prominent, best-verified
+  // stories from the newest batch.
+  const breaking = useMemo(() => {
+    if (!fullStories) return []
+    return [...items.slice(0, 10)]
+      .sort((a, b) => (b.importance || 0) - (a.importance || 0) || (b.factScore || 0) - (a.factScore || 0))
+      .slice(0, 6)
+  }, [items, fullStories])
+
   if (loading && items.length === 0) {
     return <div className="px-[32px] py-[80px] text-center font-roboto text-[18px] text-lm-500" style={rb}>Loading stories…</div>
   }
@@ -285,6 +353,11 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[40px] px-4 py-[32px] sm:gap-[64px] sm:px-8 sm:py-[48px] lg:px-[32px]">
+      {fullStories && breaking.length > 0 && (
+        <div className="-mb-[24px] sm:-mb-[44px]">
+          <LmBreakingCarousel items={breaking} onOpen={openItem} />
+        </div>
+      )}
       {shown.map((g, gi) => (
         <motion.section
           key={g.key}
@@ -300,12 +373,21 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
             </h2>
             <div className="h-px flex-1 bg-lm-400" />
           </div>
-          {/* Blocks of 7 */}
-          <div className="flex flex-col gap-[8px]">
-            {Array.from({ length: Math.ceil(g.items.length / 7) }, (_, i) => (
-              <Block key={i} items={g.items.slice(i * 7, i * 7 + 7)} onOpen={openItem} fullStories={fullStories} />
-            ))}
-          </div>
+          {/* General: equal cards SIDE BY SIDE (a lens-expanded card takes the
+              full row); other categories keep the Figma 1.89fr/1fr blocks. */}
+          {fullStories ? (
+            <div className="grid gap-[8px] lg:grid-cols-2 lg:[grid-auto-flow:dense]">
+              {g.items.map((it, i2) => (
+                <FeaturedCard key={it.id} item={it} lead={gi === 0 && i2 === 0} onOpen={() => openItem(it)} fullStories />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-[8px]">
+              {Array.from({ length: Math.ceil(g.items.length / 7) }, (_, i) => (
+                <Block key={i} items={g.items.slice(i * 7, i * 7 + 7)} onOpen={openItem} fullStories={fullStories} />
+              ))}
+            </div>
+          )}
         </motion.section>
       ))}
 
