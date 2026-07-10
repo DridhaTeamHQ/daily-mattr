@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 // AI fact-check badge + breakdown panel. Score bands mirror the email agent's
 // _shared/fact-check.ts: >=85 verified, >=65 mostly factual, >=40 mixed,
@@ -57,6 +57,10 @@ const SIGNAL_LABEL = { attribution: 'Attribution', specificity: 'Specificity', t
 // Full transparency panel for the reader overlay: score dial, rationale,
 // per-claim verdicts, and source signals — the "why" behind the number.
 export function FactPanel({ item }) {
+  // Claim-by-claim list is collapsed by default so the panel reads as a compact
+  // trust card; one tap expands the full breakdown. Hooks must run before any
+  // early return.
+  const [showClaims, setShowClaims] = useState(false)
   if (item?.factScore == null) return null
   const score = Math.round(item.factScore)
   const band = factBand(score)
@@ -94,33 +98,47 @@ export function FactPanel({ item }) {
       )}
 
       {claims.length > 0 && (
-        <ul className="mt-[14px] flex flex-col gap-[10px]">
-          {claims.map((c, i) => {
-            const v = VERDICT_STYLE[c.verdict] || VERDICT_STYLE.unsupported
-            return (
-              <li key={i} className="flex flex-col gap-[4px] rounded-[12px] bg-white p-[12px]">
-                <span
-                  className="self-start rounded-[34px] px-[10px] py-[3px] font-roboto text-[11px] font-bold uppercase"
-                  style={{ ...rb, color: v.text, background: v.bg }}
-                >
-                  {v.label}
-                </span>
-                <span className="font-roboto text-[14px] leading-[22px] text-lm-800" style={rb}>{c.claim}</span>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-
-      {signals && (
-        <div className="mt-[14px] flex flex-wrap gap-[8px]">
-          {Object.entries(SIGNAL_LABEL).map(([key, label]) => (
-            signals[key] != null && (
-              <span key={key} className="rounded-[34px] bg-black/5 px-[12px] py-[5px] font-roboto text-[12px] font-medium text-lm-700" style={rb}>
-                {label} {signals[key]}/2
-              </span>
-            )
-          ))}
+        <div className="mt-[14px]">
+          <button
+            type="button"
+            onClick={() => setShowClaims((v) => !v)}
+            className="flex items-center gap-[8px] rounded-[100px] border border-[rgba(28,28,30,0.14)] bg-white px-[14px] py-[8px] font-roboto text-[13px] font-semibold text-lm-700 transition-colors hover:border-lm-800"
+            style={rb}
+          >
+            Claim-by-claim breakdown ({claims.length})
+            <span className={`text-[11px] transition-transform duration-200 ${showClaims ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+          {showClaims && (
+            <>
+              <ul className="mt-[12px] flex flex-col gap-[10px]">
+                {claims.map((c, i) => {
+                  const v = VERDICT_STYLE[c.verdict] || VERDICT_STYLE.unsupported
+                  return (
+                    <li key={i} className="flex flex-col gap-[4px] rounded-[12px] bg-white p-[12px]">
+                      <span
+                        className="self-start rounded-[34px] px-[10px] py-[3px] font-roboto text-[11px] font-bold uppercase"
+                        style={{ ...rb, color: v.text, background: v.bg }}
+                      >
+                        {v.label}
+                      </span>
+                      <span className="font-roboto text-[14px] leading-[22px] text-lm-800" style={rb}>{c.claim}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+              {signals && (
+                <div className="mt-[14px] flex flex-wrap gap-[8px]">
+                  {Object.entries(SIGNAL_LABEL).map(([key, label]) => (
+                    signals[key] != null && (
+                      <span key={key} className="rounded-[34px] bg-black/5 px-[12px] py-[5px] font-roboto text-[12px] font-medium text-lm-700" style={rb}>
+                        {label} {signals[key]}/2
+                      </span>
+                    )
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 
