@@ -79,6 +79,7 @@ export default function CategoryNewsPage() {
       <LmArticleFeed
         items={filtered}
         loading={loading}
+        fullStories={slug === 'general'}
         emptyLabel={
           filter === 'long'
             ? 'No long reads here yet — switch to Briefs or check back soon.'
