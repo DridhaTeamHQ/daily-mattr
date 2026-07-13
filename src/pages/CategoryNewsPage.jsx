@@ -1,13 +1,15 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import LmNav from '../components/lm/LmNav'
 import LmCategoryHero from '../components/lm/LmCategoryHero'
 import LmCategoryBar from '../components/lm/LmCategoryBar'
 import LmArticleFeed from '../components/lm/LmArticleFeed'
+import LmTopicRail from '../components/lm/LmTopicRail'
+import LmTopicTimeline from '../components/lm/LmTopicTimeline'
 import LmFaq from '../components/lm/LmFaq'
 import LmFooter from '../components/lm/LmFooter'
 import { lmCategoryBySlug } from '../components/lm/lmCategories'
-import { fetchApproved, fetchFeaturesByCategory } from '../lib/content'
+import { fetchApproved, fetchFeaturesByCategory, fetchTrendingTopics } from '../lib/content'
 import { useLiveData } from '../lib/useLiveData'
 import NotFoundPage from './NotFoundPage'
 
@@ -48,6 +50,18 @@ export default function CategoryNewsPage() {
 
   const { data: items, loading } = useLiveData(fetcher, [slug], { intervalMs: 30000 })
 
+  // Trending topics — General feed only. Fetched on mount and whenever the slug
+  // changes; fetchTrendingTopics swallows its own errors (returns []), so this
+  // never breaks the page. Opening a topic reveals its timeline overlay.
+  const [topics, setTopics] = useState([])
+  const [openTopic, setOpenTopic] = useState(null)
+  useEffect(() => {
+    if (slug !== 'general') { setTopics([]); return }
+    let alive = true
+    fetchTrendingTopics().then((t) => { if (alive) setTopics(t) })
+    return () => { alive = false }
+  }, [slug])
+
   // All / Long reads / Briefs / Fact checked — long = features & case studies;
   // fact = every AI-fact-scored story, best-verified first (the transparency view).
   const [filter, setFilter] = useState('all')
@@ -76,6 +90,11 @@ export default function CategoryNewsPage() {
       <LmNav tone="dark" />
       <LmCategoryHero title={heroTitle} tagline={tagline} image={heroImage} slug={slug} />
       <LmCategoryBar active={slug} filter={filter} onFilter={setFilter} />
+      {slug === 'general' && topics.length > 0 && (
+        <div className="pt-[32px] sm:pt-[48px]">
+          <LmTopicRail topics={topics} onOpen={setOpenTopic} />
+        </div>
+      )}
       <LmArticleFeed
         items={filtered}
         loading={loading}
@@ -92,6 +111,9 @@ export default function CategoryNewsPage() {
       />
       <LmFaq />
       <LmFooter />
+      {openTopic && (
+        <LmTopicTimeline topic={openTopic} onClose={() => setOpenTopic(null)} />
+      )}
     </div>
   )
 }

@@ -125,6 +125,59 @@ export async function fetchApprovedByCategory(slug) {
   return all.filter((a) => a.slug === slug)
 }
 
+// Specific approved/sent articles by id — used by the trending-topic timeline,
+// whose members can be older than the fetchApproved window. Same light SELECT
+// (with the missingColumn fallback) and the same normalize() as the main feed.
+export async function fetchArticlesByIds(ids) {
+  if (!ids || !ids.length) return []
+  const query = (cols) => supabase
+    .from('articles')
+    .select(cols)
+    .in('id', ids)
+    .in('status', ['approved', 'sent'])
+  let { data, error } = await query(SELECT)
+  if (missingColumn(error)) ({ data, error } = await query(SELECT_BASE))
+  if (error) throw error
+  return (data || []).map(normalize)
+}
+
+// Trending topics — clusters the agent has approved. RLS already restricts the
+// `topics` table (and its joined topic_articles) to status='approved', so we
+// just read and shape. Never selects heavy columns (no centroid/embeddings).
+// Topics with fewer than 3 members are dropped as too thin to be a timeline.
+export async function fetchTrendingTopics() {
+  try {
+    const { data, error } = await supabase
+      .from('topics')
+      .select('id,title,slug,description,score,approved_at,topic_articles(article_id,position,added_at)')
+      .order('score', { ascending: false })
+    if (error) throw error
+    return (data || [])
+      .map((t) => {
+        const members = [...(t.topic_articles || [])].sort((a, b) => {
+          const pa = a.position ?? null
+          const pb = b.position ?? null
+          if (pa != null && pb != null) return pa - pb
+          if (pa != null) return -1
+          if (pb != null) return 1
+          return new Date(a.added_at || 0) - new Date(b.added_at || 0)
+        })
+        return {
+          id: t.id,
+          title: decodeEntities(t.title || ''),
+          slug: t.slug,
+          description: decodeEntities(t.description || ''),
+          score: t.score ?? null,
+          approvedAt: t.approved_at,
+          memberIds: members.map((m) => m.article_id),
+        }
+      })
+      .filter((t) => t.memberIds.length >= 3)
+  } catch {
+    return []
+  }
+}
+
 // Long-form topic FEATURES (the daily case study per topic) — the long
 // counterpart to the short briefs in `articles`. Read from editorial_drafts.
 // topic_slug already matches our website slugs (real-estate / automobile /
