@@ -149,8 +149,10 @@ export async function fetchTrendingTopics() {
   try {
     const { data, error } = await supabase
       .from('topics')
-      .select('id,title,slug,description,score,approved_at,topic_articles(article_id,position,added_at)')
-      .order('score', { ascending: false })
+      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at)')
+      // Newest topics first, oldest last (they auto-expire after a week server-side).
+      .order('approved_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false })
     if (error) throw error
     return (data || [])
       .map((t) => {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 // Trending-topic rail for the General feed — a horizontal strip of light white
@@ -72,7 +72,42 @@ function TopicCard({ topic, onOpen }) {
 }
 
 export default function LmTopicRail({ topics = [], onOpen }) {
+  const scrollerRef = useRef(null)
+  const [atStart, setAtStart] = useState(true)
+  const [atEnd, setAtEnd] = useState(false)
+
+  // Track scroll position so we can enable/disable the arrows and fade the edge
+  // masks — the arrows only make sense while there's more to scroll to.
+  const sync = useCallback(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    setAtStart(el.scrollLeft <= 1)
+    setAtEnd(el.scrollLeft >= max - 1)
+  }, [])
+
+  useEffect(() => {
+    sync()
+    const el = scrollerRef.current
+    if (!el) return
+    el.addEventListener('scroll', sync, { passive: true })
+    window.addEventListener('resize', sync)
+    return () => {
+      el.removeEventListener('scroll', sync)
+      window.removeEventListener('resize', sync)
+    }
+  }, [sync, topics.length])
+
+  const nudge = (dir) => {
+    const el = scrollerRef.current
+    if (!el) return
+    // Scroll by roughly one card-and-a-bit so a click always reveals fresh cards.
+    el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.8, 320), behavior: 'smooth' })
+  }
+
   if (!topics.length) return null
+  const hasOverflow = !atStart || !atEnd
+
   return (
     <section className="mx-auto max-w-[1440px] px-4 sm:px-8">
       <div className="mb-[16px] flex items-center gap-[16px]">
@@ -80,11 +115,50 @@ export default function LmTopicRail({ topics = [], onOpen }) {
           Trending topics
         </h2>
         <div className="h-px flex-1 bg-lm-400" />
+        {/* Arrow controls — only shown when the rail actually overflows */}
+        {hasOverflow && (
+          <div className="hidden shrink-0 items-center gap-[8px] sm:flex">
+            <button
+              type="button"
+              onClick={() => nudge(-1)}
+              disabled={atStart}
+              aria-label="Scroll trending topics left"
+              className={`flex size-[38px] items-center justify-center rounded-full border transition-all duration-200 ${
+                atStart
+                  ? 'cursor-not-allowed border-lm-200 text-lm-300'
+                  : 'border-lm-300 text-lm-800 hover:-translate-x-[1px] hover:border-lm-800 hover:shadow-[0px_6px_16px_rgba(0,0,0,0.08)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => nudge(1)}
+              disabled={atEnd}
+              aria-label="Scroll trending topics right"
+              className={`flex size-[38px] items-center justify-center rounded-full border transition-all duration-200 ${
+                atEnd
+                  ? 'cursor-not-allowed border-lm-200 text-lm-300'
+                  : 'border-lm-300 text-lm-800 hover:translate-x-[1px] hover:border-lm-800 hover:shadow-[0px_6px_16px_rgba(0,0,0,0.08)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+          </div>
+        )}
       </div>
-      <div className="flex snap-x snap-mandatory gap-[8px] overflow-x-auto pb-[8px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {topics.map((t) => (
-          <TopicCard key={t.id} topic={t} onOpen={onOpen} />
-        ))}
+      <div className="relative">
+        {/* Edge fade masks hint at more content beyond the visible edge */}
+        <div className={`pointer-events-none absolute inset-y-0 left-0 z-[1] w-[36px] bg-gradient-to-r from-lm-50 to-transparent transition-opacity duration-300 ${atStart ? 'opacity-0' : 'opacity-100'}`} aria-hidden="true" />
+        <div className={`pointer-events-none absolute inset-y-0 right-0 z-[1] w-[36px] bg-gradient-to-l from-lm-50 to-transparent transition-opacity duration-300 ${atEnd ? 'opacity-0' : 'opacity-100'}`} aria-hidden="true" />
+        <div
+          ref={scrollerRef}
+          className="flex snap-x snap-mandatory gap-[8px] overflow-x-auto scroll-smooth pb-[8px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {topics.map((t) => (
+            <TopicCard key={t.id} topic={t} onOpen={onOpen} />
+          ))}
+        </div>
       </div>
     </section>
   )

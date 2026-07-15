@@ -193,57 +193,57 @@ function LensPills({ lenses, active, onPick, compact = false }) {
   )
 }
 
-// Staggered reveal for the version text — each line materialises out of a
-// slight blur, echoing the particle burst that opened it.
-const revealContainer = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }
-const revealItem = {
-  hidden: { opacity: 0, y: 10, filter: 'blur(5px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-}
+// The brief and its alternate lenses share ONE content box — picking a lens
+// swaps the text in place (never opening a second panel or resizing the card
+// sideways). `ContentSwap` crossfades between the two and lets the box glide to
+// the new height via framer's `layout`, so the card stays put and only its
+// content changes. Keyed remount (initial -> animate, no AnimatePresence exit)
+// matches the rest of the app.
+const swapTransition = { duration: 0.34, ease: [0.22, 1, 0.36, 1] }
 
-function LensPanel({ item, lens, onClose }) {
+function LensBody({ item, lens, size = 'lg' }) {
   const v = item.versions || {}
   const label = (LENSES.find(([id]) => id === lens) || [])[1] || ''
   const bullets = lens === 'tldr' ? v.tldr : lens === 'key_numbers' ? v.key_numbers : null
   const text = lens === 'eli5' ? v.eli5 : lens === 'deep_dive' ? v.deep_dive : ''
   const paragraphs = String(text || '').split(/\n{2,}/).filter(Boolean)
+  const tcls = size === 'lg' ? 'text-[15px] leading-[24px]' : 'text-[14px] leading-[22px]'
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      onClick={(e) => e.stopPropagation()}
-      className="flex flex-col gap-[10px] self-start rounded-[12px] border border-[rgba(28,28,30,0.08)] bg-lm-50 p-[16px]"
-    >
-      <div className="flex items-center justify-between gap-[8px]">
-        <span className="font-roboto text-[12px] font-bold uppercase tracking-wide text-lm-500" style={rb}>
-          ✦ {label}
-        </span>
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onClose() }}
-          aria-label="Close alternate view"
-          className="flex size-[24px] items-center justify-center rounded-full text-[16px] leading-none text-lm-500 hover:bg-lm-200 hover:text-lm-800"
-        >
-          ×
-        </button>
-      </div>
-      {/* Keyed by lens so switching pills re-runs the reveal */}
-      <motion.div key={lens} variants={revealContainer} initial="hidden" animate="show" className="flex flex-col gap-[10px]">
-        {bullets ? (
-          <ul className="flex flex-col gap-[10px]">
-            {bullets.map((b, i) => (
-              <motion.li key={i} variants={revealItem} className="flex items-start gap-[10px] font-roboto text-[15px] leading-[24px] text-lm-700" style={rb}>
-                <span className="mt-[9px] size-[6px] shrink-0 rounded-full bg-lm-800" />
-                {b}
-              </motion.li>
-            ))}
-          </ul>
-        ) : (
-          paragraphs.map((p, i) => (
-            <motion.p key={i} variants={revealItem} className="font-roboto text-[15px] leading-[24px] text-lm-700" style={rb}>{p}</motion.p>
-          ))
-        )}
+    <div className="flex flex-col gap-[8px]" onClick={(e) => e.stopPropagation()}>
+      <span className="inline-flex w-fit items-center gap-[5px] rounded-full bg-[rgba(121,0,217,0.08)] px-[9px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.06em] text-[#7900D9]" style={rb}>
+        ✦ {label}
+      </span>
+      {bullets ? (
+        <ul className="flex flex-col gap-[8px]">
+          {bullets.map((b, i) => (
+            <li key={i} className={`flex items-start gap-[10px] font-roboto ${tcls} text-lm-700`} style={rb}>
+              <span className="mt-[8px] size-[6px] shrink-0 rounded-full bg-[#7900D9]" />
+              {b}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="flex flex-col gap-[8px]">
+          {paragraphs.map((p, i) => (
+            <p key={i} className={`font-roboto ${tcls} text-lm-700`} style={rb}>{p}</p>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Shared swap wrapper — same box for original + every lens, smooth height glide.
+function ContentSwap({ item, lens, size, minH, children }) {
+  return (
+    <motion.div layout transition={{ layout: swapTransition }} className="relative" style={{ minHeight: minH }}>
+      <motion.div
+        key={lens || 'original'}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={swapTransition}
+      >
+        {lens ? <LensBody item={item} lens={lens} size={size} /> : children}
       </motion.div>
     </motion.div>
   )
@@ -253,8 +253,6 @@ function FeaturedCard({ item, lead = false, half = false, onOpen, fullStories = 
   const lenses = fullStories ? availableLenses(item) : []
   const [lens, setLens] = useState(null)
   const activeLens = lens && lenses.some(([id]) => id === lens) ? lens : null
-  // Wide cards show original + version SIDE BY SIDE; half cards stack.
-  const sideBySide = activeLens && !half
   // General (fullStories) cards carry the whole brief, so they run tighter than
   // the big category-page Figma cards: less padding, smaller headline/gaps.
   const pad = fullStories ? 'p-[16px] sm:p-[20px]' : 'p-[20px] sm:p-[32px]'
@@ -269,16 +267,16 @@ function FeaturedCard({ item, lead = false, half = false, onOpen, fullStories = 
       onClick={onOpen}
       className={`flex cursor-pointer flex-col ${gap} rounded-[16px] bg-white ${pad} transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:shadow-[0px_14px_36px_rgba(0,0,0,0.09)] ${
         lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)] hover:border-[rgba(28,28,30,0.25)]'
-      } ${sideBySide ? 'lg:col-span-2' : ''}`}
+      }`}
     >
       {half ? <div><FactChip item={item} small /></div> : <Tags item={item} />}
       <h3 className={`font-roboto font-bold text-black ${headCls}`} style={rb}>
         {item.headline}
       </h3>
-      <div className={sideBySide ? 'grid gap-[16px] lg:grid-cols-2' : 'flex flex-col gap-[16px]'}>
+      {/* Brief and lenses share ONE box — no side panel, no width change */}
+      <ContentSwap item={item} lens={activeLens} size={half ? 'sm' : 'lg'} minH={half ? 64 : 88}>
         <Excerpt item={item} size={half ? 'sm' : 'lg'} onOpen={onOpen} full={fullStories} />
-        {activeLens && <LensPanel item={item} lens={activeLens} onClose={() => setLens(null)} />}
-      </div>
+      </ContentSwap>
       {lenses.length > 0 && <LensPills lenses={lenses} active={activeLens} onPick={setLens} compact={half} />}
       <SourceRow item={item} />
     </article>
@@ -293,8 +291,9 @@ function CompactCard({ item, onOpen, fullStories = false }) {
     <article onClick={onOpen} className="flex cursor-pointer flex-col gap-[8px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[16px] transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)]">
       {item.factScore != null && <div><FactChip item={item} small /></div>}
       <h3 className="font-roboto text-[21px] font-semibold leading-[1.36] text-black" style={rb}>{item.headline}</h3>
-      <Excerpt item={item} size="sm" onOpen={onOpen} full={fullStories} />
-      {activeLens && <LensPanel item={item} lens={activeLens} onClose={() => setLens(null)} />}
+      <ContentSwap item={item} lens={activeLens} size="sm" minH={56}>
+        <Excerpt item={item} size="sm" onOpen={onOpen} full={fullStories} />
+      </ContentSwap>
       {lenses.length > 0 && <LensPills lenses={lenses} active={activeLens} onPick={setLens} compact />}
       <SourceRow item={item} />
     </article>
