@@ -149,10 +149,7 @@ export async function fetchTrendingTopics() {
   try {
     const { data, error } = await supabase
       .from('topics')
-      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at)')
-      // Newest topics first, oldest last (they auto-expire after a week server-side).
-      .order('approved_at', { ascending: false, nullsFirst: false })
-      .order('created_at', { ascending: false })
+      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at,articles(source))')
     if (error) throw error
     return (data || [])
       .map((t) => {
@@ -164,6 +161,12 @@ export async function fetchTrendingTopics() {
           if (pb != null) return 1
           return new Date(a.added_at || 0) - new Date(b.added_at || 0)
         })
+        // Distinct outlets across the (RLS-visible, approved) members. Drives
+        // ordering: a story several sources are covering ranks ahead of a
+        // single-outlet cluster.
+        const sourceSet = new Set(
+          members.map((m) => (m.articles?.source || '').trim().toLowerCase()).filter(Boolean),
+        )
         return {
           id: t.id,
           title: decodeEntities(t.title || ''),
@@ -171,10 +174,16 @@ export async function fetchTrendingTopics() {
           description: decodeEntities(t.description || ''),
           score: t.score ?? null,
           approvedAt: t.approved_at,
+          sourceCount: sourceSet.size,
           memberIds: members.map((m) => m.article_id),
         }
       })
       .filter((t) => t.memberIds.length >= 3)
+      // Multi-source stories first; newest-first within the same source count.
+      .sort((a, b) => {
+        if (b.sourceCount !== a.sourceCount) return b.sourceCount - a.sourceCount
+        return new Date(b.approvedAt || 0) - new Date(a.approvedAt || 0)
+      })
   } catch {
     return []
   }
