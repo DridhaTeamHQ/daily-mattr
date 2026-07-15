@@ -52,17 +52,20 @@ function SourceRow({ item }) {
   )
 }
 
+// Small, flat, editorial meta pills — monochrome outline for "min read", a
+// confident solid-black pill for long reads, and the fact chip (its band colour
+// is the only colour in the row). Uppercase micro-labels, letter-spaced.
 function Tags({ item }) {
   const mins = readTime(item.headline, item.body)
   const long = item.kind === 'case_study' || item.kind === 'feature'
   return (
-    <div className="flex flex-wrap items-center gap-[8px]">
+    <div className="flex flex-wrap items-center gap-[6px]">
       {long && (
-        <span className="rounded-[34px] bg-[rgba(153,51,255,0.1)] px-[16px] py-[8px] font-roboto text-[12px] font-bold uppercase text-[#7900D9]" style={rb}>
-          Long story
+        <span className="rounded-full bg-lm-800 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white" style={rb}>
+          Long read
         </span>
       )}
-      <span className="rounded-[34px] bg-black/5 px-[16px] py-[8px] font-roboto text-[12px] font-bold uppercase text-lm-800" style={rb}>
+      <span className="rounded-full border border-lm-200 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-lm-500" style={rb}>
         {mins} min read
       </span>
       <FactChip item={item} />
@@ -76,9 +79,12 @@ function Excerpt({ item, size = 'lg', onOpen, full = false }) {
   const limit = size === 'lg' ? 260 : 150
   const clipped = !full && text.length > limit
   // General cards show the WHOLE brief (they're 55-85 words) — no "Read more".
+  // Kept a touch smaller than the category-page excerpt so the full-brief cards
+  // stay compact.
   if (full) {
+    const fcls = size === 'lg' ? 'text-[15px] leading-[24px]' : 'text-[14px] leading-[22px]'
     return (
-      <p className={`font-roboto ${cls} text-lm-600`} style={rb}>{text}</p>
+      <p className={`font-roboto ${fcls} text-lm-600`} style={rb}>{text}</p>
     )
   }
   return (
@@ -249,15 +255,24 @@ function FeaturedCard({ item, lead = false, half = false, onOpen, fullStories = 
   const activeLens = lens && lenses.some(([id]) => id === lens) ? lens : null
   // Wide cards show original + version SIDE BY SIDE; half cards stack.
   const sideBySide = activeLens && !half
+  // General (fullStories) cards carry the whole brief, so they run tighter than
+  // the big category-page Figma cards: less padding, smaller headline/gaps.
+  const pad = fullStories ? 'p-[16px] sm:p-[20px]' : 'p-[20px] sm:p-[32px]'
+  const gap = fullStories ? 'gap-[14px]' : 'gap-[24px]'
+  const headCls = half
+    ? 'text-[19px] leading-[26px]'
+    : fullStories
+      ? 'text-[20px] leading-[27px] sm:text-[22px] sm:leading-[30px]'
+      : 'text-[24px] leading-[34px] sm:text-[32px] sm:leading-[44px]'
   return (
     <article
       onClick={onOpen}
-      className={`flex cursor-pointer flex-col gap-[24px] rounded-[16px] bg-white p-[20px] transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] sm:p-[32px] ${
+      className={`flex cursor-pointer flex-col ${gap} rounded-[16px] bg-white ${pad} transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] ${
         lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)]'
       } ${sideBySide ? 'lg:col-span-2' : ''}`}
     >
       {half ? <div><FactChip item={item} small /></div> : <Tags item={item} />}
-      <h3 className={`font-roboto font-bold text-black ${half ? 'text-[21px] leading-normal' : 'text-[24px] leading-[34px] sm:text-[32px] sm:leading-[44px]'}`} style={rb}>
+      <h3 className={`font-roboto font-bold text-black ${headCls}`} style={rb}>
         {item.headline}
       </h3>
       <div className={sideBySide ? 'grid gap-[16px] lg:grid-cols-2' : 'flex flex-col gap-[16px]'}>

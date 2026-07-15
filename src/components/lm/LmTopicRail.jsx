@@ -27,21 +27,25 @@ function TopicCard({ topic, onOpen }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="flex w-[280px] shrink-0 snap-start flex-col gap-[12px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[18px] text-left transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] sm:w-[320px]"
+      className="group flex w-[248px] shrink-0 snap-start flex-col gap-[12px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[16px] text-left transition-all duration-200 hover:-translate-y-[2px] hover:border-lm-800 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] sm:w-[280px]"
       title={topic.title}
     >
-      <span
-        className="self-start rounded-[100px] bg-[rgba(153,51,255,0.1)] px-[12px] py-[6px] font-roboto text-[11px] font-bold uppercase tracking-wide text-[#7900D9]"
-        style={rb}
-      >
-        Trending
-      </span>
-      <h3 className="line-clamp-2 font-roboto text-[19px] font-bold leading-[1.3] text-black sm:text-[21px]" style={rb}>
+      <div className="flex items-center justify-between">
+        <span
+          className="inline-flex items-center gap-[6px] rounded-full bg-lm-800 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white"
+          style={rb}
+        >
+          <span className="size-[5px] rounded-full bg-white" />
+          Trending
+        </span>
+        <span className="font-roboto text-[15px] text-lm-300 transition-all duration-200 group-hover:translate-x-[2px] group-hover:text-lm-800">→</span>
+      </div>
+      <h3 className="line-clamp-2 font-roboto text-[18px] font-bold leading-[1.3] text-black sm:text-[20px]" style={rb}>
         {topic.title}
       </h3>
-      <p className="mt-auto font-bevietnam text-[13px] text-lm-500">
-        {count} {count === 1 ? 'story' : 'stories'}
-        {when ? <> · latest {when}</> : null}
+      <p className="mt-auto flex items-center gap-[6px] font-roboto text-[12px] font-medium uppercase tracking-[0.05em] text-lm-400" style={rb}>
+        <span className="text-lm-700">{count}</span> {count === 1 ? 'story' : 'stories'}
+        {when ? <><span className="text-lm-300">·</span> {when}</> : null}
       </p>
     </motion.button>
   )

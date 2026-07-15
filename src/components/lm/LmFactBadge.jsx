@@ -29,14 +29,13 @@ export function FactChip({ item, small = false }) {
   const score = Math.round(item.factScore)
   const band = factBand(score)
   const n = sourceCount(item)
-  const pad = small ? 'px-[10px] py-[4px] text-[11px]' : 'px-[16px] py-[8px] text-[12px]'
   return (
     <span
-      className={`inline-flex items-center gap-[6px] rounded-[34px] font-roboto font-bold uppercase ${pad}`}
+      className="inline-flex items-center gap-[5px] rounded-full px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.06em]"
       style={{ ...rb, color: band.text, background: band.bg }}
       title={n > 1 ? `Checked across ${n} sources — ${item.factNotes?.rationale || band.label}` : (item.factNotes?.rationale || band.label)}
     >
-      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M6 0.5L10.5 2.5V5.5C10.5 8.3 8.6 10.6 6 11.5C3.4 10.6 1.5 8.3 1.5 5.5V2.5L6 0.5Z" fill="currentColor" opacity="0.25" />
         <path d="M4 5.8L5.4 7.2L8 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>

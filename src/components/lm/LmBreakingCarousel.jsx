@@ -33,20 +33,21 @@ export default function LmBreakingCarousel({ items = [], onOpen }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="flex items-center gap-[12px] px-[14px] py-[13px] sm:gap-[16px] sm:px-[24px]">
+      <div className="flex items-center gap-[12px] px-[16px] py-[14px] sm:gap-[18px] sm:px-[22px]">
         <span
-          className="flex shrink-0 items-center gap-[7px] rounded-[100px] bg-[#E33B3B] px-[12px] py-[6px] font-roboto text-[11px] font-bold uppercase tracking-wide"
+          className="flex shrink-0 items-center gap-[7px] rounded-full bg-[#E33B3B] px-[11px] py-[5px] font-roboto text-[10px] font-bold uppercase tracking-[0.09em] text-white"
           style={rb}
         >
           <motion.span
-            className="size-[7px] rounded-full bg-white"
+            className="size-[6px] rounded-full bg-white"
             animate={{ opacity: [1, 0.15, 1], scale: [1, 0.8, 1] }}
             transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
           />
           Breaking
         </span>
 
-        <div className="relative min-h-[26px] flex-1 overflow-hidden">
+        {/* right-edge fade so a truncated headline reads as intentional */}
+        <div className="relative min-h-[26px] flex-1 overflow-hidden after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-[40px] after:bg-gradient-to-l after:from-lm-800 after:to-transparent">
           <motion.button
             key={story.id}
             type="button"
@@ -54,7 +55,7 @@ export default function LmBreakingCarousel({ items = [], onOpen }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="block w-full truncate text-left font-roboto text-[14px] font-semibold text-white hover:underline sm:text-[17px]"
+            className="block w-full truncate pr-[24px] text-left font-roboto text-[15px] font-semibold text-white hover:underline sm:text-[17px]"
             style={rb}
             title={story.headline}
           >
