@@ -4,7 +4,7 @@ import { readTime } from '../../lib/readTime'
 import LmReader from './LmReader'
 import LmBreakingCarousel from './LmBreakingCarousel'
 import { FactChip } from './LmFactBadge'
-import { breakingScore, isBreaking } from '../../lib/content'
+import { breakingScore, isBreaking, topicLabel } from '../../lib/content'
 
 // Date-grouped article feed — Figma node 1:5453. Each date group: bold header
 // with hairline divider, then a two-column grid — left 895px (2 featured +
@@ -52,14 +52,26 @@ function SourceRow({ item }) {
   )
 }
 
-// Small, flat, editorial meta pills — monochrome outline for "min read", a
-// confident solid-black pill for long reads, and the fact chip (its band colour
-// is the only colour in the row). Uppercase micro-labels, letter-spaced.
+function TopicChip({ item }) {
+  const label = topicLabel(item)
+  if (!label) return null
+  return (
+    <span className="rounded-full bg-black/5 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-lm-700" style={rb}>
+      {label}
+    </span>
+  )
+}
+
+// Small, flat, editorial meta pills — the topic tag (National/World/Business…)
+// leads, then a monochrome outline for "min read", a confident solid-black pill
+// for long reads, and the fact chip (its band colour is the only colour in the
+// row). Uppercase micro-labels, letter-spaced.
 function Tags({ item }) {
   const mins = readTime(item.headline, item.body)
   const long = item.kind === 'case_study' || item.kind === 'feature'
   return (
     <div className="flex flex-wrap items-center gap-[6px]">
+      <TopicChip item={item} />
       {long && (
         <span className="rounded-full bg-lm-800 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white" style={rb}>
           Long read
@@ -269,7 +281,12 @@ function FeaturedCard({ item, lead = false, half = false, onOpen, fullStories = 
         lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)] hover:border-[rgba(28,28,30,0.25)]'
       }`}
     >
-      {half ? <div><FactChip item={item} small /></div> : <Tags item={item} />}
+      {half ? (
+        <div className="flex flex-wrap items-center gap-[6px]">
+          <TopicChip item={item} />
+          <FactChip item={item} small />
+        </div>
+      ) : <Tags item={item} />}
       <h3 className={`font-roboto font-bold text-black ${headCls}`} style={rb}>
         {item.headline}
       </h3>
@@ -289,7 +306,12 @@ function CompactCard({ item, onOpen, fullStories = false }) {
   const activeLens = lens && lenses.some(([id]) => id === lens) ? lens : null
   return (
     <article onClick={onOpen} className="flex cursor-pointer flex-col gap-[8px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[16px] transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)]">
-      {item.factScore != null && <div><FactChip item={item} small /></div>}
+      {(item.factScore != null || topicLabel(item)) && (
+        <div className="flex flex-wrap items-center gap-[6px]">
+          <TopicChip item={item} />
+          <FactChip item={item} small />
+        </div>
+      )}
       <h3 className="font-roboto text-[21px] font-semibold leading-[1.36] text-black" style={rb}>{item.headline}</h3>
       <ContentSwap item={item} lens={activeLens} size="sm" minH={56}>
         <Excerpt item={item} size="sm" onOpen={onOpen} full={fullStories} />

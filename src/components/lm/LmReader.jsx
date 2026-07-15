@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { readTime } from '../../lib/readTime'
-import { SLUG_LABEL } from '../../lib/content'
+import { SLUG_LABEL, topicLabel } from '../../lib/content'
 import { FactChip, FactPanel } from './LmFactBadge'
 
 // Full-screen story reader — tap a card to enter, then swipe left/right
@@ -138,6 +138,11 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
         >
           <div className="mx-auto w-full max-w-[720px]">
             <div className="flex flex-wrap items-center gap-[8px]">
+              {topicLabel(item) && (
+                <span className="rounded-[34px] bg-lm-800 px-[14px] py-[7px] font-roboto text-[11px] font-bold uppercase text-white" style={rb}>
+                  {topicLabel(item)}
+                </span>
+              )}
               {long && (
                 <span className="rounded-[34px] bg-[rgba(153,51,255,0.1)] px-[14px] py-[7px] font-roboto text-[11px] font-bold uppercase text-[#7900D9]" style={rb}>
                   Long story

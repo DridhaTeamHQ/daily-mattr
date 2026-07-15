@@ -62,6 +62,25 @@ function stripArtifacts(s) {
     .trim()
 }
 
+// Reader-facing label for the scraper's internal feed topic. "India" reads as
+// "National" on the site; unknown topics fall back to their own name. Category
+// pages already name their bucket, so the tag applies to General articles only.
+const TOPIC_LABEL = {
+  India: 'National',
+  Politics: 'Politics',
+  World: 'World',
+  Business: 'Business',
+  Explained: 'Explained',
+  Sports: 'Sports',
+  Science: 'Science',
+  Technology: 'Tech',
+}
+export function topicLabel(item) {
+  if (item?.category) return null
+  const t = item?.topic
+  return t ? TOPIC_LABEL[t] || t : null
+}
+
 function normalize(row) {
   const bucket = row.category || row.topic || ''
   return {
