@@ -19,6 +19,7 @@ function latestDate(topic) {
 function TopicCard({ topic, onOpen }) {
   const count = topic?.memberIds?.length || 0
   const when = latestDate(topic)
+  const dots = Math.min(count, 6)
   return (
     <motion.button
       key={topic.id}
@@ -27,26 +28,45 @@ function TopicCard({ topic, onOpen }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group flex w-[248px] shrink-0 snap-start flex-col gap-[12px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[16px] text-left transition-all duration-200 hover:-translate-y-[2px] hover:border-lm-800 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] sm:w-[280px]"
+      className="group relative flex w-[258px] shrink-0 snap-start flex-col gap-[16px] overflow-hidden rounded-[18px] border border-[rgba(28,28,30,0.1)] bg-white p-[18px] text-left transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-lm-800 hover:shadow-[0px_16px_40px_rgba(0,0,0,0.10)] sm:w-[296px]"
       title={topic.title}
     >
+      {/* accent bar that draws in from the left on hover */}
+      <span className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-lm-800 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
       <div className="flex items-center justify-between">
         <span
           className="inline-flex items-center gap-[6px] rounded-full bg-lm-800 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white"
           style={rb}
         >
-          <span className="size-[5px] rounded-full bg-white" />
+          <span className="size-[5px] animate-pulse rounded-full bg-[#E33B3B]" />
           Trending
         </span>
-        <span className="font-roboto text-[15px] text-lm-300 transition-all duration-200 group-hover:translate-x-[2px] group-hover:text-lm-800">→</span>
+        <span className="font-roboto text-[16px] leading-none text-lm-300 transition-all duration-300 group-hover:translate-x-[3px] group-hover:text-lm-800">↗</span>
       </div>
-      <h3 className="line-clamp-2 font-roboto text-[18px] font-bold leading-[1.3] text-black sm:text-[20px]" style={rb}>
+      <h3 className="line-clamp-3 font-roboto text-[19px] font-bold leading-[1.28] text-black sm:text-[21px]" style={rb}>
         {topic.title}
       </h3>
-      <p className="mt-auto flex items-center gap-[6px] font-roboto text-[12px] font-medium uppercase tracking-[0.05em] text-lm-400" style={rb}>
-        <span className="text-lm-700">{count}</span> {count === 1 ? 'story' : 'stories'}
-        {when ? <><span className="text-lm-300">·</span> {when}</> : null}
-      </p>
+      <div className="mt-auto flex flex-col gap-[10px]">
+        {/* a little timeline: one dot per story, filling in on hover */}
+        <div className="flex items-center gap-[5px]">
+          {Array.from({ length: dots }).map((_, i) => (
+            <span
+              key={i}
+              className="size-[5px] rounded-full bg-lm-200 transition-colors duration-300 group-hover:bg-lm-800"
+              style={{ transitionDelay: `${i * 45}ms` }}
+            />
+          ))}
+          {count > dots && <span className="font-roboto text-[11px] font-medium text-lm-400" style={rb}>+{count - dots}</span>}
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="font-roboto text-[11px] font-semibold uppercase tracking-[0.06em] text-lm-400" style={rb}>
+            {count} {count === 1 ? 'story' : 'stories'}{when ? ` · ${when}` : ''}
+          </span>
+          <span className="font-roboto text-[12px] font-semibold text-lm-400 transition-colors duration-200 group-hover:text-lm-800" style={rb}>
+            View&nbsp;timeline
+          </span>
+        </div>
+      </div>
     </motion.button>
   )
 }

@@ -267,8 +267,8 @@ function FeaturedCard({ item, lead = false, half = false, onOpen, fullStories = 
   return (
     <article
       onClick={onOpen}
-      className={`flex cursor-pointer flex-col ${gap} rounded-[16px] bg-white ${pad} transition-shadow hover:shadow-[0px_10px_30px_rgba(0,0,0,0.07)] ${
-        lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)]'
+      className={`flex cursor-pointer flex-col ${gap} rounded-[16px] bg-white ${pad} transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:shadow-[0px_14px_36px_rgba(0,0,0,0.09)] ${
+        lead ? 'border border-lm-800' : 'border border-[rgba(28,28,30,0.1)] hover:border-[rgba(28,28,30,0.25)]'
       } ${sideBySide ? 'lg:col-span-2' : ''}`}
     >
       {half ? <div><FactChip item={item} small /></div> : <Tags item={item} />}
@@ -422,12 +422,15 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
 
       {hasMore && (
         <div className="flex justify-center">
-          <button type="button" onClick={() => setVisible((v) => v + 2)} className="flex items-center">
-            <span className="rounded-[50px] border border-lm-700 bg-white/10 px-[16px] py-[8px] font-roboto text-[15px] font-semibold text-lm-800" style={rb}>
-              Load more
-            </span>
-            <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[50px] bg-lm-700">
-              <img alt="" src="/figma/icon-load-more-arrow-down.svg" className="h-[12px] w-[10px]" />
+          <button
+            type="button"
+            onClick={() => setVisible((v) => v + 2)}
+            className="group inline-flex items-center gap-[10px] rounded-full border border-lm-300 bg-white py-[8px] pl-[20px] pr-[8px] font-roboto text-[14px] font-semibold text-lm-800 transition-all duration-200 hover:border-lm-800 hover:shadow-[0px_8px_24px_rgba(0,0,0,0.08)]"
+            style={rb}
+          >
+            Load more stories
+            <span className="flex size-[30px] items-center justify-center rounded-full bg-lm-800 text-white transition-transform duration-300 group-hover:translate-y-[2px]">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2v8M2.5 6.5 6 10l3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </span>
           </button>
         </div>

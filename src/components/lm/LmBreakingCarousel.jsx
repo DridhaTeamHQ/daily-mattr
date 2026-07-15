@@ -29,11 +29,13 @@ export default function LmBreakingCarousel({ items = [], onOpen }) {
       initial={{ opacity: 0, y: -14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mb-[20px] overflow-hidden rounded-[16px] bg-lm-800 text-white sm:mb-[28px]"
+      className="relative mb-[20px] overflow-hidden rounded-[16px] bg-gradient-to-r from-[#0f0f12] via-lm-800 to-[#1c1c22] text-white shadow-[0px_10px_30px_rgba(0,0,0,0.18)] ring-1 ring-white/5 sm:mb-[28px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="flex items-center gap-[12px] px-[16px] py-[14px] sm:gap-[18px] sm:px-[22px]">
+      {/* faint red glow anchored at the BREAKING chip */}
+      <span className="pointer-events-none absolute -left-[30px] top-1/2 h-[120px] w-[160px] -translate-y-1/2 rounded-full bg-[#E33B3B] opacity-[0.14] blur-[40px]" aria-hidden="true" />
+      <div className="relative z-[1] flex items-center gap-[12px] px-[16px] py-[14px] sm:gap-[18px] sm:px-[22px]">
         <span
           className="flex shrink-0 items-center gap-[7px] rounded-full bg-[#E33B3B] px-[11px] py-[5px] font-roboto text-[10px] font-bold uppercase tracking-[0.09em] text-white"
           style={rb}
@@ -47,7 +49,7 @@ export default function LmBreakingCarousel({ items = [], onOpen }) {
         </span>
 
         {/* right-edge fade so a truncated headline reads as intentional */}
-        <div className="relative min-h-[26px] flex-1 overflow-hidden after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-[40px] after:bg-gradient-to-l after:from-lm-800 after:to-transparent">
+        <div className="relative min-h-[26px] flex-1 overflow-hidden after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-[40px] after:bg-gradient-to-l after:from-[#1a1a20] after:to-transparent">
           <motion.button
             key={story.id}
             type="button"
