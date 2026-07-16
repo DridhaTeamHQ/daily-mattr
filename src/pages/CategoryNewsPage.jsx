@@ -10,7 +10,7 @@ import LmTopicTimeline from '../components/lm/LmTopicTimeline'
 import LmFaq from '../components/lm/LmFaq'
 import LmFooter from '../components/lm/LmFooter'
 import { lmCategoryBySlug } from '../components/lm/lmCategories'
-import { fetchApproved, fetchFeaturesByCategory, fetchTrendingTopics } from '../lib/content'
+import { fetchApproved, fetchFeaturesByCategory, fetchTrendingTopics, freshTopics } from '../lib/content'
 import { useLiveData } from '../lib/useLiveData'
 import NotFoundPage from './NotFoundPage'
 
@@ -63,6 +63,11 @@ export default function CategoryNewsPage() {
     return () => { alive = false }
   }, [slug])
 
+  // A topic is trending only while it has a story on the feed's freshest day.
+  // Compared against the UNFILTERED feed, so picking a section pill (Sports…)
+  // never changes which topics qualify.
+  const visibleTopics = useMemo(() => freshTopics(topics, items || []), [topics, items])
+
   // Filter pills. News Studio filters by SECTION (the scraper's feed topic —
   // National / International / Politics / …); category pages keep the
   // content-kind pills (All / Long reads / Briefs / Fact checked).
@@ -104,16 +109,23 @@ export default function CategoryNewsPage() {
   return (
     <div className="min-h-screen bg-white font-bevietnam text-lm-800">
       <LmNav tone="dark" />
-      <LmCategoryHero title={heroTitle} tagline={tagline} image={heroImage} slug={slug} />
+      {/* News Studio opens straight on the toolbar + stories (broadsheet front
+          page, nothing to scroll past); category pages keep their big hero. */}
+      {slug !== 'general' ? (
+        <LmCategoryHero title={heroTitle} tagline={tagline} image={heroImage} slug={slug} />
+      ) : (
+        // Clear the fixed 70px nav — the hero used to carry this padding.
+        <div className="h-[70px] bg-black" aria-hidden="true" />
+      )}
       <LmCategoryBar
         active={slug}
         filter={filter}
         onFilter={setFilter}
         filters={slug === 'general' ? STUDIO_FILTERS : undefined}
       />
-      {slug === 'general' && topics.length > 0 && (
+      {slug === 'general' && visibleTopics.length > 0 && (
         <div className="pt-[32px] sm:pt-[48px]">
-          <LmTopicRail topics={topics} onOpen={setOpenTopic} />
+          <LmTopicRail topics={visibleTopics} onOpen={setOpenTopic} />
         </div>
       )}
       {/* General = the image-led News Studio front page; category pages keep

@@ -4,7 +4,7 @@ import { readTime } from '../../lib/readTime'
 import LmReader from './LmReader'
 import LmBreakingCarousel from './LmBreakingCarousel'
 import { FactChip } from './LmFactBadge'
-import { breakingScore, isBreaking, topicLabel } from '../../lib/content'
+import { breakingScore, isBreaking, topicLabel, istDayKey } from '../../lib/content'
 
 // Date-grouped article feed — Figma node 1:5453. Each date group: bold header
 // with hairline divider, then a two-column grid — left 895px (2 featured +
@@ -13,7 +13,9 @@ import { breakingScore, isBreaking, topicLabel } from '../../lib/content'
 const rb = { fontVariationSettings: '"wdth" 100' }
 const IST = 'Asia/Kolkata'
 
-export const dayKey = (iso) => new Date(iso).toLocaleDateString('en-IN', { timeZone: IST })
+// One IST day key for the whole site (content.js owns it) — re-exported here
+// because LmNewsStudio and this feed both group by it.
+export const dayKey = istDayKey
 const ordinal = (n) => {
   const s = ['th', 'st', 'nd', 'rd']
   const v = n % 100

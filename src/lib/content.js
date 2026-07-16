@@ -62,6 +62,13 @@ function stripArtifacts(s) {
     .trim()
 }
 
+// The newsroom runs on IST — every "which day is this story from" question on
+// the site (feed date headers, trending freshness) keys off this one helper so
+// they can never disagree. Returns a stable per-day key ('16/7/2026'); it is an
+// identity key, NOT sortable (en-IN renders dd/mm/yyyy) — order by timestamp.
+export const IST = 'Asia/Kolkata'
+export const istDayKey = (iso) => (iso ? new Date(iso).toLocaleDateString('en-IN', { timeZone: IST }) : '')
+
 // Reader-facing label for the scraper's internal feed topic. "India" reads as
 // "National" on the site; unknown topics fall back to their own name. Category
 // pages already name their bucket, so the tag applies to General articles only.
@@ -110,6 +117,10 @@ function normalize(row) {
     versions: row.versions || null,
     // Lead image scraped from the source feed / og:image (General only; often null).
     image: row.image_url || null,
+    // URLs of the OTHER outlets' copies of this same story, found semantically
+    // (title embeddings) by the fact-check corroborator. Powers the front page's
+    // same-story dedupe: if A lists B's url, they are one story.
+    relatedUrls: (row.fact_notes?.sources || []).map((s) => cleanUrl(s?.url)).filter(Boolean),
   }
 }
 
@@ -170,7 +181,7 @@ export async function fetchTrendingTopics() {
   try {
     const { data, error } = await supabase
       .from('topics')
-      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at,articles(source,image_url))')
+      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at,articles(source,image_url,reviewed_at,scraped_at))')
     if (error) throw error
     return (data || [])
       .map((t) => {
@@ -188,6 +199,13 @@ export async function fetchTrendingTopics() {
         const sourceSet = new Set(
           members.map((m) => (m.articles?.source || '').trim().toLowerCase()).filter(Boolean),
         )
+        // The topic's NEWEST story (same publishedAt recipe as normalize()) —
+        // what the card date shows, and what the freshness rule keys off.
+        const latestMs = Math.max(
+          0,
+          ...members.map((m) => new Date(m.articles?.reviewed_at || m.articles?.scraped_at || 0).getTime()),
+        )
+        const latestAt = latestMs > 0 ? new Date(latestMs).toISOString() : t.approved_at
         return {
           id: t.id,
           title: decodeEntities(t.title || ''),
@@ -195,6 +213,8 @@ export async function fetchTrendingTopics() {
           description: decodeEntities(t.description || ''),
           score: t.score ?? null,
           approvedAt: t.approved_at,
+          latestAt,
+          latestDayKey: istDayKey(latestAt),
           sourceCount: sourceSet.size,
           // First member that carries a scraped image — the rail card's visual.
           image: members.map((m) => m.articles?.image_url).find(Boolean) || null,
@@ -202,14 +222,30 @@ export async function fetchTrendingTopics() {
         }
       })
       .filter((t) => t.memberIds.length >= 3)
-      // Multi-source stories first; newest-first within the same source count.
+      // Multi-source stories first; freshest story wins within the same count.
       .sort((a, b) => {
         if (b.sourceCount !== a.sourceCount) return b.sourceCount - a.sourceCount
-        return new Date(b.approvedAt || 0) - new Date(a.approvedAt || 0)
+        return new Date(b.latestAt || 0) - new Date(a.latestAt || 0)
       })
   } catch {
     return []
   }
+}
+
+// A topic is only TRENDING while it is still getting coverage. Keep topics
+// whose newest story falls on the freshest IST day present in `items` (the
+// live feed) — NOT wall-clock "today", which would empty the rail every
+// morning until the ~08:40 IST cron lands the day's stories. When the feed
+// hasn't loaded yet, pass everything through rather than blanking the rail.
+export function freshTopics(topics, items) {
+  if (!topics?.length) return []
+  if (!items?.length) return topics
+  // Max by timestamp, then derive the day key — the en-IN key (dd/mm/yyyy) is
+  // an identity, not a sortable string.
+  const latestMs = Math.max(...items.map((a) => new Date(a.publishedAt || 0).getTime()))
+  if (!Number.isFinite(latestMs) || latestMs <= 0) return topics
+  const latestFeedDay = istDayKey(new Date(latestMs).toISOString())
+  return topics.filter((t) => t.latestDayKey === latestFeedDay)
 }
 
 // Long-form topic FEATURES (the daily case study per topic) — the long

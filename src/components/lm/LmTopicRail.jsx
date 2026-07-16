@@ -9,9 +9,9 @@ import { motion } from 'framer-motion'
 const rb = { fontVariationSettings: '"wdth" 100' }
 
 function latestDate(topic) {
-  // memberIds carry no timestamps; fall back to the topic's approved_at so the
-  // meta line still reads a real "latest" moment.
-  const iso = topic?.approvedAt
+  // The topic's NEWEST story (computed in fetchTrendingTopics from member
+  // timestamps) — never the approval date, which lags running stories by days.
+  const iso = topic?.latestAt || topic?.approvedAt
   if (!iso) return ''
   return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }

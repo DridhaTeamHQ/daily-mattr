@@ -25,11 +25,17 @@ const serif = { fontFamily: "Georgia, 'Times New Roman', serif" }
 const hideOnError = (e) => { e.currentTarget.style.display = 'none' }
 
 // ---- Same-story dedupe ----
-// Different outlets file the same story under near-identical headlines ("US" vs
-// "U.S."), and URL-level dedupe can't catch that. Collapse stories whose
-// headline token sets overlap heavily, keeping the better-corroborated one
-// (higher source count, then fact score). Distinct angles on a story (lower
-// overlap) still show.
+// Different outlets file the same story under DIFFERENT headlines ("Cabinet
+// approves Rs 25,000 cr Ganga, Varuna corridors" vs "Varanasi to get two
+// elevated highway corridors…"), so headline comparison alone can't catch them.
+// The pipeline already links these semantically: the fact-check corroborator
+// matches title embeddings and records each sibling's URL in
+// fact_notes.sources[] (surfaced as item.relatedUrls). Two stories where either
+// lists the other's URL ARE the same story. Headline-token overlap stays only
+// as a fallback for near-identical twins ("US" vs "U.S.") on rows whose source
+// list is missing. The better-corroborated copy survives (more sources, then
+// higher fact score); comparison is against already-kept stories only — no
+// transitive chain-merging of loosely related coverage.
 const STOP = new Set(['the', 'a', 'an', 'and', 'or', 'for', 'to', 'of', 'in', 'on', 'at', 'by', 'with', 'from', 'as', 'is', 'are', 'was', 'were', 'has', 'have', 'had', 'his', 'her', 'their', 'any', 'after', 'over', 'into', 'says', 'said', 'new'])
 function titleTokens(headline) {
   const out = new Set()
@@ -38,12 +44,17 @@ function titleTokens(headline) {
   }
   return out
 }
-function sameStory(aTokens, bTokens) {
+function similarTitles(aTokens, bTokens) {
   if (aTokens.size === 0 || bTokens.size === 0) return false
   let inter = 0
   for (const t of aTokens) if (bTokens.has(t)) inter++
   const jaccard = inter / (aTokens.size + bTokens.size - inter)
   return jaccard >= 0.5 || inter >= 7
+}
+function sameStory(a, b) {
+  if (a.url && b.item.relatedUrls?.includes(a.url)) return true
+  if (b.url && a.item.relatedUrls?.includes(b.url)) return true
+  return similarTitles(a.tokens, b.tokens)
 }
 function corroboration(it) {
   return (it.factNotes?.source_count ?? 1) * 1000 + (it.factScore ?? 0)
@@ -54,9 +65,9 @@ function dedupeStories(items) {
   const kept = new Set()
   const picked = []
   for (const it of ranked) {
-    const tokens = titleTokens(it.headline)
-    if (picked.some((p) => sameStory(tokens, p.tokens))) continue
-    picked.push({ id: it.id, tokens })
+    const entry = { item: it, url: it.sourceUrl || '', tokens: titleTokens(it.headline) }
+    if (picked.some((p) => sameStory(entry, p))) continue
+    picked.push(entry)
     kept.add(it.id)
   }
   return items.filter((it) => kept.has(it.id))
