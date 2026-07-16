@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import LmReader from './LmReader'
-import LmBreakingCarousel from './LmBreakingCarousel'
 import { FactChip } from './LmFactBadge'
 import { breakingScore, isBreaking, topicLabel } from '../../lib/content'
 import {
@@ -99,6 +98,97 @@ function Meta({ item }) {
   )
 }
 
+// Broadcast lower-third ticker — a thin dark strip hugging the glass toolbar.
+// The day's hottest headlines scroll continuously (CSS marquee: the row is
+// rendered twice and translated -50%, so the loop is seamless); hover pauses,
+// clicking a headline opens the reader on that story.
+function LmBreakingTicker({ items = [], onOpen }) {
+  if (!items.length) return null
+  const row = (keyPrefix) => (
+    <div className="flex shrink-0 items-center">
+      {items.map((it) => (
+        <button
+          key={`${keyPrefix}-${it.id}`}
+          type="button"
+          onClick={() => onOpen?.(it)}
+          className="flex shrink-0 items-center gap-[10px] px-[22px] font-roboto text-[13px] font-medium text-white/90 transition-colors hover:text-white hover:underline"
+          style={rb}
+        >
+          <span className="size-[4px] shrink-0 rounded-full bg-[#E33B3B]" aria-hidden="true" />
+          <span className="whitespace-nowrap">{it.headline}</span>
+        </button>
+      ))}
+    </div>
+  )
+  return (
+    <div className="relative flex h-[38px] items-stretch overflow-hidden bg-[#0F0F11]">
+      <style>{'@keyframes lm-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}'}</style>
+      {/* Fixed BREAKING tab on the left */}
+      <span className="z-[1] flex shrink-0 items-center gap-[7px] bg-[#E33B3B] px-[14px] font-roboto text-[11px] font-bold uppercase tracking-[0.09em] text-white" style={rb}>
+        <motion.span
+          className="size-[6px] rounded-full bg-white"
+          animate={{ opacity: [1, 0.15, 1] }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        Breaking
+      </span>
+      {/* Marquee: pause on hover via CSS */}
+      <div className="group flex flex-1 items-center overflow-hidden">
+        <div
+          className="flex w-max items-center group-hover:[animation-play-state:paused]"
+          style={{ animation: `lm-ticker ${Math.max(24, items.length * 9)}s linear infinite` }}
+        >
+          {row('a')}
+          {row('b')}
+        </div>
+      </div>
+      {/* Right edge fade so headlines slide out cleanly */}
+      <span className="pointer-events-none absolute inset-y-0 right-0 w-[48px] bg-gradient-to-l from-[#0F0F11] to-transparent" aria-hidden="true" />
+    </div>
+  )
+}
+
+// Shimmer placeholder shaped like the front page (kicker + hero band + card
+// row), so first paint doesn't jump when the feed lands.
+function StudioSkeleton() {
+  const block = 'animate-pulse bg-lm-100'
+  return (
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-[32px] sm:px-8 sm:py-[48px] lg:px-[32px]" aria-hidden="true">
+      <div className={`h-[12px] w-[110px] ${block}`} />
+      <div className="mt-[20px] grid gap-[28px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)_minmax(0,1fr)]">
+        <div className="order-2 flex flex-col gap-[20px] lg:order-1">
+          <div className={`aspect-video w-full ${block}`} />
+          <div className={`h-[20px] w-4/5 ${block}`} />
+          <div className={`h-[64px] w-full ${block}`} />
+        </div>
+        <div className="order-1 flex flex-col gap-[14px] lg:order-2 lg:px-[28px]">
+          <div className={`aspect-video w-full ${block}`} />
+          <div className={`h-[30px] w-11/12 ${block}`} />
+          <div className={`h-[30px] w-3/5 ${block}`} />
+          <div className={`h-[44px] w-full ${block}`} />
+        </div>
+        <div className="order-3 flex flex-col gap-[16px]">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex flex-col gap-[8px]">
+              <div className={`h-[16px] w-full ${block}`} />
+              <div className={`h-[12px] w-2/3 ${block}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-[44px] grid gap-[24px] sm:grid-cols-2 lg:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col gap-[10px]">
+            <div className={`aspect-video w-full ${block}`} />
+            <div className={`h-[18px] w-5/6 ${block}`} />
+            <div className={`h-[40px] w-full ${block}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // Uppercase section kicker under a full-width dark rule — the broadsheet
 // section divider ("TOP STORIES", "TODAY, 16TH JULY").
 function Kicker({ children, light = false }) {
@@ -131,9 +221,28 @@ function LeadStory({ item, onOpen }) {
   )
 }
 
-// Secondary story — BBC mobile row (thumbnail left, headline + meta right);
-// stacks into an image-top column from the sm breakpoint up.
-function SideStory({ item, onOpen }) {
+// Secondary story — size-stepped so the left column reads 2nd-then-3rd, not as
+// two equals (BBC's hierarchy). `prominent` = image-top with a big headline and
+// standfirst; otherwise a compact thumbnail row at every width. Mobile always
+// collapses to the thumbnail row.
+function SideStory({ item, onOpen, prominent = false }) {
+  if (!prominent) {
+    return (
+      <button type="button" onClick={onOpen} className="group flex w-full gap-[12px] text-left">
+        {item.image && (
+          <div className="h-[76px] w-[114px] shrink-0 overflow-hidden bg-lm-100">
+            <img src={item.image} alt="" loading="lazy" onError={hideOnError} className="size-full object-cover" />
+          </div>
+        )}
+        <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
+          <h3 className="line-clamp-3 text-[16px] font-bold leading-[1.24] text-black group-hover:underline sm:text-[17px]" style={serif}>
+            {item.headline}
+          </h3>
+          <Meta item={item} />
+        </div>
+      </button>
+    )
+  }
   return (
     <button type="button" onClick={onOpen} className="group flex w-full gap-[12px] text-left sm:flex-col sm:gap-[10px]">
       {item.image && (
@@ -142,7 +251,7 @@ function SideStory({ item, onOpen }) {
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-[8px] sm:gap-[10px]">
-        <h3 className="text-[18px] font-bold leading-[1.22] text-black group-hover:underline sm:text-[21px]" style={serif}>
+        <h3 className="text-[19px] font-bold leading-[1.2] text-black group-hover:underline sm:text-[24px]" style={serif}>
           {item.headline}
         </h3>
         <p className="hidden font-roboto text-[13px] leading-[20px] text-lm-500 sm:line-clamp-2" style={rb}>
@@ -244,7 +353,12 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
     return { lead, side, rail, rest }
   }, [items])
 
-  // Date groups for everything below the band.
+  // Date groups for everything below the band. Within each day, SECTION FRONTS
+  // are derived automatically from the stories actually present: any topic with
+  // 4+ stories that day earns its own band (kicker + its hottest 4), capped at
+  // 3 bands so the page keeps rhythm; everything else flows into the day's
+  // masonry. Entirely data-driven — when a story wave ends (the World Cup
+  // wraps), its section simply stops qualifying and disappears.
   const groups = useMemo(() => {
     const byDay = new Map()
     for (const it of rest) {
@@ -255,7 +369,30 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
     }
     return [...byDay.entries()]
       .sort((a, b) => new Date(b[1][0].publishedAt) - new Date(a[1][0].publishedAt))
-      .map(([k, arr]) => ({ key: k, items: arr, ...headerLabel(arr[0].publishedAt) }))
+      .map(([k, arr]) => {
+        const byTopic = new Map()
+        for (const it of arr) {
+          const label = topicLabel(it)
+          if (!label) continue
+          if (!byTopic.has(label)) byTopic.set(label, [])
+          byTopic.get(label).push(it)
+        }
+        const sections = [...byTopic.entries()]
+          .filter(([, list]) => list.length >= 4)
+          .sort((a, b) => b[1].length - a[1].length)
+          .slice(0, 3)
+          .map(([label, list]) => ({
+            label,
+            items: [...list].sort((a, b) => breakingScore(b) - breakingScore(a)).slice(0, 4),
+          }))
+        const sectioned = new Set(sections.flatMap((s) => s.items.map((it) => it.id)))
+        return {
+          key: k,
+          sections,
+          items: arr.filter((it) => !sectioned.has(it.id)),
+          ...headerLabel(arr[0].publishedAt),
+        }
+      })
   }, [rest])
 
   const [visible, setVisible] = useState(2)
@@ -263,20 +400,18 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
   const hasMore = groups.length > visible
 
   if (loading && items.length === 0) {
-    return <div className="px-[32px] py-[80px] text-center font-roboto text-[18px] text-lm-500" style={rb}>Loading stories…</div>
+    return <StudioSkeleton />
   }
   if (!loading && items.length === 0) {
     return <div className="px-[32px] py-[80px] text-center font-roboto text-[18px] text-lm-500" style={rb}>{emptyLabel}</div>
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[44px] px-4 py-[32px] sm:px-8 sm:py-[48px] lg:px-[32px]">
-      {breaking.length > 0 && (
-        <div className="-mb-[16px]">
-          <LmBreakingCarousel items={breaking} onOpen={openItem} />
-        </div>
-      )}
+    <>
+      {/* Broadcast ticker hugs the glass toolbar above (full-bleed) */}
+      <LmBreakingTicker items={breaking} onOpen={openItem} />
 
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[44px] px-4 py-[32px] sm:px-8 sm:py-[48px] lg:px-[32px]">
       {/* ---- Top-stories band: [side pair | image lead | headline rail] ---- */}
       {lead && (
         <motion.section
@@ -290,9 +425,10 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
             <div className="order-1 lg:order-2 lg:border-x lg:border-lm-200 lg:px-[28px]">
               <LeadStory item={lead} onOpen={() => openItem(lead)} />
             </div>
+            {/* Size-stepped left column: 2nd story big, 3rd compact */}
             <div className="order-2 flex flex-col gap-[20px] divide-y divide-lm-200 lg:order-1 [&>*+*]:pt-[20px]">
-              {side.map((it) => (
-                <SideStory key={it.id} item={it} onOpen={() => openItem(it)} />
+              {side.map((it, i) => (
+                <SideStory key={it.id} item={it} prominent={i === 0} onOpen={() => openItem(it)} />
               ))}
             </div>
             <div className="order-3 flex flex-col divide-y divide-lm-200">
@@ -304,7 +440,9 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
         </motion.section>
       )}
 
-      {/* ---- The rest of the feed: date sections of flat masonry cards ---- */}
+      {/* ---- The rest of the feed: per-day SECTION FRONTS (auto-derived from
+           the day's topics — a section exists only while its story wave does)
+           followed by the day's masonry ---- */}
       {shown.map((g) => (
         <motion.section
           key={g.key}
@@ -314,6 +452,31 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <Kicker light={!g.today}>{g.label}</Kicker>
+
+          {g.sections.map((sec) => (
+            <div key={sec.label} className="mb-[36px]">
+              <div className="mb-[16px] flex items-center gap-[12px]">
+                <h3 className="font-roboto text-[12px] font-bold uppercase tracking-[0.12em] text-[#3979FF]" style={rb}>
+                  {sec.label}
+                </h3>
+                <div className="h-px flex-1 bg-lm-200" />
+              </div>
+              <div className="grid gap-[20px] sm:grid-cols-2 lg:grid-cols-4">
+                {sec.items.map((it) => (
+                  <StudioCard key={it.id} item={it} onOpen={() => openItem(it)} />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {g.sections.length > 0 && g.items.length > 0 && (
+            <div className="mb-[16px] flex items-center gap-[12px]">
+              <h3 className="font-roboto text-[12px] font-bold uppercase tracking-[0.12em] text-lm-500" style={rb}>
+                Also in news
+              </h3>
+              <div className="h-px flex-1 bg-lm-200" />
+            </div>
+          )}
           {/* Masonry via CSS columns with broadsheet column rules: an expanded
               card (open reading lens) only pushes down its OWN column. */}
           <div className="columns-1 gap-[32px] sm:columns-2 lg:columns-3 [column-rule:1px_solid_#E4E4E7]">
@@ -350,6 +513,7 @@ export default function LmNewsStudio({ items: rawItems = [], loading = false, em
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
