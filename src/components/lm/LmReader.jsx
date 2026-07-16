@@ -215,6 +215,18 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
             {/* Editorial rule between the headline block and the body */}
             <div className="mt-[20px] h-[3px] w-[56px] bg-black" />
 
+            {/* Lead image (General stories scraped with one) — hides itself on a
+                broken hotlink so the reader never shows a broken-image icon */}
+            {item.image && (
+              <img
+                src={item.image}
+                alt=""
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none' }}
+                className="mt-[24px] max-h-[420px] w-full rounded-[16px] bg-lm-100 object-cover"
+              />
+            )}
+
             {/* Reading-mode switcher — only when alternate versions exist */}
             {MODES.length > 1 && (
               <div className="mt-[24px]">

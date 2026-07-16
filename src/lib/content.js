@@ -108,6 +108,8 @@ function normalize(row) {
     // Alternate reader versions generated at approval:
     // { eli5, tldr[], deep_dive, key_numbers[] }
     versions: row.versions || null,
+    // Lead image scraped from the source feed / og:image (General only; often null).
+    image: row.image_url || null,
   }
 }
 
@@ -120,7 +122,7 @@ const SELECT_BASE =
   'id,title,edited_title,summary,edited_summary,source,url,topic,category,section,prominence,status,reviewed_at,scraped_at,created_at'
 // Fact check + alternate versions arrived later; fall back to the base list if
 // the DB migration hasn't been applied yet so the feed never breaks on deploy order.
-const SELECT = `${SELECT_BASE},fact_score,fact_label,fact_notes,versions`
+const SELECT = `${SELECT_BASE},fact_score,fact_label,fact_notes,versions,image_url`
 
 const missingColumn = (error) => error && /column|does not exist/i.test(error.message || '')
 
@@ -168,7 +170,7 @@ export async function fetchTrendingTopics() {
   try {
     const { data, error } = await supabase
       .from('topics')
-      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at,articles(source))')
+      .select('id,title,slug,description,score,approved_at,created_at,topic_articles(article_id,position,added_at,articles(source,image_url))')
     if (error) throw error
     return (data || [])
       .map((t) => {
@@ -194,6 +196,8 @@ export async function fetchTrendingTopics() {
           score: t.score ?? null,
           approvedAt: t.approved_at,
           sourceCount: sourceSet.size,
+          // First member that carries a scraped image — the rail card's visual.
+          image: members.map((m) => m.articles?.image_url).find(Boolean) || null,
           memberIds: members.map((m) => m.article_id),
         }
       })
@@ -269,7 +273,7 @@ export function isBreaking(item) {
 
 // Pretty label for a category slug (for chips/sections on the home page).
 export const SLUG_LABEL = {
-  general: 'General',
+  general: 'News Studio',
   'real-estate': 'Real Estate',
   'automobile': 'Automobile',
   'health-wellness': 'Health & Wellness',

@@ -2,7 +2,7 @@
 // These MUST stay in sync with the email agent's _shared/news-categories.ts.
 
 export const SUBSCRIBE_CATEGORIES = [
-  { slug: 'general', label: 'General' },
+  { slug: 'general', label: 'News Studio' },
   { slug: 'real-estate', label: 'Real Estate' },
   { slug: 'automobile', label: 'Automobile' },
   { slug: 'health-wellness', label: 'Health & Wellness' },

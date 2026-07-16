@@ -4,6 +4,7 @@ import LmNav from '../components/lm/LmNav'
 import LmCategoryHero from '../components/lm/LmCategoryHero'
 import LmCategoryBar from '../components/lm/LmCategoryBar'
 import LmArticleFeed from '../components/lm/LmArticleFeed'
+import LmNewsStudio from '../components/lm/LmNewsStudio'
 import LmTopicRail from '../components/lm/LmTopicRail'
 import LmTopicTimeline from '../components/lm/LmTopicTimeline'
 import LmFaq from '../components/lm/LmFaq'
@@ -62,11 +63,26 @@ export default function CategoryNewsPage() {
     return () => { alive = false }
   }, [slug])
 
-  // All / Long reads / Briefs / Fact checked — long = features & case studies;
-  // fact = every AI-fact-scored story, best-verified first (the transparency view).
+  // Filter pills. News Studio filters by SECTION (the scraper's feed topic —
+  // National / International / Politics / …); category pages keep the
+  // content-kind pills (All / Long reads / Briefs / Fact checked).
+  const STUDIO_FILTERS = [
+    ['all', 'All'],
+    ['India', 'National'],
+    ['World', 'International'],
+    ['Politics', 'Politics'],
+    ['Business', 'Business'],
+    ['Sports', 'Sports'],
+    ['Technology', 'Tech'],
+    ['Science', 'Science'],
+    ['Explained', 'Explained'],
+  ]
   const [filter, setFilter] = useState('all')
+  useEffect(() => { setFilter('all') }, [slug])
   const filtered = useMemo(() => {
     const list = items || []
+    if (filter === 'all') return list
+    if (slug === 'general') return list.filter((a) => a.topic === filter)
     if (filter === 'long') return list.filter((a) => a.kind === 'feature' || a.kind === 'case_study')
     if (filter === 'short') return list.filter((a) => a.kind === 'article')
     if (filter === 'fact') {
@@ -76,12 +92,12 @@ export default function CategoryNewsPage() {
         .sort((a, b) => b.factScore - a.factScore)
     }
     return list
-  }, [items, filter])
+  }, [items, filter, slug])
 
   // Unknown category → 404 (the /:category route matches any single segment).
   if (!cat && slug !== 'general') return <NotFoundPage />
 
-  const heroTitle = cat?.hero || cat?.title || (slug === 'general' ? 'General' : slug)
+  const heroTitle = cat?.hero || cat?.title || (slug === 'general' ? 'News Studio' : slug)
   const tagline = cat?.desc || 'The stories worth knowing — curated, summarized, and grouped by day.'
   const heroImage = cat?.poster || cat?.image || '/figma/hero-tech-ai-bg.png'
 
@@ -89,26 +105,44 @@ export default function CategoryNewsPage() {
     <div className="min-h-screen bg-white font-bevietnam text-lm-800">
       <LmNav tone="dark" />
       <LmCategoryHero title={heroTitle} tagline={tagline} image={heroImage} slug={slug} />
-      <LmCategoryBar active={slug} filter={filter} onFilter={setFilter} />
+      <LmCategoryBar
+        active={slug}
+        filter={filter}
+        onFilter={setFilter}
+        filters={slug === 'general' ? STUDIO_FILTERS : undefined}
+      />
       {slug === 'general' && topics.length > 0 && (
         <div className="pt-[32px] sm:pt-[48px]">
           <LmTopicRail topics={topics} onOpen={setOpenTopic} />
         </div>
       )}
-      <LmArticleFeed
-        items={filtered}
-        loading={loading}
-        fullStories={slug === 'general'}
-        emptyLabel={
-          filter === 'long'
-            ? 'No long reads here yet — switch to Briefs or check back soon.'
-            : filter === 'short'
-              ? 'No briefs here yet — switch to Long reads or check back soon.'
-              : filter === 'fact'
-                ? 'No fact-scored stories here yet — new approvals are scored automatically.'
-                : 'No stories here yet — check back soon.'
-        }
-      />
+      {/* General = the image-led News Studio front page; category pages keep
+          the original date-grouped brief feed. */}
+      {slug === 'general' ? (
+        <LmNewsStudio
+          items={filtered}
+          loading={loading}
+          emptyLabel={
+            filter === 'all'
+              ? 'No stories here yet — check back soon.'
+              : 'No stories in this section right now — check back soon.'
+          }
+        />
+      ) : (
+        <LmArticleFeed
+          items={filtered}
+          loading={loading}
+          emptyLabel={
+            filter === 'long'
+              ? 'No long reads here yet — switch to Briefs or check back soon.'
+              : filter === 'short'
+                ? 'No briefs here yet — switch to Long reads or check back soon.'
+                : filter === 'fact'
+                  ? 'No fact-scored stories here yet — new approvals are scored automatically.'
+                  : 'No stories here yet — check back soon.'
+          }
+        />
+      )}
       <LmFaq />
       <LmFooter />
       {openTopic && (

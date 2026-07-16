@@ -4,10 +4,11 @@
 // newsletter_categories row used for signed-in subscriptions.
 export const LM_CATEGORIES = [
   {
+    // Renamed from "General" 2026-07 — slug/route stay /general so links hold.
     slug: 'general',
     tile: '/figma/menu/international.png',
-    title: 'General',
-    hero: 'General',
+    title: 'News Studio',
+    hero: 'News Studio',
     desc: "The day's biggest stories across India, world, business, sports and tech — in ten sharp reads.",
     bg: '#FFF2EB',
     image: '/figma/category-international.png',

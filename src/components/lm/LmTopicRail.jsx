@@ -16,10 +16,12 @@ function latestDate(topic) {
   return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+// Full-bleed poster card: the topic's image fills the card, a dark gradient
+// keeps the overlaid white text readable, and imageless topics fall back to a
+// solid dark card with the same layout.
 function TopicCard({ topic, onOpen }) {
   const count = topic?.memberIds?.length || 0
   const when = latestDate(topic)
-  const dots = Math.min(count, 6)
   return (
     <motion.button
       key={topic.id}
@@ -28,41 +30,41 @@ function TopicCard({ topic, onOpen }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative flex w-[258px] shrink-0 snap-start flex-col gap-[16px] overflow-hidden rounded-[18px] border border-[rgba(28,28,30,0.1)] bg-white p-[18px] text-left transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-lm-800 hover:shadow-[0px_16px_40px_rgba(0,0,0,0.10)] sm:w-[296px]"
+      className="group relative flex h-[240px] w-[258px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[18px] bg-[#141417] p-[16px] text-left transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0px_16px_40px_rgba(0,0,0,0.22)] sm:h-[260px] sm:w-[296px]"
       title={topic.title}
     >
-      {/* accent bar that draws in from the left on hover */}
-      <span className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-lm-800 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
-      <div className="flex items-center justify-between">
+      {/* Full-bleed image + readability gradient (hides itself on a broken link) */}
+      {topic.image && (
+        <img
+          src={topic.image}
+          alt=""
+          loading="lazy"
+          onError={(e) => { e.currentTarget.style.display = 'none' }}
+          className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+        />
+      )}
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" aria-hidden="true" />
+
+      <div className="relative z-[1] flex items-center justify-between">
         <span
-          className="inline-flex items-center gap-[6px] rounded-full bg-lm-800 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white"
+          className="inline-flex items-center gap-[6px] rounded-full bg-white/95 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-lm-800"
           style={rb}
         >
           <span className="size-[5px] animate-pulse rounded-full bg-[#E33B3B]" />
           Trending
         </span>
-        <span className="font-roboto text-[16px] leading-none text-lm-300 transition-all duration-300 group-hover:translate-x-[3px] group-hover:text-lm-800">↗</span>
+        <span className="font-roboto text-[16px] leading-none text-white/70 transition-all duration-300 group-hover:translate-x-[3px] group-hover:text-white">↗</span>
       </div>
-      <h3 className="line-clamp-3 font-roboto text-[19px] font-bold leading-[1.28] text-black sm:text-[21px]" style={rb}>
-        {topic.title}
-      </h3>
-      <div className="mt-auto flex flex-col gap-[10px]">
-        {/* a little timeline: one dot per story, filling in on hover */}
-        <div className="flex items-center gap-[5px]">
-          {Array.from({ length: dots }).map((_, i) => (
-            <span
-              key={i}
-              className="size-[5px] rounded-full bg-lm-200 transition-colors duration-300 group-hover:bg-lm-800"
-              style={{ transitionDelay: `${i * 45}ms` }}
-            />
-          ))}
-          {count > dots && <span className="font-roboto text-[11px] font-medium text-lm-400" style={rb}>+{count - dots}</span>}
-        </div>
+
+      <div className="relative z-[1] flex flex-col gap-[8px]">
+        <h3 className="line-clamp-3 font-roboto text-[19px] font-bold leading-[1.26] text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.45)] sm:text-[21px]" style={rb}>
+          {topic.title}
+        </h3>
         <div className="flex items-center justify-between">
-          <span className="font-roboto text-[11px] font-semibold uppercase tracking-[0.06em] text-lm-400" style={rb}>
+          <span className="font-roboto text-[11px] font-semibold uppercase tracking-[0.06em] text-white/75" style={rb}>
             {count} {count === 1 ? 'story' : 'stories'}{when ? ` · ${when}` : ''}
           </span>
-          <span className="font-roboto text-[12px] font-semibold text-lm-400 transition-colors duration-200 group-hover:text-lm-800" style={rb}>
+          <span className="font-roboto text-[12px] font-semibold text-white/75 transition-colors duration-200 group-hover:text-white group-hover:underline" style={rb}>
             View&nbsp;timeline
           </span>
         </div>

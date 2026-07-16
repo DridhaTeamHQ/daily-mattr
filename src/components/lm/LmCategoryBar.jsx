@@ -2,7 +2,8 @@ import React from 'react'
 
 // Sticky reading toolbar — sits under the fixed nav on category pages.
 // Category chips removed as per user request (since category can be selected from header nav).
-// The All / Long reads / Briefs filter is shifted to the left side.
+// Default pills are the content-kind filters; pages can pass their own set via
+// `filters` (News Studio uses topic sections: National / International / …).
 const FILTERS = [
   ['all', 'All'],
   ['long', 'Long reads'],
@@ -10,7 +11,7 @@ const FILTERS = [
   ['fact', 'Fact checked'],
 ]
 
-export default function LmCategoryBar({ active, filter = 'all', onFilter, showFilter = true }) {
+export default function LmCategoryBar({ active, filter = 'all', onFilter, showFilter = true, filters = FILTERS }) {
   if (!showFilter) return null
 
   return (
@@ -19,7 +20,7 @@ export default function LmCategoryBar({ active, filter = 'all', onFilter, showFi
       <div className="mx-auto flex w-full max-w-[1440px] items-center justify-start overflow-x-auto px-4 py-[12px] [scrollbar-width:none] sm:py-[14px] sm:px-8 lg:px-[32px] [&::-webkit-scrollbar]:hidden">
         {/* Long / short filter moved to the left side with larger size */}
         <div className="flex shrink-0 items-center gap-[4px] rounded-[100px] border border-lm-200 bg-lm-50 p-[4px] shadow-sm sm:gap-[6px] sm:p-[5px]">
-          {FILTERS.map(([id, label]) => (
+          {filters.map(([id, label]) => (
             <button
               key={id}
               type="button"

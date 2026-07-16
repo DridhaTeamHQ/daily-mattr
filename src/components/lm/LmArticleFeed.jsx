@@ -13,13 +13,13 @@ import { breakingScore, isBreaking, topicLabel } from '../../lib/content'
 const rb = { fontVariationSettings: '"wdth" 100' }
 const IST = 'Asia/Kolkata'
 
-const dayKey = (iso) => new Date(iso).toLocaleDateString('en-IN', { timeZone: IST })
+export const dayKey = (iso) => new Date(iso).toLocaleDateString('en-IN', { timeZone: IST })
 const ordinal = (n) => {
   const s = ['th', 'st', 'nd', 'rd']
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
-function headerLabel(iso) {
+export function headerLabel(iso) {
   const d = new Date(iso)
   const today = dayKey(new Date().toISOString()) === dayKey(iso)
   const day = Number(d.toLocaleDateString('en-IN', { timeZone: IST, day: 'numeric' }))
@@ -33,7 +33,7 @@ function favicon(url) {
   try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32` } catch { return '' }
 }
 
-function SourceRow({ item }) {
+export function SourceRow({ item }) {
   const ico = favicon(item.sourceUrl)
   return (
     <div className="flex items-center gap-[8px]">
@@ -52,7 +52,7 @@ function SourceRow({ item }) {
   )
 }
 
-function TopicChip({ item }) {
+export function TopicChip({ item }) {
   const label = topicLabel(item)
   if (!label) return null
   return (
@@ -66,7 +66,7 @@ function TopicChip({ item }) {
 // leads, then a monochrome outline for "min read", a confident solid-black pill
 // for long reads, and the fact chip (its band colour is the only colour in the
 // row). Uppercase micro-labels, letter-spaced.
-function Tags({ item }) {
+export function Tags({ item }) {
   const mins = readTime(item.headline, item.body)
   const long = item.kind === 'case_study' || item.kind === 'feature'
   return (
@@ -85,7 +85,7 @@ function Tags({ item }) {
   )
 }
 
-function Excerpt({ item, size = 'lg', onOpen, full = false }) {
+export function Excerpt({ item, size = 'lg', onOpen, full = false }) {
   const text = item.body || item.summary || ''
   const cls = size === 'lg' ? 'text-[18px] leading-[30px]' : 'text-[16px] leading-[25px]'
   const limit = size === 'lg' ? 260 : 150
@@ -125,7 +125,7 @@ const LENSES = [
   ['deep_dive', 'Deep dive'],
 ]
 
-function availableLenses(item) {
+export function availableLenses(item) {
   const v = item?.versions || {}
   return LENSES.filter(([id]) =>
     id === 'tldr' || id === 'key_numbers'
@@ -173,7 +173,7 @@ function ParticleBurst() {
   )
 }
 
-function LensPills({ lenses, active, onPick, compact = false }) {
+export function LensPills({ lenses, active, onPick, compact = false }) {
   // Bumps on every activation so the burst re-fires even on the same pill.
   const [burst, setBurst] = useState(null)
   return (
@@ -246,7 +246,7 @@ function LensBody({ item, lens, size = 'lg' }) {
 }
 
 // Shared swap wrapper — same box for original + every lens, smooth height glide.
-function ContentSwap({ item, lens, size, minH, children }) {
+export function ContentSwap({ item, lens, size, minH, children }) {
   return (
     <motion.div layout transition={{ layout: swapTransition }} className="relative" style={{ minHeight: minH }}>
       <motion.div
