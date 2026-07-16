@@ -122,6 +122,7 @@ export default function CategoryNewsPage() {
         filter={filter}
         onFilter={setFilter}
         filters={slug === 'general' ? STUDIO_FILTERS : undefined}
+        title={slug === 'general' ? 'News Studio' : undefined}
       />
       {slug === 'general' && visibleTopics.length > 0 && (
         <div className="pt-[32px] sm:pt-[48px]">
