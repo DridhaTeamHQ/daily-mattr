@@ -201,11 +201,21 @@ export async function fetchTrendingTopics() {
         )
         // The topic's NEWEST story (same publishedAt recipe as normalize()) —
         // what the card date shows, and what the freshness rule keys off.
-        const latestMs = Math.max(
-          0,
-          ...members.map((m) => new Date(m.articles?.reviewed_at || m.articles?.scraped_at || 0).getTime()),
-        )
+        const memberTimes = members.map((m) => new Date(m.articles?.reviewed_at || m.articles?.scraped_at || 0).getTime())
+        const latestMs = Math.max(0, ...memberTimes)
         const latestAt = latestMs > 0 ? new Date(latestMs).toISOString() : t.approved_at
+        // TREND SCORE, computed live at view time (the DB score goes stale — it
+        // was set when the cluster formed). Velocity = every story decayed by an
+        // 18h half-life-ish exponential, so a topic gathering coverage RIGHT NOW
+        // outruns a big-but-cooling one; breadth = distinct outlets, worth 2
+        // stories each. Rail order = this, descending.
+        const now = Date.now()
+        const velocity = memberTimes.reduce((sum, ms) => {
+          if (!ms) return sum
+          const ageHours = Math.max(0, (now - ms) / 3_600_000)
+          return sum + Math.exp(-ageHours / 18)
+        }, 0)
+        const trendScore = velocity + sourceSet.size * 2
         return {
           id: t.id,
           title: decodeEntities(t.title || ''),
@@ -216,15 +226,17 @@ export async function fetchTrendingTopics() {
           latestAt,
           latestDayKey: istDayKey(latestAt),
           sourceCount: sourceSet.size,
+          trendScore,
           // First member that carries a scraped image — the rail card's visual.
           image: members.map((m) => m.articles?.image_url).find(Boolean) || null,
           memberIds: members.map((m) => m.article_id),
         }
       })
       .filter((t) => t.memberIds.length >= 3)
-      // Multi-source stories first; freshest story wins within the same count.
+      // MOST trending first: live velocity + outlet breadth (see trendScore
+      // above). Freshest story breaks exact ties.
       .sort((a, b) => {
-        if (b.sourceCount !== a.sourceCount) return b.sourceCount - a.sourceCount
+        if (b.trendScore !== a.trendScore) return b.trendScore - a.trendScore
         return new Date(b.latestAt || 0) - new Date(a.latestAt || 0)
       })
   } catch {
