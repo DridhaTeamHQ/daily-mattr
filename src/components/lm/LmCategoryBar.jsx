@@ -18,27 +18,36 @@ const FILTERS = [
 
 const serif = { fontFamily: "Georgia, 'Times New Roman', serif" }
 
-// Morphing search (adapted from a Uiverse concept by fanishah, rebuilt on
-// framer-motion in the LONG MATTR glass language): idle, the input shrinks into
-// the LENS of a magnifier (thick dark inset ring) and the button is the rotated
-// HANDLE. Focused — or while holding text — the lens unfolds into a glass input
-// and the handle unrolls into a #3979FF gradient pill with a magnifier glyph.
-const searchSpring = { type: 'spring', stiffness: 420, damping: 34 }
+// Expanding search — a frosted glass circle holding a magnifier that springs
+// open into a full glass pill capsule (same frosted material and radius as the
+// filter capsule beside it; the focus ring and clear dot pick up the pill
+// blue). Stays open while it holds text; Escape or × clears and collapses.
+const searchSpring = { type: 'spring', stiffness: 420, damping: 36 }
 
 function LmSearch({ value = '', onSearch }) {
   const [focused, setFocused] = React.useState(false)
   const inputRef = React.useRef(null)
   const open = focused || value.trim().length > 0
   return (
-    <form
-      className={`ml-auto flex shrink-0 items-center ${open ? '' : 'cursor-pointer'}`}
+    <motion.div
       role="search"
-      onSubmit={(e) => e.preventDefault()}
-      // The idle magnifier is visually tiny (scaled-down lens + handle), so the
-      // WHOLE form area acts as its hit target.
-      onClick={() => { if (!open) inputRef.current?.focus() }}
+      initial={false}
+      animate={{ width: open ? 250 : 41 }}
+      transition={searchSpring}
+      onClick={() => inputRef.current?.focus()}
+      className={`ml-auto flex h-[41px] shrink-0 items-center overflow-hidden rounded-[100px] border backdrop-blur-xl transition-[border-color,background-color,box-shadow] duration-200 ${
+        open
+          ? 'border-[#3979FF]/40 bg-white/80 shadow-[0_2px_14px_rgba(57,121,255,0.18),inset_0_1px_0_rgba(255,255,255,0.8)]'
+          : 'cursor-pointer border-white/50 bg-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_2px_12px_rgba(15,15,17,0.05)] hover:bg-white/60'
+      }`}
     >
-      <motion.input
+      <span className="flex size-[39px] shrink-0 items-center justify-center" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.8" cy="6.8" r="4.6" stroke={open ? '#3979FF' : '#0F0F11'} strokeWidth="1.8" className="transition-colors duration-200" />
+          <path d="M10.4 10.4 14 14" stroke={open ? '#3979FF' : '#0F0F11'} strokeWidth="1.8" strokeLinecap="round" className="transition-colors duration-200" />
+        </svg>
+      </span>
+      <input
         ref={inputRef}
         type="search"
         autoComplete="off"
@@ -49,51 +58,21 @@ function LmSearch({ value = '', onSearch }) {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onKeyDown={(e) => { if (e.key === 'Escape') { onSearch?.(''); e.currentTarget.blur() } }}
-        initial={false}
-        animate={{
-          width: open ? 200 : 39,
-          scale: open ? 1 : 0.5,
-          x: open ? 0 : 10,
-          borderRadius: open ? '20px 0px 0px 20px' : '20px',
-          backgroundColor: open ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0)',
-          boxShadow: open
-            ? 'inset 0 0 0 1px rgba(15,15,17,0.12), 0 2px 12px rgba(15,15,17,0.06)'
-            : 'inset 0 0 0 4.5px #0F0F11',
-        }}
-        transition={searchSpring}
-        className="h-[39px] min-w-0 border-0 bg-transparent px-[13px] font-bevietnam text-[13px] font-medium text-[#0F0F11] outline-none placeholder:text-lm-400 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
-        style={{ transformOrigin: '100% 50%', backdropFilter: 'blur(12px)', appearance: 'none', WebkitAppearance: 'none' }}
+        className="h-full min-w-0 flex-1 border-0 bg-transparent pr-[6px] font-bevietnam text-[13px] font-medium text-[#0F0F11] outline-none placeholder:text-lm-400 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+        style={{ appearance: 'none', WebkitAppearance: 'none' }}
       />
-      <motion.button
-        type="submit"
-        aria-label="Search"
-        onClick={(e) => { e.preventDefault(); e.currentTarget.previousSibling?.focus?.() }}
-        initial={false}
-        animate={{
-          rotate: open ? 0 : 45,
-          scaleX: open ? 1 : 0.28,
-          scaleY: open ? 1 : 0.14,
-          x: open ? 0 : -8,
-          borderRadius: open ? '0px 20px 20px 0px' : '4px',
-          background: open ? 'linear-gradient(180deg,#5D93FF,#3979FF)' : 'linear-gradient(180deg,#0F0F11,#0F0F11)',
-          boxShadow: open ? '0 4px 14px rgba(57,121,255,0.4), inset 0 1px 0 rgba(255,255,255,0.35)' : '0 0 0 rgba(0,0,0,0)',
-        }}
-        transition={searchSpring}
-        className="flex h-[39px] w-[42px] shrink-0 cursor-pointer items-center justify-center border-0"
-        style={{ transformOrigin: '0% 50%' }}
-      >
-        {/* Magnifier glyph fades in once the pill unrolls */}
-        <motion.svg
-          width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"
-          initial={false}
-          animate={{ opacity: open ? 1 : 0 }}
-          transition={{ duration: 0.18 }}
+      {value && (
+        <button
+          type="button"
+          aria-label="Clear search"
+          // mousedown (not click) so the input never blurs mid-clear
+          onMouseDown={(e) => { e.preventDefault(); onSearch?.('') }}
+          className="mr-[8px] flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#3979FF]/10 text-[13px] leading-none text-[#3979FF] transition-colors hover:bg-[#3979FF] hover:text-white"
         >
-          <circle cx="6.8" cy="6.8" r="4.6" stroke="#fff" strokeWidth="1.9" />
-          <path d="M10.4 10.4 14 14" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" />
-        </motion.svg>
-      </motion.button>
-    </form>
+          ×
+        </button>
+      )}
+    </motion.div>
   )
 }
 
