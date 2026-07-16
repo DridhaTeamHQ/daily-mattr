@@ -83,9 +83,18 @@ export default function CategoryNewsPage() {
     ['Explained', 'Explained'],
   ]
   const [filter, setFilter] = useState('all')
-  useEffect(() => { setFilter('all') }, [slug])
+  const [query, setQuery] = useState('')
+  useEffect(() => { setFilter('all'); setQuery('') }, [slug])
   const filtered = useMemo(() => {
-    const list = items || []
+    let list = items || []
+    // Live search from the toolbar — matches headline, brief, and outlet name;
+    // composes with the section/kind pills below.
+    const q = query.trim().toLowerCase()
+    if (q) {
+      list = list.filter((a) =>
+        `${a.headline} ${a.summary || ''} ${a.source || ''}`.toLowerCase().includes(q),
+      )
+    }
     if (filter === 'all') return list
     if (slug === 'general') return list.filter((a) => a.topic === filter)
     if (filter === 'long') return list.filter((a) => a.kind === 'feature' || a.kind === 'case_study')
@@ -97,7 +106,7 @@ export default function CategoryNewsPage() {
         .sort((a, b) => b.factScore - a.factScore)
     }
     return list
-  }, [items, filter, slug])
+  }, [items, filter, slug, query])
 
   // Unknown category → 404 (the /:category route matches any single segment).
   if (!cat && slug !== 'general') return <NotFoundPage />
@@ -123,6 +132,8 @@ export default function CategoryNewsPage() {
         onFilter={setFilter}
         filters={slug === 'general' ? STUDIO_FILTERS : undefined}
         title={slug === 'general' ? 'News Studio' : undefined}
+        search={query}
+        onSearch={setQuery}
       />
       {slug === 'general' && visibleTopics.length > 0 && (
         <div className="pt-[32px] sm:pt-[48px]">
@@ -136,9 +147,11 @@ export default function CategoryNewsPage() {
           items={filtered}
           loading={loading}
           emptyLabel={
-            filter === 'all'
-              ? 'No stories here yet — check back soon.'
-              : 'No stories in this section right now — check back soon.'
+            query.trim()
+              ? `No stories match “${query.trim()}”.`
+              : filter === 'all'
+                ? 'No stories here yet — check back soon.'
+                : 'No stories in this section right now — check back soon.'
           }
         />
       ) : (
