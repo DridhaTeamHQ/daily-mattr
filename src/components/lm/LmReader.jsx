@@ -26,6 +26,7 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
   // 0..1 scroll progress of the CURRENT story, shown as the thin bar under the
   // header. Resets on every story change (the article remounts via key).
   const [progress, setProgress] = useState(0)
+  const [goToVal, setGoToVal] = useState('')
   const scrollRef = useRef(null)
   const item = items[index]
   const canPrev = index > 0
@@ -34,6 +35,7 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
   useEffect(() => {
     setMode('original')
     setProgress(0)
+    setGoToVal('')
   }, [item?.id])
 
   const go = (delta) => {
@@ -42,6 +44,55 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
     setDir(delta)
     setHinted(true)
     onIndex(next)
+  }
+
+  const handleGoToPage = (e) => {
+    e.preventDefault()
+    const targetPage = parseInt(goToVal, 10)
+    if (isNaN(targetPage)) return
+    const clampedPage = Math.max(1, Math.min(targetPage, items.length))
+    onIndex(clampedPage - 1)
+    setGoToVal('')
+  }
+
+  const getPageNumbers = () => {
+    const totalPages = items.length
+    const currentPage = index + 1
+    const pages = []
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+      return pages
+    }
+
+    pages.push(1)
+
+    const siblingCount = 2
+    const leftSiblingIndex = Math.max(currentPage - siblingCount, 2)
+    const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages - 1)
+
+    const showLeftEllipsis = leftSiblingIndex > 2
+    const showRightEllipsis = rightSiblingIndex < totalPages - 1
+
+    if (showLeftEllipsis) {
+      pages.push('...')
+      for (let i = leftSiblingIndex; i <= rightSiblingIndex; i++) {
+        pages.push(i)
+      }
+    } else {
+      for (let i = 2; i <= rightSiblingIndex; i++) {
+        pages.push(i)
+      }
+    }
+
+    if (showRightEllipsis) {
+      pages.push('...')
+    }
+
+    pages.push(totalPages)
+    return pages
   }
 
   useEffect(() => {
@@ -134,7 +185,7 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
             if (info.offset.x < -SWIPE_DISTANCE || info.velocity.x < -SWIPE_VELOCITY) go(1)
             else if (info.offset.x > SWIPE_DISTANCE || info.velocity.x > SWIPE_VELOCITY) go(-1)
           }}
-          className="h-full cursor-grab overflow-y-auto px-4 pb-[120px] pt-[32px] active:cursor-grabbing sm:px-8"
+          className="h-full cursor-grab overflow-y-auto px-4 pb-[150px] sm:pb-[120px] pt-[32px] active:cursor-grabbing sm:px-8"
         >
           <div className="mx-auto w-full max-w-[720px]">
             <div className="flex flex-wrap items-center gap-[8px]">
@@ -272,26 +323,124 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
         )}
       </div>
 
-      {/* Prev / next controls */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-center gap-[10px] bg-gradient-to-t from-white via-white/90 to-transparent px-4 pb-[20px] pt-[36px]">
-        <button
-          type="button"
-          disabled={!canPrev}
-          onClick={() => go(-1)}
-          className={`pointer-events-auto flex h-[44px] items-center gap-[6px] rounded-[50px] border px-[18px] font-roboto text-[14px] font-semibold transition-colors ${canPrev ? 'border-lm-800 bg-white text-lm-800 hover:bg-lm-50' : 'border-lm-200 bg-white text-lm-300'}`}
-          style={rb}
-        >
-          ← Prev
-        </button>
-        <button
-          type="button"
-          disabled={!canNext}
-          onClick={() => go(1)}
-          className={`pointer-events-auto flex h-[44px] items-center gap-[6px] rounded-[50px] px-[18px] font-roboto text-[14px] font-semibold transition-colors ${canNext ? 'bg-lm-800 text-white hover:bg-black' : 'bg-lm-200 text-lm-400'}`}
-          style={rb}
-        >
-          Next →
-        </button>
+      {/* Redesigned Floating Pagination Bar */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center px-4 pb-[24px] pt-[36px] bg-gradient-to-t from-white via-white/90 to-transparent z-10">
+        <div className="pointer-events-auto flex flex-col md:flex-row items-center justify-between gap-4 rounded-[24px] border border-lm-200 bg-white/95 px-6 py-3 shadow-lg max-w-4xl w-full text-lm-800 backdrop-blur-md">
+          {/* Page info (left) */}
+          <div className="text-[13px] font-medium text-lm-500 font-roboto" style={rb}>
+            Page <span className="font-bold text-lm-800">{index + 1}</span> of <span className="font-bold text-lm-800">{items.length}</span>
+          </div>
+
+          {/* Controls (center) */}
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-center">
+            {/* First (<<) */}
+            <button
+              type="button"
+              disabled={!canPrev}
+              onClick={() => onIndex(0)}
+              className={`flex size-[32px] items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                canPrev ? 'text-lm-700 hover:bg-lm-100 hover:text-black' : 'text-lm-300 cursor-not-allowed'
+              }`}
+              style={rb}
+              title="First Page"
+            >
+              &lt;&lt;
+            </button>
+
+            {/* Prev (<) */}
+            <button
+              type="button"
+              disabled={!canPrev}
+              onClick={() => go(-1)}
+              className={`flex size-[32px] items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                canPrev ? 'text-lm-700 hover:bg-lm-100 hover:text-black' : 'text-lm-300 cursor-not-allowed'
+              }`}
+              style={rb}
+              title="Previous Page"
+            >
+              &lt;
+            </button>
+
+            {/* Page Numbers & Ellipses */}
+            {getPageNumbers().map((p, idx) => {
+              if (p === '...') {
+                return (
+                  <span
+                    key={`ellipsis-${idx}`}
+                    className="hidden sm:inline-flex px-1 text-[13px] text-lm-400 font-bold items-center justify-center size-[32px]"
+                  >
+                    ...
+                  </span>
+                )
+              }
+              const isActive = p === index + 1
+              const isEndPage = p === 1 || p === items.length
+              return (
+                <button
+                  key={`page-${p}`}
+                  type="button"
+                  onClick={() => onIndex(p - 1)}
+                  className={`size-[32px] items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                    isActive
+                      ? 'flex bg-lm-800 text-white shadow-sm'
+                      : isEndPage
+                      ? 'flex text-lm-600 hover:bg-lm-100 hover:text-lm-800'
+                      : 'hidden sm:flex text-lm-600 hover:bg-lm-100 hover:text-lm-800'
+                  }`}
+                  style={rb}
+                >
+                  {p}
+                </button>
+              )
+            })}
+
+            {/* Next (>) */}
+            <button
+              type="button"
+              disabled={!canNext}
+              onClick={() => go(1)}
+              className={`flex size-[32px] items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                canNext ? 'text-lm-700 hover:bg-lm-100 hover:text-black' : 'text-lm-300 cursor-not-allowed'
+              }`}
+              style={rb}
+              title="Next Page"
+            >
+              &gt;
+            </button>
+
+            {/* Last (>>) */}
+            <button
+              type="button"
+              disabled={!canNext}
+              onClick={() => onIndex(items.length - 1)}
+              className={`flex size-[32px] items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                canNext ? 'text-lm-700 hover:bg-lm-100 hover:text-black' : 'text-lm-300 cursor-not-allowed'
+              }`}
+              style={rb}
+              title="Last Page"
+            >
+              &gt;&gt;
+            </button>
+          </div>
+
+          {/* Go to page form (right) */}
+          <form onSubmit={handleGoToPage} className="flex items-center gap-2">
+            <label htmlFor="goto-page-input" className="text-[13px] font-medium text-lm-500 font-roboto" style={rb}>
+              Go to
+            </label>
+            <input
+              id="goto-page-input"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={goToVal}
+              onChange={(e) => setGoToVal(e.target.value.replace(/\D/g, ''))}
+              placeholder={index + 1}
+              className="w-12 h-8 rounded-lg border border-lm-200 px-1 text-center text-[13px] font-semibold text-lm-800 outline-none focus:border-lm-800 focus:ring-1 focus:ring-lm-800 transition-colors"
+              style={rb}
+            />
+          </form>
+        </div>
       </div>
     </motion.div>
   )
