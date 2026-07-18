@@ -8,13 +8,21 @@ import { motion } from 'framer-motion'
 // rest of the app (see LmReader / LmBreakingCarousel).
 const rb = { fontVariationSettings: '"wdth" 100' }
 
-// Confirmation badge — how independent the coverage is (computed in
-// fetchTrendingTopics from distinct media-ownership groups). Confirmed = 3+
-// independent houses, developing = 2, detected = one voice so far.
-const STATUS_BADGE = {
-  confirmed: { label: 'Confirmed', dot: 'bg-[#2FA35C]' },
-  developing: { label: 'Developing', dot: 'bg-[#E0A62E]' },
-  detected: { label: 'Detected', dot: 'bg-white/60' },
+// The "Trending" mark — a thin red rule beside the word. Nothing more: the
+// poster already carries a photo + headline, so the marker stays quiet and
+// editorial (no pill, no animation).
+function TrendingMark() {
+  return (
+    <span className="flex items-center gap-[8px]">
+      <span className="h-[14px] w-[3px] rounded-full bg-[#FF3B30]" aria-hidden="true" />
+      <span
+        className="font-roboto text-[12px] font-bold tracking-[0.1em] text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.6)]"
+        style={rb}
+      >
+        Trending
+      </span>
+    </span>
+  )
 }
 
 function latestDate(topic) {
@@ -31,6 +39,10 @@ function latestDate(topic) {
 function TopicCard({ topic, onOpen }) {
   const count = topic?.memberIds?.length || 0
   const when = latestDate(topic)
+  // Corroboration lives in the tooltip rather than a badge — it varies per
+  // topic, where a status chip read "Confirmed" on almost every card.
+  const outlets = topic?.sourceCount || 0
+  const hint = outlets ? `${topic.title} — ${count} stories across ${outlets} outlets` : topic.title
   return (
     <motion.button
       key={topic.id}
@@ -40,7 +52,7 @@ function TopicCard({ topic, onOpen }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       className="group relative flex h-[240px] w-[258px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[18px] bg-[#141417] p-[16px] text-left transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0px_16px_40px_rgba(0,0,0,0.22)] sm:h-[260px] sm:w-[296px]"
-      title={topic.title}
+      title={hint}
     >
       {/* Full-bleed image + readability gradient (hides itself on a broken link) */}
       {topic.image && (
@@ -55,25 +67,7 @@ function TopicCard({ topic, onOpen }) {
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" aria-hidden="true" />
 
       <div className="relative z-[1] flex items-center justify-between">
-        <span className="flex items-center gap-[6px]">
-          <span
-            className="inline-flex items-center gap-[6px] rounded-full bg-white/95 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-lm-800"
-            style={rb}
-          >
-            <span className="size-[5px] animate-pulse rounded-full bg-[#E33B3B]" />
-            Trending
-          </span>
-          {STATUS_BADGE[topic.eventStatus] && (
-            <span
-              className="inline-flex items-center gap-[5px] rounded-full bg-black/45 px-[9px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white/90 backdrop-blur-sm"
-              style={rb}
-              title={`Coverage from ${topic.sourceCount || 1} ${topic.sourceCount === 1 ? 'source' : 'sources'}`}
-            >
-              <span className={`size-[5px] rounded-full ${STATUS_BADGE[topic.eventStatus].dot}`} />
-              {STATUS_BADGE[topic.eventStatus].label}
-            </span>
-          )}
-        </span>
+        <TrendingMark />
         <span className="font-roboto text-[16px] leading-none text-white/70 transition-all duration-300 group-hover:translate-x-[3px] group-hover:text-white">↗</span>
       </div>
 

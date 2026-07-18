@@ -238,10 +238,6 @@ export async function fetchTrendingTopics() {
         )
         const singleSourcePenalty = sourceSet.size <= 1 ? 0.6 : 1
         const trendScore = (velocity + groupSet.size * 2) * singleSourcePenalty
-        // Confirmation status shown on the card, derived from how independent
-        // the coverage is: 3+ media groups → confirmed; 2 → developing;
-        // one voice so far → detected.
-        const eventStatus = groupSet.size >= 3 ? 'confirmed' : groupSet.size === 2 ? 'developing' : 'detected'
         return {
           id: t.id,
           title: decodeEntities(t.title || ''),
@@ -252,8 +248,6 @@ export async function fetchTrendingTopics() {
           latestAt,
           latestDayKey: istDayKey(latestAt),
           sourceCount: sourceSet.size,
-          groupCount: groupSet.size,
-          eventStatus,
           trendScore,
           // First member that carries a scraped image — the rail card's visual.
           image: members.map((m) => m.articles?.image_url).find(Boolean) || null,
