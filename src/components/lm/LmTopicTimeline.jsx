@@ -5,7 +5,7 @@ import { FactChip } from './LmFactBadge'
 import { fetchArticlesByIds } from '../../lib/content'
 
 // Full-screen "trending topic → timeline" overlay. Opened from LmTopicRail with
-// a topic; fetches the topic's member articles, orders them oldest-first, and
+// a topic; fetches the topic's member articles, orders them newest-first, and
 // lays them out as a vertical timeline grouped by day. Tapping an entry opens
 // the shared LmReader on top, scoped to this topic's stories.
 // Entry/exit uses a keyed remount (initial -> animate) — deliberately no
@@ -43,8 +43,9 @@ export default function LmTopicTimeline({ topic, onClose }) {
     fetchArticlesByIds(ids)
       .then((rows) => {
         if (!alive) return
-        // Oldest first — a timeline reads forward in time.
-        const sorted = [...rows].sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt))
+        // NEWEST first — today's development opens at the top and you scroll
+        // DOWN into the story's history (18th before 15th).
+        const sorted = [...rows].sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
         setMembers(sorted)
       })
       .catch(() => { if (alive) setMembers([]) })
@@ -67,7 +68,7 @@ export default function LmTopicTimeline({ topic, onClose }) {
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  // Group members by day (already oldest-first, so groups come out ascending).
+  // Group members by day (already newest-first, so groups come out descending).
   const groups = useMemo(() => {
     const byDay = new Map()
     for (const it of members) {
