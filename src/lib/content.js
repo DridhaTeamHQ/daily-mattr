@@ -177,6 +177,21 @@ export async function fetchArticlesByIds(ids) {
 // `topics` table (and its joined topic_articles) to status='approved', so we
 // just read and shape. Never selects heavy columns (no centroid/embeddings).
 // Topics with fewer than 3 members are dropped as too thin to be a timeline.
+// Media OWNERSHIP groups — TOI + ET are both the Times Group, HT + Mint share
+// HT Media, every NDTV feed is NDTV. Counting distinct GROUPS (not feed names)
+// stops one media house's syndicated copies from posing as independent
+// multi-outlet coverage in the trend ranking and the confirmation status.
+function mediaGroupOf(source) {
+  const s = String(source || '').toLowerCase()
+  if (s.includes('times of india') || s.includes('economic times') || s.startsWith('toi')) return 'times-group'
+  if (s.includes('hindustan times') || s.startsWith('ht ') || s === 'mint' || s.includes('livemint')) return 'ht-media'
+  if (s.includes('ndtv')) return 'ndtv'
+  if (s.includes('indian express') || s.startsWith('ie ')) return 'indian-express'
+  if (s.includes('the hindu')) return 'the-hindu'
+  if (s.includes('bbc')) return 'bbc'
+  return s || 'unknown'
+}
+
 export async function fetchTrendingTopics() {
   try {
     const { data, error } = await supabase
@@ -215,7 +230,18 @@ export async function fetchTrendingTopics() {
           const ageHours = Math.max(0, (now - ms) / 3_600_000)
           return sum + Math.exp(-ageHours / 18)
         }, 0)
-        const trendScore = velocity + sourceSet.size * 2
+        // Breadth counts independent media GROUPS (ownership-aware), and a
+        // single-source cluster is penalised — one outlet pushing a story hard
+        // should not outrank two houses covering it moderately.
+        const groupSet = new Set(
+          members.map((m) => (m.articles?.source || '').trim()).filter(Boolean).map(mediaGroupOf),
+        )
+        const singleSourcePenalty = sourceSet.size <= 1 ? 0.6 : 1
+        const trendScore = (velocity + groupSet.size * 2) * singleSourcePenalty
+        // Confirmation status shown on the card, derived from how independent
+        // the coverage is: 3+ media groups → confirmed; 2 → developing;
+        // one voice so far → detected.
+        const eventStatus = groupSet.size >= 3 ? 'confirmed' : groupSet.size === 2 ? 'developing' : 'detected'
         return {
           id: t.id,
           title: decodeEntities(t.title || ''),
@@ -226,6 +252,8 @@ export async function fetchTrendingTopics() {
           latestAt,
           latestDayKey: istDayKey(latestAt),
           sourceCount: sourceSet.size,
+          groupCount: groupSet.size,
+          eventStatus,
           trendScore,
           // First member that carries a scraped image — the rail card's visual.
           image: members.map((m) => m.articles?.image_url).find(Boolean) || null,

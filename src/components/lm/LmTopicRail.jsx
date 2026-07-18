@@ -8,6 +8,15 @@ import { motion } from 'framer-motion'
 // rest of the app (see LmReader / LmBreakingCarousel).
 const rb = { fontVariationSettings: '"wdth" 100' }
 
+// Confirmation badge — how independent the coverage is (computed in
+// fetchTrendingTopics from distinct media-ownership groups). Confirmed = 3+
+// independent houses, developing = 2, detected = one voice so far.
+const STATUS_BADGE = {
+  confirmed: { label: 'Confirmed', dot: 'bg-[#2FA35C]' },
+  developing: { label: 'Developing', dot: 'bg-[#E0A62E]' },
+  detected: { label: 'Detected', dot: 'bg-white/60' },
+}
+
 function latestDate(topic) {
   // The topic's NEWEST story (computed in fetchTrendingTopics from member
   // timestamps) — never the approval date, which lags running stories by days.
@@ -46,12 +55,24 @@ function TopicCard({ topic, onOpen }) {
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" aria-hidden="true" />
 
       <div className="relative z-[1] flex items-center justify-between">
-        <span
-          className="inline-flex items-center gap-[6px] rounded-full bg-white/95 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-lm-800"
-          style={rb}
-        >
-          <span className="size-[5px] animate-pulse rounded-full bg-[#E33B3B]" />
-          Trending
+        <span className="flex items-center gap-[6px]">
+          <span
+            className="inline-flex items-center gap-[6px] rounded-full bg-white/95 px-[10px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-lm-800"
+            style={rb}
+          >
+            <span className="size-[5px] animate-pulse rounded-full bg-[#E33B3B]" />
+            Trending
+          </span>
+          {STATUS_BADGE[topic.eventStatus] && (
+            <span
+              className="inline-flex items-center gap-[5px] rounded-full bg-black/45 px-[9px] py-[3px] font-roboto text-[10px] font-bold uppercase tracking-[0.07em] text-white/90 backdrop-blur-sm"
+              style={rb}
+              title={`Coverage from ${topic.sourceCount || 1} ${topic.sourceCount === 1 ? 'source' : 'sources'}`}
+            >
+              <span className={`size-[5px] rounded-full ${STATUS_BADGE[topic.eventStatus].dot}`} />
+              {STATUS_BADGE[topic.eventStatus].label}
+            </span>
+          )}
         </span>
         <span className="font-roboto text-[16px] leading-none text-white/70 transition-all duration-300 group-hover:translate-x-[3px] group-hover:text-white">↗</span>
       </div>
