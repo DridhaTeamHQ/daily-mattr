@@ -1,11 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { LmWordmark } from './LmLogo'
 
 // Footer — redesigned top section matching user screenshot: stacked wordmark & tagline,
 // email subscribe pill, uppercase column headers with underline dash, chevron links,
 // horizontal divider, and right-aligned copyright.
-// Giant cropped "DailyMattr'." wordmark preserved at the bottom.
+// Giant cropped "dailymattr" wordmark at the bottom (same lockup as the nav).
 const pf = { fontVariationSettings: '"opsz" 12, "wdth" 100' }
 
 const PRODUCT_LINKS = [
@@ -49,13 +50,8 @@ export default function LmFooter() {
           {/* Brand block + subscribe input */}
           <div className="flex w-full max-w-[480px] flex-col gap-6">
             <div className="flex flex-col gap-1 text-lm-800">
-              <p className="leading-none">
-                <span className="font-playfair font-extrabold text-[36px] tracking-[-0.04em] sm:text-[44px]" style={pf}>the</span>
-                <span className="font-playfair font-black text-[42px] tracking-[-0.04em] sm:text-[52px]" style={pf}>Ma</span>
-                <span className="font-playfair font-black text-[42px] tracking-[-0.06em] sm:text-[52px]" style={pf}>tt</span>
-                <span className="font-playfair font-black text-[42px] sm:text-[52px]" style={pf}>r</span>
-                <span className="font-playfair font-black text-[42px] text-lm-500 sm:text-[52px]" style={pf}>’</span>
-                <span className="font-playfair font-black text-[42px] sm:text-[52px]" style={pf}>.</span>
+              <p className="text-[42px] leading-none text-[#3979FF] sm:text-[52px]">
+                <LmWordmark />
               </p>
               <p className="font-playfair text-[28px] font-bold leading-tight tracking-[-0.02em] text-lm-800 sm:text-[36px]" style={pf}>
                 your deeper read.
@@ -141,14 +137,9 @@ export default function LmFooter() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-20px' }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none mt-[40px] block select-none whitespace-nowrap pl-[24px] leading-[0.82] text-lm-800 sm:pl-[44px] lg:mt-[60px]"
+        className="pointer-events-none mt-[40px] block select-none whitespace-nowrap pl-[24px] text-[17.5vw] leading-[0.82] text-[#3979FF] sm:pl-[44px] lg:mt-[60px]"
       >
-        <span className="font-playfair font-extrabold text-[13.8vw] tracking-[-0.05em]" style={pf}>Daily</span>
-        <span className="font-playfair font-black text-[18.5vw] tracking-[-0.05em]" style={pf}>Ma</span>
-        <span className="font-playfair font-black text-[18.5vw] tracking-[-0.08em]" style={pf}>tt</span>
-        <span className="font-playfair font-black text-[18.5vw]" style={pf}>r</span>
-        <span className="font-playfair font-black text-[18.5vw] text-lm-500" style={pf}>’</span>
-        <span className="font-playfair font-black text-[18.5vw]" style={pf}>.</span>
+        <LmWordmark />
       </motion.p>
     </footer>
   )

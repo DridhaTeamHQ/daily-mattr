@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useLmDrawer } from './LmDrawerContext'
 
 // Top nav — Figma node 1:412 (1440x70). Fixed, backdrop-blurred, white-glass.
-// Left: DailyMattr'. wordmark. Center: links + "Long Mattrs" dropdown.
+// Left: "dailymattr" wordmark. Center: links + "Long Mattrs" dropdown.
 // Right: dark pills (Download App + user) with the signature glow ellipse.
 const GLOW = '/figma/nav-button-glow.svg'
 
@@ -47,7 +47,7 @@ export default function LmNav({ tone = 'light' }) {
   return (
     <header ref={ddRef} className={`fixed inset-x-0 top-0 z-50 backdrop-blur-[12.5px] ${tone === 'dark' ? 'bg-black/30' : 'bg-white/70'}`}>
       <div className="flex h-[70px] items-center justify-between px-4 sm:px-8 lg:px-[56px]">
-        <LmLogo className={tone === 'dark' ? '[&_span]:!text-white [&_span:nth-child(5)]:!text-white/60' : ''} />
+        <LmLogo tone={tone} />
 
         {/* Center links — desktop */}
         <nav className="hidden items-center lg:flex">

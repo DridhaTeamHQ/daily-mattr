@@ -86,9 +86,9 @@ export default function LmCategoryBar({ active, filter = 'all', onFilter, showFi
       {/* Scrollable on small screens so the pill row never forces page overflow */}
       <div className="mx-auto flex w-full max-w-[1440px] items-center gap-[14px] overflow-x-auto px-4 py-[12px] [scrollbar-width:none] sm:gap-[22px] sm:py-[14px] sm:px-8 lg:px-[32px] [&::-webkit-scrollbar]:hidden">
         {title && (
-          // Masthead lockup, same language as the DailyMattr logo: quiet first
-          // word, confident second, and a blue full-stop that ties the wordmark
-          // to the active pill. "NewsStudio." reads as a sibling of "DailyMattr'."
+          // Masthead lockup: quiet first word, confident second, and a blue
+          // full-stop tying it to the active pill — the same #3979FF that
+          // carries the "dailymattr" brand wordmark in the nav above.
           <h1 className="shrink-0 select-none whitespace-nowrap text-[21px] leading-none tracking-[-0.02em] sm:text-[24px]" style={serif}>
             <span className="font-normal text-lm-500">News</span>
             <span className="font-bold text-[#0F0F11]">Studio</span>
