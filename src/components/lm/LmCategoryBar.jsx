@@ -76,11 +76,17 @@ function LmSearch({ value = '', onSearch }) {
   )
 }
 
-export default function LmCategoryBar({ active, filter = 'all', onFilter, showFilter = true, filters = FILTERS, title, search, onSearch }) {
+export default function LmCategoryBar({ active, filter = 'all', onFilter, showFilter = true, filters = FILTERS, title, search, onSearch, lifted = false }) {
   if (!showFilter) return null
 
   return (
-    <div className="sticky top-[70px] z-40 border-b border-white/30 bg-white/30 shadow-[0_8px_32px_rgba(15,15,17,0.05)] backdrop-blur-2xl backdrop-saturate-150">
+    // `lifted` rides up into the space the main nav vacates on scroll, so this
+    // toolbar becomes the top-most chrome while reading.
+    <div
+      className={`sticky z-40 border-b border-white/30 bg-white/30 shadow-[0_8px_32px_rgba(15,15,17,0.05)] backdrop-blur-2xl backdrop-saturate-150 transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        lifted ? 'top-0' : 'top-[70px]'
+      }`}
+    >
       {/* top-edge light catch — the "glass lip" */}
       <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" aria-hidden="true" />
       {/* Scrollable on small screens so the pill row never forces page overflow */}

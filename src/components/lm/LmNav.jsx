@@ -19,7 +19,11 @@ function Glow() {
   )
 }
 
-export default function LmNav({ tone = 'light' }) {
+// `collapsed` slides the whole bar out of view once the reader has scrolled —
+// pages that carry their own sticky toolbar (LmCategoryBar) pass it so that
+// toolbar becomes the top-most chrome while reading. Never collapses while a
+// menu is open, or the menu would vanish under the viewport edge mid-interaction.
+export default function LmNav({ tone = 'light', collapsed = false }) {
   const { isAuthed } = useAuth()
   const { openAuth, openSubscribe } = useLmDrawer()
   const navigate = useNavigate()
@@ -37,6 +41,9 @@ export default function LmNav({ tone = 'light' }) {
   const linkColor = tone === 'dark' ? 'text-white/70 hover:text-white' : 'text-lm-500 hover:text-lm-800'
   const pillBorder = tone === 'dark' ? 'border-white/40 text-white' : 'border-lm-400 text-lm-800'
 
+  // Keep the bar put while a dropdown or the mobile sheet is open.
+  const hidden = collapsed && !catsOpen && !mobileOpen
+
   const links = [
     { label: 'Home', to: '/' },
     { label: 'Features', to: '/#categories' },
@@ -45,7 +52,12 @@ export default function LmNav({ tone = 'light' }) {
   ]
 
   return (
-    <header ref={ddRef} className={`fixed inset-x-0 top-0 z-50 backdrop-blur-[12.5px] ${tone === 'dark' ? 'bg-black/30' : 'bg-white/70'}`}>
+    <header
+      ref={ddRef}
+      className={`fixed inset-x-0 top-0 z-50 backdrop-blur-[12.5px] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        hidden ? '-translate-y-full' : 'translate-y-0'
+      } ${tone === 'dark' ? 'bg-black/30' : 'bg-white/70'}`}
+    >
       <div className="flex h-[70px] items-center justify-between px-4 sm:px-8 lg:px-[56px]">
         <LmLogo tone={tone} />
 

@@ -12,6 +12,7 @@ import LmFooter from '../components/lm/LmFooter'
 import { lmCategoryBySlug } from '../components/lm/lmCategories'
 import { fetchApproved, fetchFeaturesByCategory, fetchTrendingTopics, freshTopics } from '../lib/content'
 import { useLiveData } from '../lib/useLiveData'
+import { useScrolledPast } from '../lib/useScrolledPast'
 import NotFoundPage from './NotFoundPage'
 
 // Category reading page — Figma "Home" frame 1:5336: dark hero + date-grouped
@@ -108,6 +109,10 @@ export default function CategoryNewsPage() {
     return list
   }, [items, filter, slug, query])
 
+  // Once the reader scrolls in, the DailyMattr nav retracts and the section
+  // toolbar takes the top slot — one bar of chrome instead of two.
+  const navCollapsed = useScrolledPast(90)
+
   // Unknown category → 404 (the /:category route matches any single segment).
   if (!cat && slug !== 'general') return <NotFoundPage />
 
@@ -117,7 +122,7 @@ export default function CategoryNewsPage() {
 
   return (
     <div className="min-h-screen bg-white font-bevietnam text-lm-800">
-      <LmNav tone="dark" />
+      <LmNav tone="dark" collapsed={navCollapsed} />
       {/* News Studio opens straight on the toolbar + stories (broadsheet front
           page, nothing to scroll past); category pages keep their big hero. */}
       {slug !== 'general' ? (
@@ -134,6 +139,7 @@ export default function CategoryNewsPage() {
         title={slug === 'general' ? 'News Studio' : undefined}
         search={query}
         onSearch={setQuery}
+        lifted={navCollapsed}
       />
       {slug === 'general' && visibleTopics.length > 0 && (
         <div className="pt-[32px] sm:pt-[48px]">
