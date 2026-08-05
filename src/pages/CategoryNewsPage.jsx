@@ -134,7 +134,7 @@ export default function CategoryNewsPage() {
       {/* Trending topics ride above the section toolbar: the rail is the front
           page's opening act, the filter bar sticks once you scroll past it. */}
       {slug === 'general' && visibleTopics.length > 0 && (
-        <div className="pb-[24px] pt-[24px] sm:pb-[32px] sm:pt-[32px]">
+        <div className="pb-[20px] pt-[10px] sm:pb-[28px] sm:pt-[12px]">
           <LmTopicRail topics={visibleTopics} onOpen={setOpenTopic} />
         </div>
       )}

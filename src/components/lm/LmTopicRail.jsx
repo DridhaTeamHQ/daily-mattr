@@ -127,8 +127,8 @@ export default function LmTopicRail({ topics = [], onOpen }) {
 
   return (
     <section className="mx-auto max-w-[1440px] px-4 sm:px-8">
-      <div className="mb-[16px] flex items-center gap-[16px]">
-        <h2 className="whitespace-nowrap font-roboto text-[18px] font-bold leading-[44px] text-[#0F0F11] sm:text-[24px] sm:leading-[64px]" style={rb}>
+      <div className="mb-[14px] flex items-center gap-[16px]">
+        <h2 className="whitespace-nowrap font-roboto text-[18px] font-bold leading-[32px] text-[#0F0F11] sm:text-[24px] sm:leading-[42px]" style={rb}>
           Trending topics
         </h2>
         <div className="h-px flex-1 bg-lm-400" />
