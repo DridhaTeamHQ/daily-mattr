@@ -131,6 +131,13 @@ export default function CategoryNewsPage() {
         // Clear the fixed 70px nav — the hero used to carry this padding.
         <div className="h-[70px] bg-black" aria-hidden="true" />
       )}
+      {/* Trending topics ride above the section toolbar: the rail is the front
+          page's opening act, the filter bar sticks once you scroll past it. */}
+      {slug === 'general' && visibleTopics.length > 0 && (
+        <div className="pb-[24px] pt-[24px] sm:pb-[32px] sm:pt-[32px]">
+          <LmTopicRail topics={visibleTopics} onOpen={setOpenTopic} />
+        </div>
+      )}
       <LmCategoryBar
         active={slug}
         filter={filter}
@@ -141,11 +148,7 @@ export default function CategoryNewsPage() {
         onSearch={setQuery}
         lifted={navCollapsed}
       />
-      {slug === 'general' && visibleTopics.length > 0 && (
-        <div className="pt-[32px] sm:pt-[48px]">
-          <LmTopicRail topics={visibleTopics} onOpen={setOpenTopic} />
-        </div>
-      )}
+      {slug === 'general' && <div className="h-[24px] sm:h-[32px]" aria-hidden="true" />}
       {/* General = the image-led News Studio front page; category pages keep
           the original date-grouped brief feed. */}
       {slug === 'general' ? (

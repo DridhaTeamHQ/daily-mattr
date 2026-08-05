@@ -23,17 +23,26 @@ export function LmWordmark({ className = '' }) {
   )
 }
 
+// Nav lockup — the exported Figma artwork rather than the live-text wordmark,
+// so the nav shows the mark exactly as designed. The SVG is baked in brand
+// blue (#3979FF); on near-black surfaces it steps up a touch so it doesn't
+// read dim against the dark bar.
+const LOGO = '/figma/logo.svg'
+
 export default function LmLogo({ className = '', to = '/', tone = 'light' }) {
-  // On near-black surfaces the pill blue reads dim, so the lockup steps up to
-  // the lighter end of the brand gradient.
-  const color = tone === 'dark' ? 'text-[#5D93FF]' : 'text-[#3979FF]'
   return (
     <Link
       to={to}
       aria-label="dailymattr home"
-      className={`inline-block select-none whitespace-nowrap text-[30px] leading-none transition-opacity hover:opacity-80 ${color} ${className}`}
+      className={`inline-block select-none leading-none transition-opacity hover:opacity-80 ${className}`}
     >
-      <LmWordmark />
+      <img
+        alt="dailymattr"
+        src={LOGO}
+        width="156"
+        height="32"
+        className={`block h-[26px] w-auto max-w-none sm:h-[32px] ${tone === 'dark' ? 'brightness-125' : ''}`}
+      />
     </Link>
   )
 }

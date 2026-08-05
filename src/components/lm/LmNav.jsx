@@ -46,9 +46,7 @@ export default function LmNav({ tone = 'light', collapsed = false }) {
 
   const links = [
     { label: 'Home', to: '/' },
-    { label: 'Features', to: '/#categories' },
-    { label: 'What is Mattr', to: '/#faq' },
-    { label: 'Contact Us', to: '/#footer' },
+    { label: 'Support', to: 'https://www.dailymattr.com/support/' },
   ]
 
   return (
@@ -73,7 +71,7 @@ export default function LmNav({ tone = 'light', collapsed = false }) {
             onClick={() => setCatsOpen((v) => !v)}
             className={`flex items-center gap-[4px] rounded-[40px] border border-solid px-[12px] py-[8px] font-bevietnam text-[13px] font-semibold ${catsOpen && tone !== 'dark' ? 'border-lm-800 bg-lm-800 text-white' : pillBorder} ${catsOpen && tone === 'dark' ? 'bg-white !text-lm-800' : ''}`}
           >
-            Long Mattrs
+            Daily Mattr
             <motion.img
               alt=""
               src="/figma/nav-icon-arrow-down.svg"
@@ -92,7 +90,7 @@ export default function LmNav({ tone = 'light', collapsed = false }) {
             className="relative hidden items-center justify-center overflow-hidden rounded-[50px] bg-[rgba(28,28,17,0.93)] px-[16px] py-[8px] font-bevietnam text-[14px] font-semibold text-white sm:flex"
           >
             <Glow />
-            Download App
+            Subscribe
           </button>
           <button
             type="button"
