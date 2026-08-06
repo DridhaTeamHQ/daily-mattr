@@ -13,13 +13,11 @@ const pf = { fontVariationSettings: '"opsz" 12, "wdth" 100' }
 
 export function LmWordmark({ className = '' }) {
   return (
-    <span className={`font-playfair font-black leading-none tracking-[-0.02em] ${className}`} style={pf}>
-      {/* Straight (not curly) quote marks, riding high against the ascenders —
-          matching the Figma lockup */}
-      <span className="text-[0.62em] align-top leading-none">&quot;</span>
-      dailymattr
-      <span className="text-[0.62em] align-top leading-none">&quot;</span>
-    </span>
+    <img
+      alt="dailymattr"
+      src="/figma/logo.svg"
+      className={`inline-block h-[1em] w-auto ${className}`}
+    />
   )
 }
 

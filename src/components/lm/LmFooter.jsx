@@ -49,10 +49,14 @@ export default function LmFooter() {
         <div className="flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-16">
           {/* Brand block + subscribe input */}
           <div className="flex w-full max-w-[480px] flex-col gap-6">
-            <div className="flex flex-col gap-1 text-lm-800">
-              <p className="text-[42px] leading-none text-[#3979FF] sm:text-[52px]">
-                <LmWordmark />
-              </p>
+            <div className="flex flex-col gap-2 text-lm-800">
+              <Link to="/" aria-label="dailymattr home" className="inline-block transition-opacity hover:opacity-80">
+                <img
+                  alt="dailymattr"
+                  src="/figma/logo.svg"
+                  className="h-[36px] w-auto sm:h-[46px]"
+                />
+              </Link>
               <p className="font-playfair text-[28px] font-bold leading-tight tracking-[-0.02em] text-lm-800 sm:text-[36px]" style={pf}>
                 your deeper read.
               </p>
@@ -130,17 +134,21 @@ export default function LmFooter() {
         </p>
       </div>
 
-      {/* Giant cropped wordmark — preserved exactly as requested */}
-      <motion.p
+      {/* Giant wordmark — matching the nav logo artwork */}
+      <motion.div
         aria-hidden
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-20px' }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none mt-[40px] block select-none whitespace-nowrap pl-[24px] text-[17.5vw] leading-[0.82] text-[#3979FF] sm:pl-[44px] lg:mt-[60px]"
+        className="pointer-events-none mt-[40px] block select-none px-4 sm:px-8 lg:mt-[60px]"
       >
-        <LmWordmark />
-      </motion.p>
+        <img
+          alt=""
+          src="/figma/logo.svg"
+          className="w-full h-auto max-w-full block"
+        />
+      </motion.div>
     </footer>
   )
 }
