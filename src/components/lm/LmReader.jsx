@@ -70,6 +70,7 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
 
   if (!item) return null
   const long = item.kind === 'case_study' || item.kind === 'feature'
+  const hasImage = !!item.image
 
   const versions = item.versions || {}
   const MODES = [
@@ -145,45 +146,53 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
           }}
           className="h-full cursor-grab overflow-y-auto px-4 pb-[120px] pt-[32px] active:cursor-grabbing sm:px-8"
         >
-          <div className="mx-auto w-full max-w-[720px]">
-            {/* Section kicker — small uppercase, broadsheet style */}
-            {(topicLabel(item) || long) && (
-              <p className="font-roboto text-[12px] font-bold uppercase tracking-[0.12em] text-lm-500" style={rb}>
-                {long ? 'Long story' : topicLabel(item)}
-              </p>
-            )}
-            <h1 className="pt-[12px] text-[30px] font-bold leading-[1.12] tracking-[-0.01em] text-black sm:text-[40px]" style={serif}>
-              {item.headline}
-            </h1>
-            {/* Meta line — same voice as the front page cards */}
-            <p className="pt-[14px] font-roboto text-[13px] text-lm-500" style={rb}>
-              {timeAgo(item.publishedAt)}
-              {item.source && (
-                <>
+          <div className={`mx-auto w-full max-w-[720px] ${hasImage ? 'lg:max-w-[1120px]' : ''}`}>
+            {/* Headline block and lead image sit side by side from lg up (text
+                left, image right); narrower widths stack them in reading order. */}
+            <div className={hasImage ? 'grid items-start gap-[24px] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-[48px]' : ''}>
+              <div className="min-w-0">
+                {/* Section kicker — small uppercase, broadsheet style */}
+                {(topicLabel(item) || long) && (
+                  <p className="font-roboto text-[12px] font-bold uppercase tracking-[0.12em] text-lm-500" style={rb}>
+                    {long ? 'Long story' : topicLabel(item)}
+                  </p>
+                )}
+                <h1 className="pt-[12px] text-[30px] font-bold leading-[1.12] tracking-[-0.01em] text-black sm:text-[40px]" style={serif}>
+                  {item.headline}
+                </h1>
+                {/* Meta line — same voice as the front page cards */}
+                <p className="pt-[14px] font-roboto text-[13px] text-lm-500" style={rb}>
+                  {timeAgo(item.publishedAt)}
+                  {item.source && (
+                    <>
+                      <span className="px-[8px] text-lm-300">|</span>
+                      <span className="font-medium text-lm-700">{item.source}</span>
+                      {item.company ? ` · ${item.company}` : ''}
+                    </>
+                  )}
                   <span className="px-[8px] text-lm-300">|</span>
-                  <span className="font-medium text-lm-700">{item.source}</span>
-                  {item.company ? ` · ${item.company}` : ''}
-                </>
+                  {readTime(item.headline, item.body)} min read
+                </p>
+                <div className="mt-[12px]"><FactChip item={item} small /></div>
+                {/* Editorial rule between the headline block and the body */}
+                <div className="mt-[18px] h-[3px] w-[56px] bg-black" />
+              </div>
+
+              {/* Lead image (General stories scraped with one) — hides itself on a
+                  broken hotlink so the reader never shows a broken-image icon */}
+              {hasImage && (
+                <img
+                  src={item.image}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  className="max-h-[420px] w-full rounded-[16px] bg-lm-100 object-cover lg:mt-[6px] lg:aspect-[4/3] lg:max-h-none"
+                />
               )}
-              <span className="px-[8px] text-lm-300">|</span>
-              {readTime(item.headline, item.body)} min read
-            </p>
-            <div className="mt-[12px]"><FactChip item={item} small /></div>
-            {/* Editorial rule between the headline block and the body */}
-            <div className="mt-[18px] h-[3px] w-[56px] bg-black" />
+            </div>
 
-            {/* Lead image (General stories scraped with one) — hides itself on a
-                broken hotlink so the reader never shows a broken-image icon */}
-            {item.image && (
-              <img
-                src={item.image}
-                alt=""
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none' }}
-                className="mt-[24px] max-h-[420px] w-full rounded-[16px] bg-lm-100 object-cover"
-              />
-            )}
-
+            {/* Body keeps a readable measure and stays under the text column */}
+            <div className={hasImage ? 'lg:max-w-[640px]' : ''}>
             {/* Reading-mode switcher — only when alternate versions exist */}
             {MODES.length > 1 && (
               <div className="mt-[24px]">
@@ -254,6 +263,7 @@ export default function LmReader({ items = [], index = 0, onIndex, onClose }) {
                 </span>
               </button>
             )}
+            </div>
           </div>
         </motion.article>
 
