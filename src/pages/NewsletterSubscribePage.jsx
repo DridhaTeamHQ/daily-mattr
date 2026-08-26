@@ -119,6 +119,7 @@ export default function NewsletterSubscribePage() {
                 </div>
               ) : (
                 <form onSubmit={submit} className="w-full">
+                  <img src="/logo.svg" alt="Daily Mattr" className="mb-7 h-8 w-auto" />
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block text-[13px] font-semibold text-lm-700">First name <span className="font-normal text-lm-400">(optional)</span>
                       <input value={name} onChange={(event) => setName(event.target.value)} placeholder="What should we call you?" className="mt-2 w-full rounded-xl border-2 border-lm-200 bg-[#fffdf8] px-4 py-3 text-[14px] outline-none transition focus:border-lm-800" />
