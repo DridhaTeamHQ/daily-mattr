@@ -25,7 +25,7 @@ function Glow() {
 // menu is open, or the menu would vanish under the viewport edge mid-interaction.
 export default function LmNav({ tone = 'light', collapsed = false }) {
   const { isAuthed } = useAuth()
-  const { openAuth, openSubscribe } = useLmDrawer()
+  const { openAuth } = useLmDrawer()
   const navigate = useNavigate()
   const [catsOpen, setCatsOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -46,6 +46,7 @@ export default function LmNav({ tone = 'light', collapsed = false }) {
 
   const links = [
     { label: 'Home', to: '/' },
+    { label: 'Newsletter', to: '/newsletter' },
     { label: 'Support', to: 'https://www.dailymattr.com/support/' },
   ]
 
@@ -86,7 +87,7 @@ export default function LmNav({ tone = 'light', collapsed = false }) {
         <div className="flex items-center gap-[8px]">
           <button
             type="button"
-            onClick={() => openSubscribe([])}
+            onClick={() => navigate('/newsletter')}
             className="relative hidden items-center justify-center overflow-hidden rounded-[50px] bg-[rgba(28,28,17,0.93)] px-[16px] py-[8px] font-bevietnam text-[14px] font-semibold text-white sm:flex"
           >
             <Glow />

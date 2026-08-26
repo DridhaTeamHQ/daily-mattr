@@ -6,6 +6,7 @@ import ScrollTopButton from './components/ScrollTopButton'
 import { LmDrawerProvider } from './components/lm/LmDrawerContext'
 import LmDrawerHost from './components/lm/LmDrawerHost'
 import NewsletterPage from './pages/NewsletterPage'
+import NewsletterSubscribePage from './pages/NewsletterSubscribePage'
 import CategoryNewsPage from './pages/CategoryNewsPage'
 import NotFoundPage from './pages/NotFoundPage'
 import { SubscribeRoute, AuthRoute } from './pages/DrawerRoutes'
@@ -27,6 +28,7 @@ function App() {
       >
         <Routes location={location}>
           <Route path="/" element={<NewsletterPage />} />
+          <Route path="/newsletter" element={<NewsletterSubscribePage />} />
           {/* Old page URLs now open the matching drawer over the home page */}
           <Route path="/subscribe" element={<SubscribeRoute />} />
           <Route path="/login" element={<AuthRoute />} />
