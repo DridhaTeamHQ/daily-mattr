@@ -88,6 +88,43 @@ function TopicCard({ topic, onOpen }) {
   )
 }
 
+// Shimmer placeholder for Trending Topics rail matching the horizontal poster card layout
+export function TopicRailSkeleton() {
+  return (
+    <section className="mx-auto max-w-[1440px] px-4 sm:px-8" aria-hidden="true">
+      <div className="mb-[14px] flex items-center gap-[16px]">
+        <div className="skeleton-shimmer-dark h-[22px] sm:h-[28px] w-[170px] rounded-[6px]" />
+        <div className="h-px flex-1 bg-lm-200" />
+      </div>
+      <div className="flex gap-[8px] overflow-hidden pb-[8px]">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className="relative flex h-[240px] w-[258px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#141417] p-[16px] sm:h-[260px] sm:w-[296px]"
+          >
+            <div className="skeleton-shimmer-dark absolute inset-0 opacity-20" />
+            <div className="relative z-[1] flex items-center justify-between">
+              <div className="flex items-center gap-[8px]">
+                <span className="h-[14px] w-[3px] rounded-full bg-[#FF3B30]" />
+                <span className="font-roboto text-[12px] font-bold tracking-[0.1em] text-white/50" style={rb}>Trending</span>
+              </div>
+              <span className="font-roboto text-[16px] text-white/40">↗</span>
+            </div>
+            <div className="relative z-[1] flex flex-col gap-[8px]">
+              <div className="h-[20px] w-full rounded bg-white/20" />
+              <div className="h-[20px] w-3/4 rounded bg-white/20" />
+              <div className="mt-[4px] flex items-center justify-between">
+                <div className="h-[12px] w-[90px] rounded bg-white/15" />
+                <div className="h-[12px] w-[75px] rounded bg-white/15" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default function LmTopicRail({ topics = [], onOpen }) {
   const scrollerRef = useRef(null)
   const [atStart, setAtStart] = useState(true)

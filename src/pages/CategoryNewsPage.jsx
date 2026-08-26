@@ -5,7 +5,7 @@ import LmCategoryHero from '../components/lm/LmCategoryHero'
 import LmCategoryBar from '../components/lm/LmCategoryBar'
 import LmArticleFeed from '../components/lm/LmArticleFeed'
 import LmNewsStudio from '../components/lm/LmNewsStudio'
-import LmTopicRail from '../components/lm/LmTopicRail'
+import LmTopicRail, { TopicRailSkeleton } from '../components/lm/LmTopicRail'
 import LmTopicTimeline from '../components/lm/LmTopicTimeline'
 import LmFaq from '../components/lm/LmFaq'
 import LmFooter from '../components/lm/LmFooter'
@@ -133,9 +133,13 @@ export default function CategoryNewsPage() {
       )}
       {/* Trending topics ride above the section toolbar: the rail is the front
           page's opening act, the filter bar sticks once you scroll past it. */}
-      {slug === 'general' && visibleTopics.length > 0 && (
+      {slug === 'general' && (
         <div className="pb-[20px] pt-[10px] sm:pb-[28px] sm:pt-[12px]">
-          <LmTopicRail topics={visibleTopics} onOpen={setOpenTopic} />
+          {loading && visibleTopics.length === 0 ? (
+            <TopicRailSkeleton />
+          ) : visibleTopics.length > 0 ? (
+            <LmTopicRail topics={visibleTopics} onOpen={setOpenTopic} />
+          ) : null}
         </div>
       )}
       <LmCategoryBar

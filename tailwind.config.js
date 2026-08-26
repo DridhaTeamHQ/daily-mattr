@@ -17,6 +17,7 @@ export default {
         lm: {
           0: '#FFFFFF',
           50: '#FAFAFB',
+          100: '#F2F2F7',
           200: '#E5E5EA',
           300: '#D1D1D6',
           400: '#B8B8C0',

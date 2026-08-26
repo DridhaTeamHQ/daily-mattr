@@ -349,6 +349,139 @@ function Block({ items, onOpen, fullStories }) {
   )
 }
 
+// Skeleton loader for category news feed matching the exact Figma 2-column card grid
+export function ArticleFeedSkeleton() {
+  return (
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[40px] px-4 py-[32px] sm:gap-[64px] sm:px-8 sm:py-[48px] lg:px-[32px]" aria-hidden="true">
+      <div>
+        {/* Date header skeleton */}
+        <div className="mb-[16px] flex items-center gap-[16px]">
+          <div className="skeleton-shimmer h-[26px] sm:h-[34px] w-[180px] sm:w-[240px] rounded-[6px]" />
+          <div className="h-px flex-1 bg-lm-200" />
+        </div>
+
+        {/* Two-column grid matching Figma / live feed */}
+        <div className="flex flex-col gap-[8px] lg:grid lg:grid-cols-[minmax(0,1.89fr)_minmax(0,1fr)]">
+          {/* Left Column (Wide) */}
+          <div className="flex flex-col gap-[8px]">
+            {/* Lead Featured Card */}
+            <div className="flex flex-col gap-[20px] rounded-[16px] border border-lm-800 bg-white p-[20px] sm:p-[32px]">
+              {/* Tags row */}
+              <div className="flex flex-wrap items-center gap-[6px]">
+                <div className="skeleton-shimmer-dark h-[22px] w-[84px] rounded-full" />
+                <div className="skeleton-shimmer h-[22px] w-[76px] rounded-full" />
+                <div className="skeleton-shimmer h-[22px] w-[64px] rounded-full" />
+              </div>
+              {/* Headline */}
+              <div className="flex flex-col gap-[10px]">
+                <div className="skeleton-shimmer-dark h-[26px] sm:h-[34px] w-11/12 rounded-[6px]" />
+                <div className="skeleton-shimmer-dark h-[26px] sm:h-[34px] w-4/5 rounded-[6px]" />
+              </div>
+              {/* Excerpt */}
+              <div className="flex flex-col gap-[8px]">
+                <div className="skeleton-shimmer h-[16px] w-full rounded-[4px]" />
+                <div className="skeleton-shimmer h-[16px] w-11/12 rounded-[4px]" />
+                <div className="skeleton-shimmer h-[16px] w-3/4 rounded-[4px]" />
+              </div>
+              {/* Source row */}
+              <div className="flex items-center gap-[8px]">
+                <div className="skeleton-shimmer size-[16px] rounded-full" />
+                <div className="skeleton-shimmer h-[14px] w-[130px] rounded-[4px]" />
+              </div>
+            </div>
+
+            {/* Second Featured Card */}
+            <div className="flex flex-col gap-[20px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[20px] sm:p-[32px]">
+              <div className="flex flex-wrap items-center gap-[6px]">
+                <div className="skeleton-shimmer-dark h-[22px] w-[84px] rounded-full" />
+                <div className="skeleton-shimmer h-[22px] w-[76px] rounded-full" />
+              </div>
+              <div className="flex flex-col gap-[10px]">
+                <div className="skeleton-shimmer-dark h-[26px] sm:h-[34px] w-full rounded-[6px]" />
+                <div className="skeleton-shimmer-dark h-[26px] sm:h-[34px] w-3/4 rounded-[6px]" />
+              </div>
+              <div className="flex flex-col gap-[8px]">
+                <div className="skeleton-shimmer h-[16px] w-full rounded-[4px]" />
+                <div className="skeleton-shimmer h-[16px] w-5/6 rounded-[4px]" />
+              </div>
+              <div className="flex items-center gap-[8px]">
+                <div className="skeleton-shimmer size-[16px] rounded-full" />
+                <div className="skeleton-shimmer h-[14px] w-[140px] rounded-[4px]" />
+              </div>
+            </div>
+
+            {/* Two Half Cards */}
+            <div className="flex flex-col gap-[8px] sm:flex-row">
+              {/* Half Card 1 */}
+              <div className="flex flex-1 flex-col gap-[14px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[20px]">
+                <div className="flex flex-wrap items-center gap-[6px]">
+                  <div className="skeleton-shimmer h-[20px] w-[64px] rounded-full" />
+                  <div className="skeleton-shimmer h-[20px] w-[54px] rounded-full" />
+                </div>
+                <div className="flex flex-col gap-[8px]">
+                  <div className="skeleton-shimmer-dark h-[20px] w-full rounded-[5px]" />
+                  <div className="skeleton-shimmer-dark h-[20px] w-4/5 rounded-[5px]" />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <div className="skeleton-shimmer h-[14px] w-full rounded-[4px]" />
+                  <div className="skeleton-shimmer h-[14px] w-2/3 rounded-[4px]" />
+                </div>
+                <div className="flex items-center gap-[8px]">
+                  <div className="skeleton-shimmer size-[16px] rounded-full" />
+                  <div className="skeleton-shimmer h-[14px] w-[90px] rounded-[4px]" />
+                </div>
+              </div>
+
+              {/* Half Card 2 */}
+              <div className="flex flex-1 flex-col gap-[14px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[20px]">
+                <div className="flex flex-wrap items-center gap-[6px]">
+                  <div className="skeleton-shimmer h-[20px] w-[64px] rounded-full" />
+                  <div className="skeleton-shimmer h-[20px] w-[54px] rounded-full" />
+                </div>
+                <div className="flex flex-col gap-[8px]">
+                  <div className="skeleton-shimmer-dark h-[20px] w-full rounded-[5px]" />
+                  <div className="skeleton-shimmer-dark h-[20px] w-3/4 rounded-[5px]" />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <div className="skeleton-shimmer h-[14px] w-full rounded-[4px]" />
+                  <div className="skeleton-shimmer h-[14px] w-4/5 rounded-[4px]" />
+                </div>
+                <div className="flex items-center gap-[8px]">
+                  <div className="skeleton-shimmer size-[16px] rounded-full" />
+                  <div className="skeleton-shimmer h-[14px] w-[100px] rounded-[4px]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column (Compact Cards) */}
+          <div className="flex flex-col gap-[8px]">
+            {[1, 2, 3].map((idx) => (
+              <div key={idx} className="flex flex-col gap-[10px] rounded-[16px] border border-[rgba(28,28,30,0.1)] bg-white p-[16px]">
+                <div className="flex flex-wrap items-center gap-[6px]">
+                  <div className="skeleton-shimmer h-[18px] w-[70px] rounded-full" />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <div className="skeleton-shimmer-dark h-[20px] w-full rounded-[5px]" />
+                  <div className="skeleton-shimmer-dark h-[20px] w-4/5 rounded-[5px]" />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <div className="skeleton-shimmer h-[14px] w-full rounded-[4px]" />
+                  <div className="skeleton-shimmer h-[14px] w-5/6 rounded-[4px]" />
+                </div>
+                <div className="flex items-center gap-[8px]">
+                  <div className="skeleton-shimmer size-[16px] rounded-full" />
+                  <div className="skeleton-shimmer h-[12px] w-[100px] rounded-[4px]" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // fullStories: General mode — cards carry the complete brief (no Read more)
 // plus the alternate-reading lens pills.
 export default function LmArticleFeed({ items = [], loading = false, emptyLabel = 'No stories here yet — check back soon.', fullStories = false }) {
@@ -388,7 +521,7 @@ export default function LmArticleFeed({ items = [], loading = false, emptyLabel 
   }, [items, fullStories])
 
   if (loading && items.length === 0) {
-    return <div className="px-[32px] py-[80px] text-center font-roboto text-[18px] text-lm-500" style={rb}>Loading stories…</div>
+    return <ArticleFeedSkeleton />
   }
   if (!loading && items.length === 0) {
     return <div className="px-[32px] py-[80px] text-center font-roboto text-[18px] text-lm-500" style={rb}>{emptyLabel}</div>

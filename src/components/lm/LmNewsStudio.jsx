@@ -148,44 +148,129 @@ function LmBreakingTicker({ items = [], onOpen }) {
   )
 }
 
-// Shimmer placeholder shaped like the front page (kicker + hero band + card
-// row), so first paint doesn't jump when the feed lands.
+// Shimmer placeholder matching the exact News Studio broadsheet front page
+// (Breaking ticker + Top stories 3-column band + Section Fronts & Masonry cards).
 function StudioSkeleton() {
-  const block = 'animate-pulse bg-lm-100'
+  const block = 'skeleton-shimmer rounded-[4px]'
+  const blockDark = 'skeleton-shimmer-dark rounded-[4px]'
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-4 py-[32px] sm:px-8 sm:py-[48px] lg:px-[32px]" aria-hidden="true">
-      <div className={`h-[12px] w-[110px] ${block}`} />
-      <div className="mt-[20px] grid gap-[28px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)_minmax(0,1fr)]">
-        <div className="order-2 flex flex-col gap-[20px] lg:order-1">
-          <div className={`aspect-video w-full ${block}`} />
-          <div className={`h-[20px] w-4/5 ${block}`} />
-          <div className={`h-[64px] w-full ${block}`} />
-        </div>
-        <div className="order-1 flex flex-col gap-[14px] lg:order-2 lg:px-[28px]">
-          <div className={`aspect-video w-full ${block}`} />
-          <div className={`h-[30px] w-11/12 ${block}`} />
-          <div className={`h-[30px] w-3/5 ${block}`} />
-          <div className={`h-[44px] w-full ${block}`} />
-        </div>
-        <div className="order-3 flex flex-col gap-[16px]">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="flex flex-col gap-[8px]">
-              <div className={`h-[16px] w-full ${block}`} />
-              <div className={`h-[12px] w-2/3 ${block}`} />
-            </div>
-          ))}
+    <>
+      {/* Broadcast ticker skeleton */}
+      <div className="relative flex h-[38px] items-stretch overflow-hidden bg-[#0F0F11]" aria-hidden="true">
+        <span className="z-[1] flex shrink-0 items-center gap-[7px] bg-[#E33B3B] px-[14px] font-roboto text-[11px] font-bold uppercase tracking-[0.09em] text-white" style={rb}>
+          <span className="size-[6px] rounded-full bg-white opacity-60" />
+          Breaking
+        </span>
+        <div className="flex flex-1 items-center gap-[24px] px-[22px]">
+          <div className="h-[12px] w-[240px] rounded bg-white/20" />
+          <div className="hidden h-[12px] w-[200px] rounded bg-white/15 md:block" />
+          <div className="hidden h-[12px] w-[220px] rounded bg-white/10 xl:block" />
         </div>
       </div>
-      <div className="mt-[44px] grid gap-[24px] sm:grid-cols-2 lg:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex flex-col gap-[10px]">
-            <div className={`aspect-video w-full ${block}`} />
-            <div className={`h-[18px] w-5/6 ${block}`} />
-            <div className={`h-[40px] w-full ${block}`} />
+
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[44px] px-4 py-[32px] sm:px-8 sm:py-[48px] lg:px-[32px]" aria-hidden="true">
+        {/* ---- Top-stories band skeleton ---- */}
+        <section>
+          <div className="mb-[20px] border-t border-lm-800 pt-[10px]">
+            <div className={`h-[13px] w-[110px] ${blockDark}`} />
           </div>
-        ))}
+          <div className="grid gap-[28px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)_minmax(0,1fr)]">
+            {/* Center Lead Story: Order 1 on mobile, Order 2 on desktop, flanked by hairlines */}
+            <div className="order-1 flex flex-col gap-[14px] lg:order-2 lg:border-x lg:border-lm-200 lg:px-[28px]">
+              <div className={`aspect-video w-full ${block}`} />
+              <div className="flex flex-col gap-[8px]">
+                <div className={`h-[28px] sm:h-[34px] w-11/12 ${blockDark}`} />
+                <div className={`h-[28px] sm:h-[34px] w-4/5 ${blockDark}`} />
+              </div>
+              <div className="flex flex-col gap-[6px]">
+                <div className={`h-[15px] w-full ${block}`} />
+                <div className={`h-[15px] w-11/12 ${block}`} />
+                <div className={`h-[15px] w-3/4 ${block}`} />
+              </div>
+              <div className="flex items-center gap-[10px]">
+                <div className={`h-[13px] w-[130px] ${block}`} />
+                <div className={`h-[18px] w-[60px] rounded-full ${block}`} />
+              </div>
+            </div>
+
+            {/* Left Column: Order 2 on mobile, Order 1 on desktop (prominent top + thumbnail bottom) */}
+            <div className="order-2 flex flex-col gap-[20px] divide-y divide-lm-200 lg:order-1 [&>*+*]:pt-[20px]">
+              {/* Prominent side story */}
+              <div className="flex flex-col gap-[10px]">
+                <div className={`aspect-video w-full ${block}`} />
+                <div className="flex flex-col gap-[6px]">
+                  <div className={`h-[20px] sm:h-[24px] w-full ${blockDark}`} />
+                  <div className={`h-[20px] sm:h-[24px] w-4/5 ${blockDark}`} />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <div className={`h-[13px] w-full ${block}`} />
+                  <div className={`h-[13px] w-2/3 ${block}`} />
+                </div>
+                <div className={`h-[12px] w-[110px] ${block}`} />
+              </div>
+              {/* Compact thumbnail row */}
+              <div className="flex gap-[12px]">
+                <div className={`h-[76px] w-[114px] shrink-0 ${block}`} />
+                <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
+                  <div className={`h-[17px] w-full ${blockDark}`} />
+                  <div className={`h-[17px] w-3/4 ${blockDark}`} />
+                  <div className={`mt-[4px] h-[12px] w-[90px] ${block}`} />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column (Headline Rail): Order 3 */}
+            <div className="order-3 flex flex-col divide-y divide-lm-200">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex flex-col gap-[6px] py-[16px] first:pt-0 last:pb-0">
+                  <div className={`h-[17px] w-full ${blockDark}`} />
+                  <div className={`h-[17px] w-4/5 ${blockDark}`} />
+                  <div className={`h-[13px] w-11/12 ${block}`} />
+                  <div className={`mt-[2px] h-[12px] w-[100px] ${block}`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---- Section Fronts & Masonry skeleton below the band ---- */}
+        <section>
+          <div className="mb-[20px] border-t border-lm-800 pt-[10px]">
+            <div className={`h-[13px] w-[180px] ${blockDark}`} />
+          </div>
+
+          <div className="mb-[36px]">
+            <div className="mb-[16px] flex items-center gap-[12px]">
+              <div className="skeleton-shimmer h-[13px] w-[90px] rounded-[3px]" />
+              <div className="h-px flex-1 bg-lm-200" />
+            </div>
+            <div className="grid gap-[20px] sm:grid-cols-2 lg:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex flex-col gap-[10px] border-b border-lm-200 pb-[16px]">
+                  <div className={`aspect-video w-full ${block}`} />
+                  <div className="flex flex-col gap-[6px]">
+                    <div className={`h-[19px] w-full ${blockDark}`} />
+                    <div className={`h-[19px] w-4/5 ${blockDark}`} />
+                  </div>
+                  <div className="flex flex-col gap-[4px]">
+                    <div className={`h-[13px] w-full ${block}`} />
+                    <div className={`h-[13px] w-5/6 ${block}`} />
+                  </div>
+                  <div className="mt-[2px] flex gap-[6px]">
+                    <div className={`h-[22px] w-[80px] rounded-full ${block}`} />
+                    <div className={`h-[22px] w-[65px] rounded-full ${block}`} />
+                  </div>
+                  <div className="mt-[4px] flex items-center justify-between">
+                    <div className={`h-[12px] w-[90px] ${block}`} />
+                    <div className={`h-[12px] w-[60px] ${block}`} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   )
 }
 

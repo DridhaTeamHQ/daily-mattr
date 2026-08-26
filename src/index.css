@@ -59,3 +59,31 @@
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* Skeleton shimmer animation */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f2f2f7 0%, #e5e5ea 50%, #f2f2f7 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+.skeleton-shimmer-subtle {
+  background: linear-gradient(90deg, #f7f7f9 0%, #ebebef 50%, #f7f7f9 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+.skeleton-shimmer-dark {
+  background: linear-gradient(90deg, #e5e5ea 0%, #d1d1d6 50%, #e5e5ea 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
