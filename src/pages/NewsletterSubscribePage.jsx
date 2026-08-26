@@ -109,7 +109,7 @@ export default function NewsletterSubscribePage() {
               <p className="relative mt-10 text-[13px] font-medium text-white/80">No doomscrolling. No clutter. Unsubscribe whenever.</p>
             </aside>
 
-            <div className="p-6 sm:p-10 lg:p-11">
+            <div className="flex min-h-[300px] items-center p-6 sm:p-10 lg:p-11">
               {done ? (
                 <div className="flex min-h-[440px] flex-col items-center justify-center text-center">
                   <span className="flex size-20 items-center justify-center rounded-full border-2 border-lm-800 bg-[#AEEDE0] text-4xl shadow-[4px_4px_0_#1c1c1e]">🎉</span>
@@ -118,7 +118,7 @@ export default function NewsletterSubscribePage() {
                   <button type="button" onClick={() => setDone(false)} className="mt-7 rounded-full border-2 border-lm-800 px-5 py-2.5 text-[14px] font-semibold shadow-[2px_2px_0_#1c1c1e] transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">Add another email</button>
                 </div>
               ) : (
-                <form onSubmit={submit}>
+                <form onSubmit={submit} className="w-full">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block text-[13px] font-semibold text-lm-700">First name <span className="font-normal text-lm-400">(optional)</span>
                       <input value={name} onChange={(event) => setName(event.target.value)} placeholder="What should we call you?" className="mt-2 w-full rounded-xl border-2 border-lm-200 bg-[#fffdf8] px-4 py-3 text-[14px] outline-none transition focus:border-lm-800" />
