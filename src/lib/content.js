@@ -1,6 +1,7 @@
-// Live content layer — reads APPROVED content straight from the email agent's
-// Supabase `articles` table, so anything the team approves (and any edits they
-// make via edited_title / edited_summary) shows on the site automatically.
+// Live content layer — reads completed content straight from the email agent's
+// safe public feed, so every successfully summarized article appears on the
+// site without waiting for email approval. Editor changes still win through
+// edited_title / edited_summary when present.
 //
 // The agent funnels everything into one table:
 //   • Topic short articles -> category in Real Estate / Automobile /
@@ -8,7 +9,7 @@
 //                             (kind: 'article')
 //   • General news         -> category null, topic in India/World/Business/...
 // Long reads per topic come from editorial_drafts (kind: 'feature').
-// We only ever read status in ('approved','sent') — drafts/pending never show.
+// We read status in ('summarized','approved','sent'); pending/rejected never show.
 
 import { supabase } from './supabaseClient'
 
@@ -134,19 +135,25 @@ const SELECT_BASE =
 // Fact check + alternate versions arrived later; fall back to the base list if
 // the DB migration hasn't been applied yet so the feed never breaks on deploy order.
 const SELECT = `${SELECT_BASE},fact_score,fact_label,fact_notes,versions,image_url`
+const PUBLIC_ARTICLES_RELATION = 'public_articles_feed'
+const PUBLIC_STATUSES = ['summarized', 'approved', 'sent']
 
 const missingColumn = (error) => error && /column|does not exist/i.test(error.message || '')
 
-// Every approved item, newest first.
+// Every completed item, newest first. Fall back to the base table during a
+// staggered deploy; its RLS will continue exposing only the previously public
+// rows until the safe feed view migration lands.
 export async function fetchApproved() {
-  const query = (cols) => supabase
-    .from('articles')
+  const query = (relation, cols) => supabase
+    .from(relation)
     .select(cols)
-    .in('status', ['approved', 'sent'])
-    .order('reviewed_at', { ascending: false, nullsFirst: false })
+    .in('status', PUBLIC_STATUSES)
     .order('scraped_at', { ascending: false })
-  let { data, error } = await query(SELECT)
-  if (missingColumn(error)) ({ data, error } = await query(SELECT_BASE))
+  let { data, error } = await query(PUBLIC_ARTICLES_RELATION, SELECT)
+  if (error && /relation|schema cache|could not find/i.test(error.message || '')) {
+    ({ data, error } = await query('articles', SELECT))
+  }
+  if (missingColumn(error)) ({ data, error } = await query(PUBLIC_ARTICLES_RELATION, SELECT_BASE))
   if (error) throw error
   return (data || []).map(normalize)
 }
@@ -157,18 +164,21 @@ export async function fetchApprovedByCategory(slug) {
   return all.filter((a) => a.slug === slug)
 }
 
-// Specific approved/sent articles by id — used by the trending-topic timeline,
+// Specific completed articles by id — used by the trending-topic timeline,
 // whose members can be older than the fetchApproved window. Same light SELECT
 // (with the missingColumn fallback) and the same normalize() as the main feed.
 export async function fetchArticlesByIds(ids) {
   if (!ids || !ids.length) return []
-  const query = (cols) => supabase
-    .from('articles')
+  const query = (relation, cols) => supabase
+    .from(relation)
     .select(cols)
     .in('id', ids)
-    .in('status', ['approved', 'sent'])
-  let { data, error } = await query(SELECT)
-  if (missingColumn(error)) ({ data, error } = await query(SELECT_BASE))
+    .in('status', PUBLIC_STATUSES)
+  let { data, error } = await query(PUBLIC_ARTICLES_RELATION, SELECT)
+  if (error && /relation|schema cache|could not find/i.test(error.message || '')) {
+    ({ data, error } = await query('articles', SELECT))
+  }
+  if (missingColumn(error)) ({ data, error } = await query(PUBLIC_ARTICLES_RELATION, SELECT_BASE))
   if (error) throw error
   return (data || []).map(normalize)
 }
